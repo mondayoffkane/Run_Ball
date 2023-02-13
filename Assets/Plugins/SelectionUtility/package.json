@@ -1,0 +1,7 @@
+{
+  "name": "com.nementic.selection-utility",
+  "version": "1.0.2",
+  "displayName": "Selection Utility",
+  "description": "A lightweight tool which facilitates selecting GameObjects in the Scene view by displaying a context menu with all objects currently under the mouse cursor.",
+  "unity": "2018.4"
+}

@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+    stages {
+        # YOUR_JENKINS_ITEM_NAME => Jenkins item 이름으로 바꿀것 // jenkins 화면에서 dashboard 에 보이는 Name
+        # YOUR_GAME_NAME => 게임 이름으로 바꿀것  // project setting -> player -> product name
+        # YOUR_APPLEID => 자신의 애플아이디  // https://appleid.apple.com/account/manage   id   예시 ) mondayoff.jerry@gmail.com
+        # YOUR_APPID => 자신의 애플 앱 암호  // https://appleid.apple.com/account/manage    로그인 > 앱 암호 > 암호 + > 적당한 이름 입력 후 생성된 패스워드를 입력   예시 ) rfcu-fgyg-jeiw-guzb
+        stage('iOSBuild') {
+            steps {
+                 sh '''
+		          rm -rf Builds
+                  echo "Unity Build starting..."
+                  /Applications/Unity/Hub/Editor/2021.3.25f1/Unity.app/Contents/MacOS/Unity  -quit -batchmode -projectPath . -executeMethod  AutoBuilder.PerformBuildIOS  -buildTarget ios  -nographics  -stackTraceLogType Full    --silent-crashes
+                  echo "Unity Build finished..."
+                  '''
+            }
+        }
+        # Third party를 사용하지 않아 pod 사용하지 않는경우에는 주석 풀어주세요
+        # stage('podInit') {
+        #     steps {
+        #         sh '''
+		#         echo "podInit"
+	    #         cd '/Users/build/.jenkins/workspace/YOUR_JENKINS_ITEM_NAME/Builds/iOS'
+		#         pod init
+        #         echo "podInit finished..."
+        #         '''
+        #     }
+        # }
+        stage('podInstall') {
+            steps {
+                sh '''
+		        echo "podInstall"
+	            cd '/Users/build/.jenkins/workspace/YOUR_JENKINS_ITEM_NAME/Builds/iOS'
+		        pod install
+                echo "podInstall finished..."
+                '''
+            }
+        }
+        stage('iOSClean') {
+            steps {
+                sh '''
+		        echo "xCode Clean Project starting..."
+	            cd '/Users/build/.jenkins/workspace/YOUR_JENKINS_ITEM_NAME/Builds/iOS'
+		        /usr/bin/xcodebuild -workspace Unity-iPhone.xcworkspace -scheme Unity-iPhone -sdk iphoneos -configuration Release clean
+                echo "xCode Clean Project finished..."
+                '''
+            }
+        }
+        stage('iOSArch') {
+            steps {
+                sh '''
+                echo "Create Archive starting..."
+                cd '/Users/build/.jenkins/workspace/YOUR_JENKINS_ITEM_NAME/Builds/iOS'
+      	        /usr/bin/xcodebuild  -workspace Unity-iPhone.xcworkspace -scheme Unity-iPhone -sdk iphoneos -configuration Release archive -archivePath '../ios-build/YOUR_GAME_NAME.xcarchive' clean
+                echo "Create Archive finished..."
+                '''
+            }
+        }
+        stage('iOSipa') {
+            steps {
+                sh '''
+                echo "Create ipa starting..."
+                cd '/Users/build/.jenkins/workspace/YOUR_JENKINS_ITEM_NAME/Builds/ios-build'
+                /usr/bin/xcodebuild  -exportArchive -archivePath 'YOUR_GAME_NAME.xcarchive'  -exportPath '.' -allowProvisioningUpdates -exportOptionsPlist '../../ios-conf/exportOptions.plist' 
+                echo "Create ipa finished..."
+                '''
+            }
+        }
+        stage('iOSTestFlight') {
+            steps {
+                sh '''
+                echo "TesfFlight upload starting"
+                cd '/Users/build/.jenkins/workspace/YOUR_JENKINS_ITEM_NAME/Builds/ios-build'
+                /usr/bin/xcrun altool --upload-app --type ios --file YOUR_GAME_NAME.ipa --username YOUR_APPLEID --password YOUR_APPID
+                echo "TesfFlight upload completed"    
+                '''
+            }
+        }
+    }
+}

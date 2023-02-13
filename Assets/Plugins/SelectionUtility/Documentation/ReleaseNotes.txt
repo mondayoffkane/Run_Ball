@@ -1,0 +1,33 @@
+# Changelog
+All notable changes to this package will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+
+## [1.2.0]
+### Added
+- SelectionPopupExtensions class to allow adding a custom filter tab to the toolbar.
+
+### Fixed
+- Minor pixel-pushing for improved layout of popup elements.
+
+## [1.1.0]
+### Added
+- Escape key closes the popup.
+- Support contact in Readme.
+- User preference to show duplicate icons (disabled by default).
+- User preference to show missing script icons (enabled by default).
+- User preference to enable and configure the new outline feature.
+- When hovering over an item in the popup the GameObject will be highlighted
+  with a colored outline in the scene view. Works for 3D objects and 2D Sprites
+  and only with the builtin render pipeline. Unity UI objects are not outlined
+  and the feature is not supported when using the Universal or High Definition Render Pipeline.
+- Filter modes toolbar: [All, 3D, 2D, UI] reduces the shown item list to those that
+  contain MeshRenderer, SpriteRenderer, or RectTransform components.
+
+### Changed
+- Missing script icons are now shown by default.
+
+## [1.0.0]
+### Added
+- Initial release of the tool.

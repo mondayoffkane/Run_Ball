@@ -1,0 +1,16 @@
+{
+    "name": "Nementic.SelectionUtility.Editor",
+    "references": [
+        "Nementic.SelectionUtility.Runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": []
+}
