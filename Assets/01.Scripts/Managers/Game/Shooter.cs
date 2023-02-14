@@ -59,10 +59,10 @@ public class Shooter : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Col");
+        //Debug.Log("Col");
         if (other.CompareTag("Ball"))
         {
-            Debug.Log("Col Ball");
+            //Debug.Log("Col Ball");
             other.GetComponent<Rigidbody>().velocity = Vector3.zero;
             other.transform.DOMove(transform.position, 0.2f);
             Ball_Queue.Enqueue(other.GetComponent<Rigidbody>());

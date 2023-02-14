@@ -10,6 +10,8 @@ TagManager:
   - Cam_Pos2
   - Child
   - Ball
+  - Point
+  - Pin
   layers:
   - Default
   - TransparentFX
@@ -18,7 +20,7 @@ TagManager:
   - Water
   - UI
   - Ball
-  - 
+  - Point
   - 
   - 
   - 
