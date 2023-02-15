@@ -72,7 +72,7 @@ public class PoolManager
         Object.DontDestroyOnLoad(_root);
     }
     ///<summary>Pool을 만들고 Dic에 추가함</summary>
-    public void CreatePool(GameObject original, int count = 5)
+    public void CreatePool(GameObject original, int count = 1)
     {
         Pool pool = new Pool();
         pool.Init(original, count);

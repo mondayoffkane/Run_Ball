@@ -25,7 +25,6 @@ public class Pin : MonoBehaviour
     public PinType pinType;
 
 
-    public double Price;
 
     // ===============================
 

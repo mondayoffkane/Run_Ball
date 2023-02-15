@@ -12,6 +12,10 @@ TagManager:
   - Ball
   - Point
   - Pin
+  - Obj
+  - isNotReady
+  - Stone
+  - IncomeText
   layers:
   - Default
   - TransparentFX

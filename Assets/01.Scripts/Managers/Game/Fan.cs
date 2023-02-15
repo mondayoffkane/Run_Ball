@@ -8,6 +8,11 @@ public class Fan : MonoBehaviour
 
 
 
+    private void Start()
+    {
+        GetComponent<Renderer>().enabled = false;
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Ball"))

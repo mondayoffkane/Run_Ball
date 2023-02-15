@@ -5,9 +5,6 @@ using Sirenix.OdinInspector;
 
 public class GridManager : MonoBehaviour
 {
-
-
-
     public class LimitSize
     {
         public float Top = 13;
@@ -18,22 +15,31 @@ public class GridManager : MonoBehaviour
     [ShowInInspector]
     public LimitSize limitSize;
 
-
-
-
     public float Offset_X = 3f, Offset_Y = 3f;
 
 
+
+
+
+
     public GameObject Point;
+
+    public Shooter _shooter;
+
 
     [SerializeField] int X, Y;
 
     public GameObject Object_Pref;
 
 
+
     private void Start()
     {
         Managers.Game._gridManager = this;
+        if (_shooter == null)
+        {
+            _shooter = transform.GetComponentInChildren<Shooter>();
+        }
     }
 
     [Button]

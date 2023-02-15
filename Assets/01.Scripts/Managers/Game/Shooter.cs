@@ -13,13 +13,17 @@ public class Shooter : MonoBehaviour
 
     [ShowInInspector]
     public Queue<Rigidbody> Ball_Queue;
-
+    [SerializeField] GameObject Ball_Pref;
     // Start is called before the first frame update
     void Start()
     {
         Ball_Queue = new Queue<Rigidbody>();
 
         StartCoroutine(Cor_Shoot());
+        Ball_Pref = Resources.Load<GameObject>("Ball");
+
+        //Managers.Pool.CreatePool(Ball_Pref);
+
     }
 
     // Update is called once per frame
@@ -27,9 +31,7 @@ public class Shooter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            Rigidbody _ball = Instantiate(Resources.Load<GameObject>("Ball")).GetComponent<Rigidbody>();
-            _ball.transform.position = transform.position + Vector3.up * 2f;
-            _ball.velocity = Vector3.up * Random.Range(Force * 0.8f, Force * 1.2f);
+            AddBall();
         }
 
 
@@ -45,8 +47,15 @@ public class Shooter : MonoBehaviour
             if (Ball_Queue.Count > 0)
             {
                 Rigidbody _rb = Ball_Queue.Dequeue().GetComponent<Rigidbody>();
-
-                _rb.AddForce(Vector3.up * Power);
+                if (_rb.GetComponent<Ball>().isReady == true)
+                {
+                    //_rb.GetComponent<Ball>().isReady = false;
+                    DOTween.Kill(_rb);
+                    _rb.velocity = Vector3.zero;
+                    _rb.angularVelocity = Vector3.zero;
+                    _rb.isKinematic = false;
+                    _rb.AddForce(Vector3.up * Power);
+                }
             }
 
 
@@ -55,17 +64,27 @@ public class Shooter : MonoBehaviour
         }
     }
 
+    public void AddBall()
+    {
+        Rigidbody _ball = Managers.Pool.Pop(Ball_Pref).GetComponent<Rigidbody>(); // Instantiate(Ball_Pref).GetComponent<Rigidbody>();
+        _ball.transform.position = transform.position + Vector3.up * 2f;
+        //_ball.velocity = Vector3.up * Force /*Random.Range(Force * 0.8f, Force * 1.2f)*/;
+        _ball.AddForce(Vector3.up * Power);
+    }
 
 
     private void OnTriggerEnter(Collider other)
     {
-        //Debug.Log("Col");
         if (other.CompareTag("Ball"))
         {
-            //Debug.Log("Col Ball");
-            other.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            other.transform.DOMove(transform.position, 0.2f);
-            Ball_Queue.Enqueue(other.GetComponent<Rigidbody>());
+            if (other.GetComponent<Ball>().isReady == false)
+            {
+                other.GetComponent<Ball>().isReady = true;
+                other.GetComponent<Rigidbody>().isKinematic = true;
+                other.transform.position = transform.position;
+                //other.transform.DOMove(transform.position, 0.1f);
+                Ball_Queue.Enqueue(other.GetComponent<Rigidbody>());
+            }
         }
     }
 }
