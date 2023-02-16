@@ -14158,10 +14158,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Offset_X: 2.4
   Offset_Y: 2.4
-  Point: {fileID: 9180895871384503841, guid: c4863bcb4ec7649c6a4d816f70a3cfbe, type: 3}
-  X: 5
-  Y: 7
   Object_Pref: {fileID: 8051181890021365198, guid: f616417733c5d4b50bfbc15b4c27ab37, type: 3}
+  Point: {fileID: 9180895871384503841, guid: c4863bcb4ec7649c6a4d816f70a3cfbe, type: 3}
+  _shooter: {fileID: 0}
+  addBall_BasePrice: 10
+  mergeBalls_BasePrice: 40
+  addPin_BasePrice: 30
 --- !u!1 &4272210211201275757
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,7 @@
 using UnityEngine;
 using Sirenix.OdinInspector;
+using System.Collections.Generic;
+
 public class GameManager : SerializedMonoBehaviour
 {
     public JoyStickController joyStickController;//{ private get; set; }
@@ -17,40 +19,44 @@ public class GameManager : SerializedMonoBehaviour
     }
 
 
-    public Mesh[] NumberMeshs;
-
     public bool isPick = false;
+    Transform Pick_Obj;
+    Vector3 mousePos;
+    Vector3 dir;
+    RaycastHit[] hits;
 
-    public Transform Pick_Obj;
+    Transform Temp_Pin;
+    Transform Temp_Prev_Point;
+    Transform Temp_Next_Point;
 
-    public Vector3 mousePos;
-    public Vector3 dir;
-
-    [SerializeField] RaycastHit[] hits;
-
-    public Transform Temp_Pin;
-    public Transform Temp_Prev_Point;
-    public Transform Temp_Next_Point;
-
-    public GridManager _gridManager;
-
-    public double Money;
     static readonly string[] CurrencyUnits = new string[] { "", "K", "M", "B", "T", "aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "ii", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak", "al", "am", "an", "ao", "ap", "aq", "ar", "as", "at", "au", "av", "aw", "ax", "ay", "az", "ba", "bb", "bc", "bd", "be", "bf", "bg", "bh", "bi", "bj", "bk", "bl", "bm", "bn", "bo", "bp", "bq", "br", "bs", "bt", "bu", "bv", "bw", "bx", "by", "bz", "ca", "cb", "cc", "cd", "ce", "cf", "cg", "ch", "ci", "cj", "ck", "cl", "cm", "cn", "co", "cp", "cq", "cr", "cs", "ct", "cu", "cv", "cw", "cx", };
 
-    public GameObject[] Stages;
-    public int Max_Stage = 3;
+    GameObject[] Stages;
+    int Max_Stage = 3;
+
+    List<Ball> ballList;
+    List<Ball> tempMergeBalls;
+    int[] ballLevelCount;
+
+    public GridManager _gridManager;
     public Shooter _currentShooter;
+    public double Money;
+
+    public int addBall_Level = 1;
+    public int mergeBalls_Level = 1;
+    public int addPin_Level = 1;
+
 
     // ===================================
     public void Init()
     {
-        NumberMeshs = new Mesh[10];
-        for (int i = 0; i < 10; i++)
-        {
-            NumberMeshs[i] = Resources.Load<Mesh>("Number/" + i);
-        }
+        ballList = new List<Ball>();
+        tempMergeBalls = new List<Ball>();
+        ballLevelCount = new int[10];
 
         InitStage();
+
+
 
     }
     public void Clear()
@@ -82,10 +88,40 @@ public class GameManager : SerializedMonoBehaviour
         GameObject _stage = Stages[_level % Max_Stage];
         _stage.SetActive(true);
 
-        _currentShooter = _stage.GetComponent<GridManager>()._shooter;
+        //_currentShooter = _stage.GetComponent<GridManager>()._shooter;
+        ballList.Clear();
+        ballLevelCount = new int[10];
+
+        addBall_Level = 1;
+        mergeBalls_Level = 1;
+        addPin_Level = 1;
+
 
     }
 
+    public void StartStage()
+    {
+        // 스테이지 시작시 최초 1회 제공
+        for (int i = 0; i < 2; i++)
+        {
+            Ball _newBall = _currentShooter.AddBall();
+            ballList.Add(_newBall);
+            _newBall.Init();
+            CheckMergeList(); // 위치 변경 예정 , 돈 체크도 같이 해야함
+        }
+
+        for (int i = 0; i < 1; i++)
+        {
+            if (_gridManager.Pin_Pref == null) _gridManager.Pin_Pref = Resources.Load<GameObject>("Pin");
+
+            Transform _pin = Instantiate(_gridManager.Pin_Pref).transform;
+            Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
+            _point.Fix_Pin = _pin;
+            _pin.transform.position = _point.transform.position;
+            _pin.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
+            _pin.GetComponent<Pin>().Prev_Point = _point.transform;
+        }
+    }
 
 
     private void Update()
@@ -93,12 +129,7 @@ public class GameManager : SerializedMonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            Transform _obj = Instantiate(_gridManager.Object_Pref).transform;
-            Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
-            _point.Fix_Pin = _obj;
-            _obj.transform.position = _point.transform.position;
-            _obj.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
-            _obj.GetComponent<Pin>().Prev_Point = _point.transform;
+            AddPin();
 
         }
 
@@ -291,8 +322,113 @@ public class GameManager : SerializedMonoBehaviour
 
     public void AddBall()
     {
-        _currentShooter.AddBall();
+        Money -= _gridManager.addBall_BasePrice * addBall_Level;
+        addBall_Level++;
+
+        Ball _newBall = _currentShooter.AddBall();
+        ballList.Add(_newBall);
+        _newBall.Init();
+
+        CheckMergeList(); // 위치 변경 예정 , 돈 체크도 같이 해야함
+
+        MoneyUpdate();
+
+
     }
 
+    public void MergeBalls()
+    {
+
+        Money -= _gridManager.mergeBalls_BasePrice * mergeBalls_Level;
+        mergeBalls_Level++;
+
+        int tempLevel = 0;
+        foreach (Ball _ball in tempMergeBalls)
+        {
+            tempLevel = _ball.Level;
+            Managers.Pool.Push(_ball.GetComponent<Poolable>());
+            ballList.Remove(_ball);
+        }
+        tempMergeBalls.Clear();
+        Ball _newBall = _currentShooter.AddBall();
+        _newBall.Init(tempLevel + 1);
+        ballList.Add(_newBall);
+        _currentShooter.MergeShoot(_newBall);
+        CheckMergeList();
+
+
+    }
+
+    public void AddPin()
+    {
+        Money -= _gridManager.addPin_BasePrice * addPin_Level;
+        addPin_Level++;
+
+        Transform _obj = Instantiate(_gridManager.Pin_Pref).transform;
+        Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
+        _point.Fix_Pin = _obj;
+        _obj.transform.position = _point.transform.position;
+        _obj.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
+        _obj.GetComponent<Pin>().Prev_Point = _point.transform;
+    }
+
+    public void CheckMergeList()
+    {
+        for (int i = 0; i < ballLevelCount.Length; i++)
+        {
+            ballLevelCount[i] = 0;
+        }
+
+        foreach (Ball _ball in ballList)
+        {
+            ballLevelCount[_ball.Level]++;
+        }
+
+        for (int level = 0; level < ballLevelCount.Length; level++)
+        {
+            if (ballLevelCount[level] >= 3)
+            {
+                foreach (Ball _ball in ballList)
+                {
+                    if (_ball.Level == level && tempMergeBalls.Count < 3)
+                    {
+                        tempMergeBalls.Add(_ball);
+                    }
+                }
+                break;
+            }
+        }
+
+    }
+
+    public void MoneyUpdate()
+    {
+        Managers._uiGameScene.MoneyText.text = $"${ToCurrencyString(Money)}";
+        CheckButtons();
+    }
+
+    public void CheckButtons()
+    {
+        // 버튼 텍스트 업데이트
+        Managers._uiGameScene.AddBallText.text = $"${_gridManager.addBall_BasePrice * addBall_Level}";
+        Managers._uiGameScene.MergeBallsText.text = $"${_gridManager.mergeBalls_BasePrice * mergeBalls_Level}";
+        Managers._uiGameScene.AddPinText.text = $"${_gridManager.addPin_BasePrice * addPin_Level}";
+
+
+        // 금액 비교후 버튼 활성화 결정
+
+        Managers._uiGameScene.AddBall_Button.interactable
+            = Money >= _gridManager.addBall_BasePrice * addBall_Level ? true : false;
+
+        Managers._uiGameScene.MergeBalls_Button.interactable
+             = (Money >= _gridManager.mergeBalls_BasePrice * mergeBalls_Level)
+             && (tempMergeBalls.Count >= 3) ? true : false;
+
+        Managers._uiGameScene.AddPin_Button.interactable
+        = Money >= _gridManager.addPin_BasePrice * addPin_Level ? true : false;
+
+
+
+    }
 
 }

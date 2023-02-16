@@ -7,16 +7,29 @@ public class Ball : MonoBehaviour
     public bool isReady = false;
 
     public double Price;
-    public int index;
+
     public int Level;
+    //public Material[] Mats;
 
-   
-
-    public void Init(int _index, int _level = 0, int _price = 1)
+    [SerializeField] Renderer _renderer;
+    //public Material _mat;
+    private void Start()
     {
-        index = _index;
+        _renderer = GetComponent<Renderer>();
+    }
+
+
+
+    public void Init(int _level = 0, int _basePrice = 5)
+    {
+
         Level = _level;
-        Price = _price;
+
+        Price = Level == 0 ? 1 : _basePrice * Mathf.Pow(3, Level-1);
+
+        //_mat = Resources.Load<Material>("Material/" + Level) as Material;
+        if (_renderer == null) _renderer = GetComponent<Renderer>();
+        _renderer.sharedMaterial = Resources.Load<Material>("Material/" + Level) as Material;
 
     }
 
@@ -29,5 +42,5 @@ public class Ball : MonoBehaviour
         }
     }
 
-   
+
 }

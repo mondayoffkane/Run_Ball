@@ -14,30 +14,20 @@ public class Shooter : MonoBehaviour
     [ShowInInspector]
     public Queue<Rigidbody> Ball_Queue;
     [SerializeField] GameObject Ball_Pref;
-    // Start is called before the first frame update
+
     void Start()
     {
         Ball_Queue = new Queue<Rigidbody>();
 
         StartCoroutine(Cor_Shoot());
-        Ball_Pref = Resources.Load<GameObject>("Ball");
+        if (Ball_Pref == null)
+            Ball_Pref = Resources.Load<GameObject>("Ball");
 
         //Managers.Pool.CreatePool(Ball_Pref);
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            AddBall();
-        }
 
-
-
-
-    }
 
     IEnumerator Cor_Shoot()
     {
@@ -49,7 +39,6 @@ public class Shooter : MonoBehaviour
                 Rigidbody _rb = Ball_Queue.Dequeue().GetComponent<Rigidbody>();
                 if (_rb.GetComponent<Ball>().isReady == true)
                 {
-                    //_rb.GetComponent<Ball>().isReady = false;
                     DOTween.Kill(_rb);
                     _rb.velocity = Vector3.zero;
                     _rb.angularVelocity = Vector3.zero;
@@ -64,14 +53,28 @@ public class Shooter : MonoBehaviour
         }
     }
 
-    public void AddBall()
+    public Ball AddBall()
     {
+        if (Ball_Pref == null)
+            Ball_Pref = Resources.Load<GameObject>("Ball");
         Rigidbody _ball = Managers.Pool.Pop(Ball_Pref).GetComponent<Rigidbody>(); // Instantiate(Ball_Pref).GetComponent<Rigidbody>();
         _ball.transform.position = transform.position + Vector3.up * 2f;
         //_ball.velocity = Vector3.up * Force /*Random.Range(Force * 0.8f, Force * 1.2f)*/;
         _ball.AddForce(Vector3.up * Power);
+
+
+        return _ball.GetComponent<Ball>();
     }
 
+
+    public void MergeShoot(Ball _ball)
+    {
+        _ball.GetComponent<Ball>().isReady = true;
+        _ball.GetComponent<Rigidbody>().isKinematic = true;
+        _ball.transform.position = transform.position;
+        Ball_Queue.Enqueue(_ball.GetComponent<Rigidbody>());
+
+    }
 
     private void OnTriggerEnter(Collider other)
     {

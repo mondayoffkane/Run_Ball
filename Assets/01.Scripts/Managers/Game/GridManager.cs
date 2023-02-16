@@ -14,22 +14,18 @@ public class GridManager : MonoBehaviour
     }
     [ShowInInspector]
     public LimitSize limitSize;
-
     public float Offset_X = 3f, Offset_Y = 3f;
+    int X, Y;
 
-
-
-
-
+    public GameObject Pin_Pref;
 
     public GameObject Point;
-
     public Shooter _shooter;
 
-
-    [SerializeField] int X, Y;
-
-    public GameObject Object_Pref;
+    // ======================================
+    public double addBall_BasePrice = 20;
+    public double mergeBalls_BasePrice = 80;
+    public double addPin_BasePrice = 100;
 
 
 
@@ -40,6 +36,10 @@ public class GridManager : MonoBehaviour
         {
             _shooter = transform.GetComponentInChildren<Shooter>();
         }
+        Managers.Game._currentShooter = _shooter;
+        Managers.Game.MoneyUpdate();
+        Managers.Game.StartStage();
+        Pin_Pref = Resources.Load<GameObject>("Pin");
     }
 
     [Button]
@@ -90,7 +90,7 @@ public class GridManager : MonoBehaviour
                 break;
 
             case FindState.Random:
-                int _count = transform.childCount;
+                int _count = transform.childCount - 1;
 
                 for (int i = 0; i < _count; i++)
                 {

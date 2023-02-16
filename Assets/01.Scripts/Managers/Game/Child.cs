@@ -28,7 +28,7 @@ public class Child : MonoBehaviour
         transform.localScale = Vector3.zero;
         transform.DOScale(Vector3.one, 0.2f);
 
-        NumberMeshs = Managers.Game.NumberMeshs;
+        
         Digit_Objs = new Transform[3];
 
         for (int i = 0; i < 3; i++)

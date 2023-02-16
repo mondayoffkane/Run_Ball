@@ -29,7 +29,7 @@ public class Managers : MonoBehaviour
     public static SoundManager Sound => Instance._sound;
     public static UIManager UI => Instance._ui;
 
-
+    public static UI_GameScene _uiGameScene;
     public static GameManager Game => Instance._game;
 
 
@@ -102,4 +102,7 @@ public class Managers : MonoBehaviour
         }
     }
     //============Check Internet============ 지워도 됨!
+
+
+    
 }
