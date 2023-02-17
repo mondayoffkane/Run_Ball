@@ -27,10 +27,15 @@ public class Pin : MonoBehaviour
     public PinType pinType;
     public float Force = 10f;
 
-
-
+    float _time = 0.2f;
+    //Vector3 Start_Pos;
     // ===============================
 
+
+    //private void Start()
+    //{
+    //    Start_Pos = transform.position;
+    //}
 
 
 
@@ -43,7 +48,7 @@ public class Pin : MonoBehaviour
                 break;
 
             case PinType.Spring:
-                
+
                 break;
 
             case PinType.Rot:
@@ -97,8 +102,9 @@ public class Pin : MonoBehaviour
                     , 0f), 0.5f)).SetEase(Ease.Linear)
                     .OnComplete(() => Managers.Pool.Push(_floating.GetComponent<Poolable>()));
 
-            Managers.Game.Money += (double)_ball.Price;
-            Managers.Game.MoneyUpdate();
+            //Managers.Game.Money += (double)_ball.Price;
+            //Managers.Game.MoneyUpdate();
+            Managers.Game.AddMoney(_ball.Price);
             //Managers.UI.
         }
 
@@ -110,6 +116,9 @@ public class Pin : MonoBehaviour
                 break;
 
             default:
+                //transform.DOShakePosition(_time, 0.2f); // 진
+
+
                 break;
         }
     }

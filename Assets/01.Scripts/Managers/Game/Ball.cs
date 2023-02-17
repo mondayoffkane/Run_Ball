@@ -25,7 +25,8 @@ public class Ball : MonoBehaviour
 
         Level = _level;
 
-        Price = Level == 0 ? 1 : _basePrice * Mathf.Pow(3, Level-1);
+        Price = Level == 0 ? 1 * (Managers.Game.Current_Stage_Level + 1)
+            : _basePrice * Mathf.Pow(3, Level - 1) * (Managers.Game.Current_Stage_Level + 1);
 
         //_mat = Resources.Load<Material>("Material/" + Level) as Material;
         if (_renderer == null) _renderer = GetComponent<Renderer>();
@@ -40,6 +41,11 @@ public class Ball : MonoBehaviour
         {
             isReady = false;
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        GetComponent<Rigidbody>().AddTorque(Vector3.forward * Random.Range(-360f, 360f));
     }
 
 

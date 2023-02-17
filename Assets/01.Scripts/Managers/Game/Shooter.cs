@@ -9,7 +9,7 @@ public class Shooter : MonoBehaviour
 
     public float Interval = 0.1f;
     public float Power = 100f;
-    public float Force = 20f;
+
 
     [ShowInInspector]
     public Queue<Rigidbody> Ball_Queue;
@@ -60,6 +60,7 @@ public class Shooter : MonoBehaviour
         Rigidbody _ball = Managers.Pool.Pop(Ball_Pref).GetComponent<Rigidbody>(); // Instantiate(Ball_Pref).GetComponent<Rigidbody>();
         _ball.transform.position = transform.position + Vector3.up * 2f;
         //_ball.velocity = Vector3.up * Force /*Random.Range(Force * 0.8f, Force * 1.2f)*/;
+        _ball.velocity = Vector3.zero;
         _ball.AddForce(Vector3.up * Power);
 
 

@@ -16,6 +16,7 @@ TagManager:
   - isNotReady
   - Stone
   - IncomeText
+  - Shooter
   layers:
   - Default
   - TransparentFX

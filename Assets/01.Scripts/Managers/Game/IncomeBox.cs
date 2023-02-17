@@ -56,8 +56,9 @@ public class IncomeBox : MonoBehaviour
                     , 0f), 0.5f)).SetEase(Ease.Linear)
                     .OnComplete(() => Managers.Pool.Push(_floating.GetComponent<Poolable>()));
 
-            Managers.Game.Money += (double)_ball.Price * Total_Scope;
-            Managers.Game.MoneyUpdate();
+            //Managers.Game.Money += (double)_ball.Price * Total_Scope;
+            //Managers.Game.MoneyUpdate();
+            Managers.Game.AddMoney((double)(_ball.Price * Total_Scope));
             //Managers.UI.
         }
     }
