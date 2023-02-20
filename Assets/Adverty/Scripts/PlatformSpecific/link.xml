@@ -1,0 +1,6 @@
+<linker>
+    <assembly fullname="AdvertySDK" preserve="all" />
+    <assembly fullname="AdvertyPlatformSpecific">
+        <type fullname="Adverty.*" preserve="all" />
+    </assembly>
+</linker>

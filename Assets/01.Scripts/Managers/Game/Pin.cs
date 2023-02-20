@@ -21,7 +21,7 @@ public class Pin : MonoBehaviour
     {
         Diamond,
         Spring,
-        Rot
+        Rot,
 
 
     }
@@ -32,23 +32,27 @@ public class Pin : MonoBehaviour
     //Vector3 Start_Pos;
     // ===============================
 
+    AudioClip _clip;
 
     private void Start()
     {
         // transform.GetChild(0).DOScaleZ(0.5f, 0.2f).SetEase(Ease.Linear).SetLoops(2, LoopType.Yoyo);
 
         //    Start_Pos = transform.position;
-       
+        _clip = Resources.Load<AudioClip>("Sound/Ball_1");
     }
 
 
 
     public void SetPin(PinType _pintype = PinType.Diamond)
     {
+        transform.localScale = Vector3.zero;
+        transform.DOScale(Vector3.one * 1.2f, 0.5f).SetEase(Ease.OutBounce);
+
         GetComponent<Renderer>().enabled = false;
-        for (int i=0; i<transform.childCount; i++)
+        for (int i = 0; i < transform.childCount; i++)
         {
-        transform.GetChild(i).gameObject.SetActive(false);
+            transform.GetChild(i).gameObject.SetActive(false);
         }
 
         transform.GetChild((int)_pintype).gameObject.SetActive(true);
@@ -121,10 +125,20 @@ public class Pin : MonoBehaviour
             //Managers.Game.MoneyUpdate();
             Managers.Game.AddMoney(_ball.Price);
             //Managers.UI.
+
+            Managers.Sound.Play(_clip);
         }
 
         switch (pinType)
         {
+
+            case PinType.Diamond:
+                DOTween.Kill(transform.GetChild(0));
+                DOTween.Sequence().Append(transform.GetChild(0).DOScale(Vector3.one* 0.5f, 0.1f).SetEase(Ease.Linear))
+                    .Append(transform.GetChild(0).DOScale(Vector3.one * 0.68f, 0.1f).SetEase(Ease.Linear));
+                break;
+
+
             case PinType.Spring:
                 Rigidbody _rb = collision.transform.GetComponent<Rigidbody>();
                 _rb.velocity = new Vector3(_rb.velocity.x, Force, 0f);
@@ -133,6 +147,12 @@ public class Pin : MonoBehaviour
                 //transform.GetChild(0).DOScaleZ(0.5f, 0.2f).SetEase(Ease.Linear).SetLoops(2, LoopType.Yoyo);
                 DOTween.Sequence().Append(transform.GetChild(1).DOScaleZ(0.5f, 0.1f).SetEase(Ease.Linear))
                     .Append(transform.GetChild(1).DOScaleZ(1f, 0.1f).SetEase(Ease.Linear));
+                break;
+
+            case PinType.Rot:
+                DOTween.Kill(transform.GetChild(2));
+                DOTween.Sequence().Append(transform.GetChild(2).DOScale(Vector3.one * 1.1f, 0.1f).SetEase(Ease.Linear))
+                    .Append(transform.GetChild(2).DOScale(Vector3.one * 1.3f, 0.1f).SetEase(Ease.Linear));
                 break;
 
             default:

@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0da90100806d46409dc5f2bb6272482, type: 3}
+  m_Name: EverydaySettings
+  m_EditorClassIdentifier: 
+  verboseLogging: 0
+  adSettings:
+    initializeOnLoad: 0
+    showBannerOnLoad: 0
+    adInitializationOrder: 84
+    delay: 2
+    interstitialInterval: 30
+    resetTimerOnRewarded: 1
+    bannerPosition: 7
+    iOS_IS_AdUnitID: 
+    iOS_RV_AdUnitID: 
+    iOS_BN_AdUnitID: 
+    AOS_IS_AdUnitID: 
+    AOS_RV_AdUnitID: 
+    AOS_BN_AdUnitID: 
+    playOnAPIKey_Android: 
+    playOnAPIKey_iOS: 
+    storeID: 
+    playPlayonEveryNthInterstitial: 2
+    playOnPosition:
+      useScreenPositioning: 0
+      playOnLogoAnchor: 0
+      playOnLogoOffset: {x: 0, y: 150}
+      playOnLogoSize: 64
+    initializeAdvertyOnAwake: 0
+    advertyApiKey_Android: 
+    advertyApiKey_iOS: 

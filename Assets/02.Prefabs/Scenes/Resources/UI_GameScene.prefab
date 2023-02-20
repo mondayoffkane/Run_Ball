@@ -431,10 +431,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 21609c303c9bd46fbb4c96f9378a4f02, type: 3}
-    m_FontSize: 73
+    m_FontSize: 60
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 6
     m_MaxSize: 83
     m_Alignment: 3
     m_AlignByGeometry: 0
@@ -442,7 +442,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 100K
+  m_Text: $38.5K
 --- !u!114 &173170302
 MonoBehaviour:
   m_ObjectHideFlags: 0

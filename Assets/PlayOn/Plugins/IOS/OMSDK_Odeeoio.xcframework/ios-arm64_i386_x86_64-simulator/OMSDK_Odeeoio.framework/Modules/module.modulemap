@@ -1,0 +1,4 @@
+module OMSDK_Odeeoio {
+    header "Headers/OMIDImports.h"
+    export *
+}

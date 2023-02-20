@@ -1,0 +1,17 @@
+{
+    "name": "Everyday.Ads",
+    "rootNamespace": "",
+    "references": [
+        "MaxSdk.Scripts",
+        "PlayOn"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

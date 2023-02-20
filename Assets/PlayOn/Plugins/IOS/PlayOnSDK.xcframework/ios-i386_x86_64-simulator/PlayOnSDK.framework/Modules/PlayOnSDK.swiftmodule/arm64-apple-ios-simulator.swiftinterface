@@ -1,0 +1,65 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 5.6.1 (swiftlang-5.6.0.323.66 clang-1316.0.20.12)
+// swift-module-flags: -target arm64-apple-ios9.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name PlayOnSDK
+import AdSupport
+import AudioToolbox
+import Foundation
+@_exported import PlayOnSDK
+import Swift
+import UIKit
+import _Concurrency
+@_inheritsConvenienceInitializers @objc public class ConsentService : ObjectiveC.NSObject {
+  @objc public static var shared: PlayOnSDK.ConsentService {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+extension PlayOnSDK.ConsentService {
+  @objc dynamic public var isGdprApplied: Swift.Bool {
+    @objc get
+    @objc set
+  }
+  @objc dynamic public var isCcpaApplied: Swift.Bool {
+    @objc get
+    @objc set
+  }
+  @objc dynamic public func gdprConsent(status: Swift.Bool, consentString: Swift.String? = nil)
+  @objc dynamic public func doNotSell(status: Swift.Bool, consentString: Swift.String? = nil)
+  @objc dynamic public func getConsentString() -> Swift.String
+  @objc dynamic public func getGeneralConsent() -> Swift.Bool
+  @objc dynamic public func clearConsentString()
+  @objc dynamic public func forceRegulationType(_ type: PlayOnSDK.ConsentRegulationType)
+  @objc dynamic public func clearForceRegulationType()
+  @objc dynamic public var regulationType: PlayOnSDK.ConsentRegulationType {
+    @objc get
+  }
+  @objc dynamic public var idfaString: Swift.String {
+    @objc get
+  }
+  @objc dynamic public func clearConsentServiceCache()
+  @objc dynamic public func set(consentString: Swift.String)
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objcMembers public class SilentModeService : ObjectiveC.NSObject {
+  @objc public static let shared: PlayOnSDK.SilentModeService
+  @objc public var alwaysNotify: Swift.Bool
+  @objc public var forceNotify: Swift.Bool
+  @objc public var notify: ((Swift.Bool) -> Swift.Void)?
+  @objc public var isPlaying: Swift.Bool {
+    get
+  }
+  @objc public var isMute: Swift.Bool {
+    get
+  }
+  @objc public var isPaused: Swift.Bool {
+    @objc get
+    @objc set
+  }
+  @objc public var checkInterval: Swift.Double {
+    @objc get
+    @objc set
+  }
+  @objc deinit
+  @objc public func check(forceCheck: Swift.Bool)
+  @objc public func getSilentStatus() -> Swift.String
+}

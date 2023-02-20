@@ -1,0 +1,19 @@
+{
+    "name": "Everyday.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Everyday",
+        "Everyday.Ads"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

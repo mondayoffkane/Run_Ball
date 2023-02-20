@@ -45,7 +45,7 @@ public class GameManager : SerializedMonoBehaviour
     List<Pin> pinList;
     int[] ballLevelCount;
     public double[] ballBasePrice = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-    public double[] addBall_BasePrice = new double[] { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+    public double[] addBall_BasePrice = new double[] { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20 };
     public double[] mergeBalls_BasePrice = new double[] { 30, 40, 50, 60, 70, 80, 90, 100, 110, 120 };
     public double[] addPin_BasePrice = new double[] { 20, 30, 40, 50, 60, 70, 80, 90, 100, 110 };
     public double[] ClearMoney = new double[] { 1000, 2000, 3000, 4500, 7000, 8000, 10000, 20000, 30000, 50000 };
@@ -60,9 +60,9 @@ public class GameManager : SerializedMonoBehaviour
     public int addBall_Level = 1;
     public int mergeBalls_Level = 1;
     public int addPin_Level = 1;
-    
+
     public Material[] SkyBox_Mats = new Material[7];
-   
+
     // ===================================
     public void Init()
     {
@@ -72,7 +72,7 @@ public class GameManager : SerializedMonoBehaviour
         pinList = new List<Pin>();
 
         InitStage();
-        
+
         SkyBox_Mats = new Material[7];
         SkyBox_Mats = Resources.LoadAll<Material>("SkyBox");
 
@@ -110,7 +110,7 @@ public class GameManager : SerializedMonoBehaviour
         _stage.SetActive(true);
 
         //_currentShooter = _stage.GetComponent<GridManager>()._shooter;
-        
+
         if (ballList.Count > 0)
         {
             foreach (Ball _ball in ballList)
@@ -140,7 +140,7 @@ public class GameManager : SerializedMonoBehaviour
         Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney[Current_Stage_Level & Max_Stage])}";
         Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney[Current_Stage_Level & Max_Stage]);
 
-      
+
 
     }
 
@@ -196,6 +196,18 @@ public class GameManager : SerializedMonoBehaviour
             AddPin();
         }
         else if (Input.GetKeyDown(KeyCode.R))
+        {
+            AddPin(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.T))
+        {
+            AddPin(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Y))
+        {
+            AddPin(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.G))
         {
             Money += 10000;
             MoneyUpdate();
@@ -276,6 +288,9 @@ public class GameManager : SerializedMonoBehaviour
                         Temp_Prev_Point.GetComponent<Point>().Fix_Pin = null;
                         Temp_Next_Point.GetComponent<Point>().Fix_Pin = Pick_Obj;
                         Pick_Obj.transform.position = Temp_Next_Point.position;
+
+                        Temp_Prev_Point.GetComponent<Renderer>().enabled = true;
+                        Temp_Next_Point.GetComponent<Renderer>().enabled = false;
 
                     }
                     else
@@ -432,7 +447,7 @@ public class GameManager : SerializedMonoBehaviour
         MoneyUpdate();
     }
 
-    public void AddPin()
+    public void AddPin(int _num = 0)
     {
         Money -= addPin_BasePrice[Current_Stage_Level % Max_Stage] * addPin_Level * StageScope * (Current_Stage_Level + 1);  //_gridManager.addPin_BasePrice * addPin_Level;
         addPin_Level++;
@@ -443,10 +458,31 @@ public class GameManager : SerializedMonoBehaviour
         Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
         _point.Fix_Pin = _pin.transform;
         _pin.transform.position = _point.transform.position;
-        _pin.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
+        switch (_num)
+        {
+            case 0:
+                _pin.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
+                break;
+
+            case 1:
+                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Diamond);
+                break;
+
+            case 2:
+                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Rot);
+                break;
+
+            case 3:
+                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Spring);
+                break;
+            default:
+                break;
+        }
+
         _pin.GetComponent<Pin>().Prev_Point = _point.transform;
         pinList.Add(_pin);
         MoneyUpdate();
+        Managers.Sound.Play(Resources.Load<AudioClip>("Sound/Spawn"));
     }
 
     public void CheckMergeList()
@@ -505,7 +541,7 @@ public class GameManager : SerializedMonoBehaviour
 
         Managers._uiGameScene.AddPin_Button.interactable
         = (Money >= addPin_BasePrice[Current_Stage_Level % Max_Stage] * addPin_Level * StageScope * (Current_Stage_Level + 1))
-        && (_gridManager.FindEmptyPoint(GridManager.FindState.Random)!=null)
+        && (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null)
         //_gridManager.addPin_BasePrice * addPin_Level
         ? true : false;
 
@@ -535,6 +571,7 @@ public class GameManager : SerializedMonoBehaviour
         isRunning = false;
         Current_Stage_Level++;
 
+        Managers.Sound.Play(Resources.Load<AudioClip>("Sound/Clear"));
 
         Debug.Log("Stage Clear!");
         Managers._uiGameScene.Upgrade_Panel.SetActive(false);
@@ -553,7 +590,7 @@ public class GameManager : SerializedMonoBehaviour
         currentClearMoney = 0;
         //Managers._uiGameScene.FillGuage.fillAmount = 0f;
         //Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney[Current_Stage_Level & Max_Stage])}";
-        
+
 
         Managers._uiGameScene.Upgrade_Panel.SetActive(true);
         Managers._uiGameScene.Clear_Panel.SetActive(false);

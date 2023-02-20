@@ -13,9 +13,12 @@ public class Ball : MonoBehaviour
 
     [SerializeField] Renderer _renderer;
     //public Material _mat;
+
+    
     private void Start()
     {
         _renderer = GetComponent<Renderer>();
+        
     }
 
 
@@ -46,6 +49,7 @@ public class Ball : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         GetComponent<Rigidbody>().AddTorque(Vector3.forward * Random.Range(-360f, 360f));
+      
     }
 
 
