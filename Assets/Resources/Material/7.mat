@@ -1,0 +1,128 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 7
+  m_Shader: {fileID: 4800000, guid: d843ad03c638e4826a36a67bc1468f79, type: 3}
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - DR_SPECULAR_ON
+  - FogON
+  - RimON
+  - _GLOSSYREFLECTIONS_OFF
+  - _SPECULARHIGHLIGHTS_OFF
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Ramp:
+        m_Texture: {fileID: 2800000, guid: c873e4b24d72e4c149dd69e820298562, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BumpScale: 1
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
+    - _FlatRimEdgeSmoothness: 0.5
+    - _FlatRimLightAlign: 0
+    - _FlatRimSize: 0.5
+    - _FlatSpecularEdgeSmoothness: 0.306
+    - _FlatSpecularSize: 0.306
+    - _FogMaxHeight: -5.2
+    - _FogMinHeight: -18.59
+    - _FogON: 1
+    - _GlossMapScale: 1
+    - _Glossiness: 8.51
+    - _GlossyReflections: 0
+    - _GradientAngle: 205
+    - _GradientCenterX: 12.87
+    - _GradientCenterY: -4.55
+    - _GradientSize: 8.42
+    - _Metallic: 0
+    - _Mode: 0
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _RimAmount: 0.374
+    - _RimAngle: 0.625
+    - _RimON: 1
+    - _RimPower: 8.09
+    - _RimThreshold: 0.21
+    - _SmoothnessTextureChannel: 0
+    - _Smoothstep: 0
+    - _SpecOffset: 0.583
+    - _SpecSize: 0.392
+    - _SpecularEnabled: 1
+    - _SpecularHighlights: 0
+    - _SpecularPow: 0
+    - _SpecularRange: 0.056
+    - _SrcBlend: 1
+    - _UVSec: 0
+    - _ZWrite: 1
+    - _specsmooth: 21.9
+    - _specularsmooth: 0.01
+    m_Colors:
+    - _AmbientColor: {r: 0.9107697, g: 0.740566, b: 1, a: 1}
+    - _Color: {r: 0.9433962, g: 0.9433962, b: 0.9433962, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _FlatRimColor: {r: 0.85023, g: 0.85034, b: 0.85045, a: 0.85056}
+    - _FlatSpecularColor: {r: 0.9622642, g: 0.9622642, b: 0.9622642, a: 1}
+    - _FogColor: {r: 0.6179246, g: 0.8934597, b: 1, a: 1}
+    - _GradientColor: {r: 0.15566039, g: 0.44042218, b: 1, a: 1}
+    - _HColor: {r: 1, g: 1, b: 1, a: 1}
+    - _HighlightColor: {r: 1, g: 1, b: 1, a: 1}
+    - _HightlightColor: {r: 1, g: 1, b: 1, a: 1}
+    - _MainColor: {r: 1, g: 0.39215684, b: 0.7739558, a: 1}
+    - _RimColor: {r: 1, g: 0.9627956, b: 0.8349056, a: 1}
+    - _SColor: {r: 0.6603774, g: 0.6603774, b: 0.6603774, a: 1}
+    - _ShadowColor: {r: 0.3523496, g: 0.49267402, b: 0.6981132, a: 1}
+    - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecularColor: {r: 1, g: 0.4575472, b: 0.4575472, a: 1}
+  m_BuildTextureStacks: []

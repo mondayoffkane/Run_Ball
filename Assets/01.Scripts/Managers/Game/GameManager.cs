@@ -2,6 +2,9 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using System.Collections;
+//using UnityEditor.iOS;
+using UnityEditor;
+using Unity.VisualScripting;
 
 public class GameManager : SerializedMonoBehaviour
 {
@@ -57,9 +60,9 @@ public class GameManager : SerializedMonoBehaviour
     public int addBall_Level = 1;
     public int mergeBalls_Level = 1;
     public int addPin_Level = 1;
-
-
-
+    
+    public Material[] SkyBox_Mats = new Material[7];
+   
     // ===================================
     public void Init()
     {
@@ -69,8 +72,9 @@ public class GameManager : SerializedMonoBehaviour
         pinList = new List<Pin>();
 
         InitStage();
-
-
+        
+        SkyBox_Mats = new Material[7];
+        SkyBox_Mats = Resources.LoadAll<Material>("SkyBox");
 
     }
     public void Clear()
@@ -106,7 +110,7 @@ public class GameManager : SerializedMonoBehaviour
         _stage.SetActive(true);
 
         //_currentShooter = _stage.GetComponent<GridManager>()._shooter;
-        Debug.Log("Set Stage");
+        
         if (ballList.Count > 0)
         {
             foreach (Ball _ball in ballList)
@@ -136,14 +140,18 @@ public class GameManager : SerializedMonoBehaviour
         Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney[Current_Stage_Level & Max_Stage])}";
         Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney[Current_Stage_Level & Max_Stage]);
 
+      
 
     }
 
     public void StartStage()
     {
+        Camera.main.transform.GetComponent<Skybox>().material =
+           //_stage.GetComponent<GridManager>().SkyBox_Mat;
+           SkyBox_Mats[Current_Stage_Level % Max_Stage];
 
         // 스테이지 시작시 최초 1회 제공
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 3; i++)
         {
             Ball _newBall = _currentShooter.AddBall();
             _currentShooter.Ball_Queue.Enqueue(_newBall.GetComponent<Rigidbody>());
@@ -496,7 +504,8 @@ public class GameManager : SerializedMonoBehaviour
              && (tempMergeBalls.Count >= 3) ? true : false;
 
         Managers._uiGameScene.AddPin_Button.interactable
-        = Money >= addPin_BasePrice[Current_Stage_Level % Max_Stage] * addPin_Level * StageScope * (Current_Stage_Level + 1)
+        = (Money >= addPin_BasePrice[Current_Stage_Level % Max_Stage] * addPin_Level * StageScope * (Current_Stage_Level + 1))
+        && (_gridManager.FindEmptyPoint(GridManager.FindState.Random)!=null)
         //_gridManager.addPin_BasePrice * addPin_Level
         ? true : false;
 

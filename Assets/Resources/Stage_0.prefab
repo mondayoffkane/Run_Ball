@@ -1296,11 +1296,7 @@ MonoBehaviour:
   Offset_Y: 3.6
   Pin_Pref: {fileID: 0}
   Point: {fileID: 9180895871384503841, guid: c4863bcb4ec7649c6a4d816f70a3cfbe, type: 3}
-  addBall_BasePrice: 10
-  mergeBalls_BasePrice: 40
-  addPin_BasePrice: 30
-  ClearMoney: 1000
-  BackGround_Color: {r: 0.23921569, g: 0.627451, b: 1, a: 1}
+  SkyBox_Mat: {fileID: 2100000, guid: 894af461fa0fe42c7b2d1e675ef1bbe5, type: 2}
 --- !u!1 &4404557096303203634
 GameObject:
   m_ObjectHideFlags: 0

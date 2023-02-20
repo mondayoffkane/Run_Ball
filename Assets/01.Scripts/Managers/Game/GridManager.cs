@@ -28,7 +28,10 @@ public class GridManager : MonoBehaviour
     //public double mergeBalls_BasePrice = 80;
     //public double addPin_BasePrice = 100;
     //public double ClearMoney = 1000;
-    public Color BackGround_Color;
+    //public Color BackGround_Color;
+
+    // public Material SkyBox_Mat;
+    
 
     private void Start()
     {
@@ -41,7 +44,7 @@ public class GridManager : MonoBehaviour
         Managers.Game.MoneyUpdate();
         //Managers.Game.StartStage();
         Pin_Pref = Resources.Load<GameObject>("Pin");
-        Camera.main.backgroundColor = BackGround_Color;
+       // Camera.main.backgroundColor = BackGround_Color;
     }
 
     [Button]

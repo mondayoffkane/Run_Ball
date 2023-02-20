@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using UnityEngine.ProBuilder.MeshOperations;
 
 public class Pin : MonoBehaviour
 {
@@ -32,15 +33,26 @@ public class Pin : MonoBehaviour
     // ===============================
 
 
-    //private void Start()
-    //{
-    //    Start_Pos = transform.position;
-    //}
+    private void Start()
+    {
+        // transform.GetChild(0).DOScaleZ(0.5f, 0.2f).SetEase(Ease.Linear).SetLoops(2, LoopType.Yoyo);
+
+        //    Start_Pos = transform.position;
+       
+    }
 
 
 
     public void SetPin(PinType _pintype = PinType.Diamond)
     {
+        GetComponent<Renderer>().enabled = false;
+        for (int i=0; i<transform.childCount; i++)
+        {
+        transform.GetChild(i).gameObject.SetActive(false);
+        }
+
+        transform.GetChild((int)_pintype).gameObject.SetActive(true);
+
         switch (_pintype)
         {
             case PinType.Diamond:
@@ -49,11 +61,14 @@ public class Pin : MonoBehaviour
 
             case PinType.Spring:
 
+                transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
                 break;
 
             case PinType.Rot:
-                transform.DORotate(new Vector3(0f, 0f, 360f), 4f, RotateMode.FastBeyond360)
-             .SetEase(Ease.Linear).SetRelative(true).SetLoops(-1, LoopType.Restart);
+
+                transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
+                //   transform.DORotate(new Vector3(0f, 0f, 360f), 4f, RotateMode.FastBeyond360)
+                // .SetEase(Ease.Linear).SetRelative(true).SetLoops(-1, LoopType.Restart);
                 break;
 
             default:
@@ -113,6 +128,11 @@ public class Pin : MonoBehaviour
             case PinType.Spring:
                 Rigidbody _rb = collision.transform.GetComponent<Rigidbody>();
                 _rb.velocity = new Vector3(_rb.velocity.x, Force, 0f);
+
+                DOTween.Kill(transform.GetChild(1));
+                //transform.GetChild(0).DOScaleZ(0.5f, 0.2f).SetEase(Ease.Linear).SetLoops(2, LoopType.Yoyo);
+                DOTween.Sequence().Append(transform.GetChild(1).DOScaleZ(0.5f, 0.1f).SetEase(Ease.Linear))
+                    .Append(transform.GetChild(1).DOScaleZ(1f, 0.1f).SetEase(Ease.Linear));
                 break;
 
             default:

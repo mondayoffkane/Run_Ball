@@ -7,8 +7,6 @@ public class UI_GameScene : UI_Scene
 {
     enum Images
     {
-        test,
-        JoyStick,
         FillGuage
     }
 
