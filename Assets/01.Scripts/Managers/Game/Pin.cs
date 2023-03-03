@@ -22,6 +22,7 @@ public class Pin : MonoBehaviour
         Diamond,
         Spring,
         Rot,
+        Fire
 
 
     }
@@ -33,6 +34,8 @@ public class Pin : MonoBehaviour
     // ===============================
 
     AudioClip _clip;
+    public Mesh Temp_Mesh;
+    public Material Temp_Mat;
 
     private void Start()
     {
@@ -47,7 +50,7 @@ public class Pin : MonoBehaviour
     public void SetPin(PinType _pintype = PinType.Diamond)
     {
         transform.localScale = Vector3.zero;
-        transform.DOScale(Vector3.one * 1.2f, 0.5f).SetEase(Ease.OutBounce);
+        transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBounce);
 
         GetComponent<Renderer>().enabled = false;
         for (int i = 0; i < transform.childCount; i++)
@@ -75,6 +78,12 @@ public class Pin : MonoBehaviour
                 // .SetEase(Ease.Linear).SetRelative(true).SetLoops(-1, LoopType.Restart);
                 break;
 
+            case PinType.Fire:
+                DOTween.Kill(transform);
+                transform.localScale = Vector3.one;
+                transform.DOScale(Vector3.one * 1.2f, 0.4f).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
+                break;
+
             default:
                 break;
         }
@@ -98,7 +107,7 @@ public class Pin : MonoBehaviour
         if (collision.transform.CompareTag("Ball"))
         {
             Ball _ball = collision.transform.GetComponent<Ball>();
-            Transform _floating = Managers.Pool.Pop(Resources.Load<GameObject>("Floating_Money")).transform;
+            Transform _floating = Managers.Pool.Pop(Resources.Load<GameObject>("Floating_Money"), Managers.Game.transform).transform;
             _floating.position = new Vector3(collision.transform.position.x, collision.transform.position.y, -1);
 
 
@@ -134,7 +143,7 @@ public class Pin : MonoBehaviour
 
             case PinType.Diamond:
                 DOTween.Kill(transform.GetChild(0));
-                DOTween.Sequence().Append(transform.GetChild(0).DOScale(Vector3.one* 0.5f, 0.1f).SetEase(Ease.Linear))
+                DOTween.Sequence().Append(transform.GetChild(0).DOScale(Vector3.one * 0.5f, 0.1f).SetEase(Ease.Linear))
                     .Append(transform.GetChild(0).DOScale(Vector3.one * 0.68f, 0.1f).SetEase(Ease.Linear));
                 break;
 
@@ -151,8 +160,22 @@ public class Pin : MonoBehaviour
 
             case PinType.Rot:
                 DOTween.Kill(transform.GetChild(2));
-                DOTween.Sequence().Append(transform.GetChild(2).DOScale(Vector3.one * 1.1f, 0.1f).SetEase(Ease.Linear))
-                    .Append(transform.GetChild(2).DOScale(Vector3.one * 1.3f, 0.1f).SetEase(Ease.Linear));
+                DOTween.Sequence().Append(transform.GetChild(2).DOScale(Vector3.one * 0.8f, 0.1f).SetEase(Ease.Linear))
+                    .Append(transform.GetChild(2).DOScale(Vector3.one *1f, 0.1f).SetEase(Ease.Linear));
+                break;
+
+            case PinType.Fire:
+
+                collision.transform.GetComponent<MeshFilter>().mesh = Temp_Mesh;
+                collision.transform.GetComponent<Renderer>().material = Temp_Mat;
+
+                Rigidbody _rb2 = collision.transform.GetComponent<Rigidbody>();
+                _rb2.velocity = new Vector3(Random.Range(-1f, 1f) * Force * 0.5f, Random.Range(0.5f, 1.5f) * Force, 0f);
+
+                DOTween.Kill(transform.GetChild(3));
+                //transform.GetChild(0).DOScaleZ(0.5f, 0.2f).SetEase(Ease.Linear).SetLoops(2, LoopType.Yoyo);
+                DOTween.Sequence().Append(transform.GetChild(1).DOScaleZ(0.5f, 0.1f).SetEase(Ease.Linear))
+                    .Append(transform.GetChild(1).DOScaleZ(1f, 0.1f).SetEase(Ease.Linear));
                 break;
 
             default:

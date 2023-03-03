@@ -32,27 +32,16 @@ MonoBehaviour:
     assemblyNames:
     - ACTk.Editor
     - ACTk.Runtime
-    - AdvertyPlatformSpecific
     - Assembly-CSharp
     - Assembly-CSharp-firstpass
     - Cinemachine
     - CodeStage.Maintainer.Editor
-    - Everyday
-    - Everyday.Ads
-    - Everyday.Ads.Editor
-    - Everyday.Editor
-    - Everyday.IAP
     - LeTai.TrueShadow
     - LeTai.TrueShadow.Editor
     - Lofelt.NiceVibrations
     - Lofelt.NiceVibrations.Editor
-    - MaxSdk.Scripts
-    - MaxSdk.Scripts.Editor
-    - MaxSdk.Scripts.IntegrationManager.Editor
     - Nementic.SelectionUtility.Editor
     - Nementic.SelectionUtility.Runtime
-    - PlayOn
-    - SingularSDK
     - Sirenix.OdinInspector.CompatibilityLayer
     - Sirenix.OdinInspector.CompatibilityLayer.Editor
     showAdvancedSettings: 0

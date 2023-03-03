@@ -119,7 +119,7 @@ Material:
     - _HColor: {r: 1, g: 1, b: 1, a: 1}
     - _HighlightColor: {r: 1, g: 1, b: 1, a: 1}
     - _HightlightColor: {r: 1, g: 1, b: 1, a: 1}
-    - _MainColor: {r: 1, g: 0.8608222, b: 0.39215684, a: 1}
+    - _MainColor: {r: 0.94346195, g: 1, b: 0.39215684, a: 1}
     - _RimColor: {r: 1, g: 0.9627956, b: 0.8349056, a: 1}
     - _SColor: {r: 0.6603774, g: 0.6603774, b: 0.6603774, a: 1}
     - _ShadowColor: {r: 0.3523496, g: 0.49267402, b: 0.6981132, a: 1}

@@ -49,7 +49,9 @@ public class Ball : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         GetComponent<Rigidbody>().AddTorque(Vector3.forward * Random.Range(-360f, 360f));
+
       
+
     }
 
 

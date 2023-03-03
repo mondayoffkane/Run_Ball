@@ -25,9 +25,9 @@ public class GameManager : SerializedMonoBehaviour
 
     public bool isPick = false;
     Transform Pick_Obj;
-    Vector3 mousePos;
-    Vector3 dir;
-    RaycastHit[] hits;
+    [SerializeField] Vector3 mousePos;
+    [SerializeField] Vector3 dir;
+    [SerializeField] RaycastHit[] hits;
 
     Transform Temp_Pin;
     Transform Temp_Prev_Point;
@@ -35,11 +35,13 @@ public class GameManager : SerializedMonoBehaviour
 
     static readonly string[] CurrencyUnits = new string[] { "", "K", "M", "B", "T", "aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "ii", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak", "al", "am", "an", "ao", "ap", "aq", "ar", "as", "at", "au", "av", "aw", "ax", "ay", "az", "ba", "bb", "bc", "bd", "be", "bf", "bg", "bh", "bi", "bj", "bk", "bl", "bm", "bn", "bo", "bp", "bq", "br", "bs", "bt", "bu", "bv", "bw", "bx", "by", "bz", "ca", "cb", "cc", "cd", "ce", "cf", "cg", "ch", "ci", "cj", "ck", "cl", "cm", "cn", "co", "cp", "cq", "cr", "cs", "ct", "cu", "cv", "cw", "cx", };
 
-    GameObject[] Stages;
+    //GameObject[] Stages;
     int Max_Stage = 7;
     public int Current_Stage_Level;
+    public GameObject Current_Stage;
 
-    List<Ball> ballList;
+
+    public List<Ball> ballList;
     List<Ball> tempMergeBalls;
     [ShowInInspector]
     List<Pin> pinList;
@@ -48,7 +50,7 @@ public class GameManager : SerializedMonoBehaviour
     public double[] addBall_BasePrice = new double[] { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20 };
     public double[] mergeBalls_BasePrice = new double[] { 30, 40, 50, 60, 70, 80, 90, 100, 110, 120 };
     public double[] addPin_BasePrice = new double[] { 20, 30, 40, 50, 60, 70, 80, 90, 100, 110 };
-    public double[] ClearMoney = new double[] { 1000, 2000, 3000, 4500, 7000, 8000, 10000, 20000, 30000, 50000 };
+    public double[] ClearMoney = new double[] { 1000000000, 2000, 3000, 4500, 7000, 8000, 10000, 20000, 30000, 50000 };
     public double StageScope = 1.2d;
     [SerializeField] double currentClearMoney = 0;
     [SerializeField] bool isRunning = true;
@@ -86,13 +88,13 @@ public class GameManager : SerializedMonoBehaviour
 
     public void InitStage()
     {
-        _currentShooter = GameObject.FindGameObjectWithTag("Shooter").GetComponent<Shooter>();
-        Stages = new GameObject[Max_Stage];
+        //_currentShooter = GameObject.FindGameObjectWithTag("Shooter").GetComponent<Shooter>();
+        //Stages = new GameObject[Max_Stage];
 
-        for (int i = 0; i < Max_Stage; i++)
-        {
-            Stages[i] = Instantiate(Resources.Load<GameObject>("Stage_" + i));
-        }
+        //for (int i = 0; i < Max_Stage; i++)
+        //{
+        //    Stages[i] = Instantiate(Resources.Load<GameObject>("Stage_" + i));
+        //}
 
         LoadData();
 
@@ -101,13 +103,22 @@ public class GameManager : SerializedMonoBehaviour
 
     public void SetStage(int _level = 0)
     {
-        for (int i = 0; i < Max_Stage; i++)
+        //for (int i = 0; i < Max_Stage; i++)
+        //{
+        //    Stages[i].SetActive(false);
+        //}
+        if (Current_Stage != null)
         {
-            Stages[i].SetActive(false);
+            Destroy(Current_Stage);
+            Current_Stage = null;
         }
+        Current_Stage = Instantiate(Resources.Load<GameObject>("Stage_" + _level));
+        _gridManager = Current_Stage.GetComponent<GridManager>();
+        _currentShooter = _gridManager._shooter;
 
-        GameObject _stage = Stages[_level % Max_Stage];
-        _stage.SetActive(true);
+        //UnityEditor.EditorApplication.isPaused = true;
+        //GameObject _stage = Current_Stage;
+        //_stage.SetActive(true);
 
         //_currentShooter = _stage.GetComponent<GridManager>()._shooter;
 
@@ -165,7 +176,7 @@ public class GameManager : SerializedMonoBehaviour
         {
             if (_gridManager.Pin_Pref == null) _gridManager.Pin_Pref = Resources.Load<GameObject>("Pin");
 
-            Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref).GetComponent<Pin>();
+            Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref, transform).GetComponent<Pin>();
 
             Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
             _point.Fix_Pin = _pin.transform;
@@ -173,6 +184,7 @@ public class GameManager : SerializedMonoBehaviour
             _pin.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
             _pin.GetComponent<Pin>().Prev_Point = _point.transform;
             pinList.Add(_pin);
+            _point.GetComponent<Renderer>().enabled = false;
 
 
 
@@ -195,22 +207,31 @@ public class GameManager : SerializedMonoBehaviour
         {
             AddPin();
         }
-        else if (Input.GetKeyDown(KeyCode.R))
+        else if (Input.GetKeyDown(KeyCode.A))
         {
             AddPin(1);
         }
-        else if (Input.GetKeyDown(KeyCode.T))
+        else if (Input.GetKeyDown(KeyCode.S))
         {
             AddPin(2);
         }
-        else if (Input.GetKeyDown(KeyCode.Y))
+        else if (Input.GetKeyDown(KeyCode.D))
         {
             AddPin(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Z))
+        {
+            AddPin(4);
         }
         else if (Input.GetKeyDown(KeyCode.G))
         {
             Money += 10000;
             MoneyUpdate();
+        }
+
+        else if (Input.GetKeyDown(KeyCode.T))
+        {
+            Managers._uiGameScene.Store_Panel.SetActive(!Managers._uiGameScene.Store_Panel.activeSelf);
         }
 
         else if (Input.GetKeyDown(KeyCode.Escape))
@@ -222,10 +243,13 @@ public class GameManager : SerializedMonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
 
-            mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10f));
-            dir = new Vector3(dir.x, dir.y, 50f);
+            //mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 30f));
+            //dir = (mousePos - Camera.main.transform.position);
+            //Debug.DrawRay(Camera.main.transform.position, dir);
 
-            hits = Physics.RaycastAll(mousePos, dir);
+            Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            
+            hits = Physics.RaycastAll(_ray);
             for (int i = 0; i < hits.Length; i++)
             {
                 if (hits[i].transform.CompareTag("Pin"))
@@ -255,9 +279,15 @@ public class GameManager : SerializedMonoBehaviour
         }
         else if (Input.GetMouseButton(0))
         {
-            mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10f));
-            dir = new Vector3(dir.x, dir.y, 50f);
-            Debug.DrawRay(mousePos, dir);
+            mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 30f));
+            //dir = (mousePos - Camera.main.transform.position);
+            //Debug.DrawRay(Camera.main.transform.position, dir);
+
+            //mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10f));
+            //dir = new Vector3(dir.x, dir.y, 50f);
+            //Debug.DrawRay(mousePos, dir);
+
+            Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);            
 
             if (isPick)
             {
@@ -268,9 +298,13 @@ public class GameManager : SerializedMonoBehaviour
         {
             if (isPick)
             {
-                mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10f));
-                dir = new Vector3(dir.x, dir.y, 50f);
-                hits = Physics.RaycastAll(mousePos, dir);
+                //mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 30f));
+                //dir = (mousePos - Camera.main.transform.position);
+                //hits = Physics.RaycastAll(mousePos, dir);
+
+                Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                hits = Physics.RaycastAll(_ray);
+
 
 
                 for (int i = 0; i < hits.Length; i++)
@@ -453,11 +487,12 @@ public class GameManager : SerializedMonoBehaviour
         addPin_Level++;
 
         //Transform _obj = Instantiate(_gridManager.Pin_Pref).transform;
-        Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref).GetComponent<Pin>();
+        Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref, transform).GetComponent<Pin>();
 
         Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
         _point.Fix_Pin = _pin.transform;
         _pin.transform.position = _point.transform.position;
+        _point.GetComponent<Renderer>().enabled = false;
         switch (_num)
         {
             case 0:
@@ -474,6 +509,11 @@ public class GameManager : SerializedMonoBehaviour
 
             case 3:
                 _pin.GetComponent<Pin>().SetPin(Pin.PinType.Spring);
+                break;
+
+            case 4:
+                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Fire);
+
                 break;
             default:
                 break;
@@ -618,4 +658,7 @@ public class GameManager : SerializedMonoBehaviour
 
 
     #endregion
+
+
+
 }

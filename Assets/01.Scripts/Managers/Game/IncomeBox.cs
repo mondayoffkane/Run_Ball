@@ -33,7 +33,7 @@ public class IncomeBox : MonoBehaviour
         if (other.CompareTag("Ball"))
         {
             Ball _ball = other.GetComponent<Ball>();
-            Transform _floating = Managers.Pool.Pop(Resources.Load<GameObject>("Floating_Money")).transform;
+            Transform _floating = Managers.Pool.Pop(Resources.Load<GameObject>("Floating_Money"), transform).transform;
             _floating.position = new Vector3(other.transform.position.x, other.transform.position.y, -1);
 
 

@@ -29,7 +29,8 @@ public class UI_GameScene : UI_Scene
     {
         Base_Panel,
         Upgrade_Panel,
-        Clear_Panel
+        Clear_Panel,
+        Store_Panel
     }
 
     public Text MoneyText;
@@ -37,7 +38,7 @@ public class UI_GameScene : UI_Scene
     public Text AddBallText, MergeBallsText, AddPinText, GuageText;
     public Button AddBall_Button, MergeBalls_Button, AddPin_Button, NextStage_Button;
 
-    public GameObject Base_Panel, Upgrade_Panel, Clear_Panel;
+    public GameObject Base_Panel, Upgrade_Panel, Clear_Panel, Store_Panel;
     public Image FillGuage;
 
 
@@ -80,6 +81,7 @@ public class UI_GameScene : UI_Scene
         Base_Panel = GetObject(GameObjects.Base_Panel);
         Upgrade_Panel = GetObject(GameObjects.Upgrade_Panel);
         Clear_Panel = GetObject(GameObjects.Clear_Panel);
+        Store_Panel = GetObject(GameObjects.Store_Panel);
 
         FillGuage = GetImage(Images.FillGuage);
 

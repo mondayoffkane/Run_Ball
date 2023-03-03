@@ -1,9 +1,0 @@
-<dependencies>
-  <androidPackages>
-    <androidPackage spec="com.google.android.gms:play-services-ads-identifier:17.0.1">
-      <androidSdkPackageIds>
-        <androidSdkPackageId>extra-google-m2repository</androidSdkPackageId>
-      </androidSdkPackageIds>
-    </androidPackage>
-  </androidPackages>
-</dependencies>

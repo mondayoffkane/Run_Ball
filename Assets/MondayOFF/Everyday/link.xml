@@ -1,5 +1,0 @@
-<linker>
-    <assembly fullname="Everyday" preserve="all"/>
-    <assembly fullname="SingularSDK" preserve="all"/>
-</linker>
-  
