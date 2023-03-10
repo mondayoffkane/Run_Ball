@@ -5,7 +5,7 @@ using UnityEngine;
 public class ReturnHole : MonoBehaviour
 {
 
-
+    public GameObject Effect;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -17,7 +17,21 @@ public class ReturnHole : MonoBehaviour
             Managers.Game._currentShooter.Ball_Queue.Enqueue(other.GetComponent<Rigidbody>());
             other.GetComponent<TrailRenderer>().enabled = false;
             other.GetComponent<Collider>().isTrigger = true;
-            //other.GetComponent<TrailRenderer>().
+            other.gameObject.SetActive(false);
+
+            StartCoroutine(Cor_Effect());
+
+        }
+    }
+
+
+    IEnumerator Cor_Effect()
+    {
+        if (Effect != null)
+        {
+            Effect.SetActive(true);
+            yield return new WaitForSeconds(1f);
+            Effect.SetActive(false);
         }
     }
 }

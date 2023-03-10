@@ -17,6 +17,8 @@ TagManager:
   - Stone
   - IncomeText
   - Shooter
+  - Handle
+  - NotJump
   layers:
   - Default
   - TransparentFX

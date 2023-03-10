@@ -5,7 +5,7 @@ using UnityEngine;
 public class TweenRot : MonoBehaviour
 {
 
-    public float Rot_Speed = 360;
+    public float Rot_Speed = 10;
     public bool isRevers = false;
 
     public enum Rot_Dir

@@ -6,6 +6,7 @@ using System.Collections;
 using UnityEditor;
 using Unity.VisualScripting;
 
+
 public class GameManager : SerializedMonoBehaviour
 {
     public JoyStickController joyStickController;//{ private get; set; }
@@ -42,7 +43,7 @@ public class GameManager : SerializedMonoBehaviour
 
 
     public List<Ball> ballList;
-    List<Ball> tempMergeBalls;
+    [SerializeField] List<Ball> tempMergeBalls;
     [ShowInInspector]
     List<Pin> pinList;
     int[] ballLevelCount;
@@ -50,7 +51,7 @@ public class GameManager : SerializedMonoBehaviour
     public double[] addBall_BasePrice = new double[] { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20 };
     public double[] mergeBalls_BasePrice = new double[] { 30, 40, 50, 60, 70, 80, 90, 100, 110, 120 };
     public double[] addPin_BasePrice = new double[] { 20, 30, 40, 50, 60, 70, 80, 90, 100, 110 };
-    public double[] ClearMoney = new double[] { 1000000000, 2000, 3000, 4500, 7000, 8000, 10000, 20000, 30000, 50000 };
+    public double[] ClearMoney = new double[] { 1000, 2000, 3000, 4500, 7000, 8000, 10000, 20000, 30000, 50000 };
     public double StageScope = 1.2d;
     [SerializeField] double currentClearMoney = 0;
     [SerializeField] bool isRunning = true;
@@ -64,6 +65,10 @@ public class GameManager : SerializedMonoBehaviour
     public int addPin_Level = 1;
 
     public Material[] SkyBox_Mats = new Material[7];
+
+    public Vector3 startMousePos, offset, _rotation;
+    public Transform _rotObj;
+
 
     // ===================================
     public void Init()
@@ -112,7 +117,7 @@ public class GameManager : SerializedMonoBehaviour
             Destroy(Current_Stage);
             Current_Stage = null;
         }
-        Current_Stage = Instantiate(Resources.Load<GameObject>("Stage_" + _level));
+        Current_Stage = Instantiate(Resources.Load<GameObject>("Stages/Stage_" + _level));
         _gridManager = Current_Stage.GetComponent<GridManager>();
         _currentShooter = _gridManager._shooter;
 
@@ -146,7 +151,7 @@ public class GameManager : SerializedMonoBehaviour
         addPin_Level = 1;
         isRunning = true;
 
-        Invoke("StartStage", 0.5f);
+        Invoke("StartStage", 0.1f);
 
         Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney[Current_Stage_Level & Max_Stage])}";
         Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney[Current_Stage_Level & Max_Stage]);
@@ -164,29 +169,12 @@ public class GameManager : SerializedMonoBehaviour
         // 스테이지 시작시 최초 1회 제공
         for (int i = 0; i < 3; i++)
         {
-            Ball _newBall = _currentShooter.AddBall();
-            _currentShooter.Ball_Queue.Enqueue(_newBall.GetComponent<Rigidbody>());
-            ballList.Add(_newBall);
-            _newBall.Init();
-            CheckMergeList();
-
+            AddBall(false);
         }
 
         for (int i = 0; i < 1; i++)
         {
-            if (_gridManager.Pin_Pref == null) _gridManager.Pin_Pref = Resources.Load<GameObject>("Pin");
-
-            Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref, transform).GetComponent<Pin>();
-
-            Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
-            _point.Fix_Pin = _pin.transform;
-            _pin.transform.position = _point.transform.position;
-            _pin.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
-            _pin.GetComponent<Pin>().Prev_Point = _point.transform;
-            pinList.Add(_pin);
-            _point.GetComponent<Renderer>().enabled = false;
-
-
+            AddPin(0, false);
 
         }
     }
@@ -223,6 +211,10 @@ public class GameManager : SerializedMonoBehaviour
         {
             AddPin(4);
         }
+        else if (Input.GetKeyDown(KeyCode.X))
+        {
+            AddPin(5);
+        }
         else if (Input.GetKeyDown(KeyCode.G))
         {
             Money += 10000;
@@ -239,6 +231,22 @@ public class GameManager : SerializedMonoBehaviour
             ES3.DeleteFile();
         }
 
+        else if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            Current_Stage_Level--;
+            if (Current_Stage_Level < 0) Current_Stage_Level = 0;
+            SaveData();
+            SetStage(Current_Stage_Level);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            Current_Stage_Level++;
+            if (Current_Stage_Level > Max_Stage) Current_Stage_Level = Max_Stage;
+            SaveData();
+            SetStage(Current_Stage_Level);
+        }
+
+
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -247,8 +255,10 @@ public class GameManager : SerializedMonoBehaviour
             //dir = (mousePos - Camera.main.transform.position);
             //Debug.DrawRay(Camera.main.transform.position, dir);
 
+            startMousePos = Input.mousePosition;
+
             Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            
+
             hits = Physics.RaycastAll(_ray);
             for (int i = 0; i < hits.Length; i++)
             {
@@ -259,6 +269,10 @@ public class GameManager : SerializedMonoBehaviour
                 else if (hits[i].transform.CompareTag("Point"))
                 {
                     Temp_Prev_Point = hits[i].transform;
+                }
+                else if (hits[i].transform.CompareTag("Handle"))
+                {
+                    _rotObj = hits[i].transform.parent; //.parent;
                 }
             }
 
@@ -280,6 +294,21 @@ public class GameManager : SerializedMonoBehaviour
         else if (Input.GetMouseButton(0))
         {
             mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 30f));
+
+            if (_rotObj != null)
+            {
+                //offset = (Input.mousePosition - startMousePos);
+                //_rotation.z = -(offset.x + offset.y) * Time.deltaTime * 30f;
+                //_rotObj.Rotate(_rotation);
+                //startMousePos = Input.mousePosition;
+
+                Vector3 _testpos = (mousePos - _rotObj.transform.position).normalized;
+
+                //_rotObj.rotation = Quaternion.FromToRotation(Vector3.up, Vector3.right - _testpos);
+                _rotObj.rotation = Quaternion.FromToRotation(Vector3.left, _testpos);
+
+            }
+
             //dir = (mousePos - Camera.main.transform.position);
             //Debug.DrawRay(Camera.main.transform.position, dir);
 
@@ -287,7 +316,7 @@ public class GameManager : SerializedMonoBehaviour
             //dir = new Vector3(dir.x, dir.y, 50f);
             //Debug.DrawRay(mousePos, dir);
 
-            Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);            
+            Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (isPick)
             {
@@ -296,6 +325,7 @@ public class GameManager : SerializedMonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            _rotObj = null;
             if (isPick)
             {
                 //mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 30f));
@@ -442,18 +472,24 @@ public class GameManager : SerializedMonoBehaviour
         return string.Format("{0}{1}{2}", significant, showNumber, unityString);
     }
 
-    public void AddBall()
+    public void AddBall(bool isPay = true)
     {
-        Money -= /*_gridManager.addBall_BasePrice*/ addBall_BasePrice[Current_Stage_Level % Max_Stage] * addBall_Level * StageScope * (Current_Stage_Level + 1);
-        addBall_Level++;
+        if (isPay == true)
+        {
+            Money -= /*_gridManager.addBall_BasePrice*/ addBall_BasePrice[Current_Stage_Level % Max_Stage] * addBall_Level * StageScope * (Current_Stage_Level + 1);
+            addBall_Level++;
+        }
 
         Ball _newBall = _currentShooter.AddBall();
+        _newBall.gameObject.SetActive(false);
+        _currentShooter.Ball_Queue.Enqueue(_newBall.GetComponent<Rigidbody>());
         ballList.Add(_newBall);
         _newBall.Init();
 
         CheckMergeList(); // 위치 변경 예정 , 돈 체크도 같이 해야함
 
         MoneyUpdate();
+
 
 
     }
@@ -481,10 +517,13 @@ public class GameManager : SerializedMonoBehaviour
         MoneyUpdate();
     }
 
-    public void AddPin(int _num = 0)
+    public void AddPin(int _num = 0, bool isPay = true)
     {
-        Money -= addPin_BasePrice[Current_Stage_Level % Max_Stage] * addPin_Level * StageScope * (Current_Stage_Level + 1);  //_gridManager.addPin_BasePrice * addPin_Level;
-        addPin_Level++;
+        if (isPay == true)
+        {
+            Money -= addPin_BasePrice[Current_Stage_Level % Max_Stage] * addPin_Level * StageScope * (Current_Stage_Level + 1);  //_gridManager.addPin_BasePrice * addPin_Level;
+            addPin_Level++;
+        }
 
         //Transform _obj = Instantiate(_gridManager.Pin_Pref).transform;
         Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref, transform).GetComponent<Pin>();
@@ -496,8 +535,12 @@ public class GameManager : SerializedMonoBehaviour
         switch (_num)
         {
             case 0:
-                _pin.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
+                //_pin.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
+                //System.Random _rand = new System.Random();
+                _pin.GetComponent<Pin>().SetPin(_gridManager
+                    .PinType_Array[new System.Random().Next(0, _gridManager.PinType_Array.Length)]);
                 break;
+
 
             case 1:
                 _pin.GetComponent<Pin>().SetPin(Pin.PinType.Diamond);
@@ -512,9 +555,14 @@ public class GameManager : SerializedMonoBehaviour
                 break;
 
             case 4:
-                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Fire);
+                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Triangle);
 
                 break;
+
+            case 5:
+                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Cannon);
+                break;
+
             default:
                 break;
         }
@@ -599,10 +647,10 @@ public class GameManager : SerializedMonoBehaviour
             currentClearMoney += _money;
             Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney[Current_Stage_Level & Max_Stage])}";
             Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney[Current_Stage_Level & Max_Stage]);
-            if (currentClearMoney >= /*_gridManager.ClearMoney*/ ClearMoney[Current_Stage_Level & Max_Stage])
-            {
-                StageClear();
-            }
+            //if (currentClearMoney >= /*_gridManager.ClearMoney*/ ClearMoney[Current_Stage_Level & Max_Stage])
+            //{
+            //    StageClear();
+            //}
         }
     }
 

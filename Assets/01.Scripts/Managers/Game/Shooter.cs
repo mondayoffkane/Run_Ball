@@ -8,7 +8,7 @@ public class Shooter : MonoBehaviour
 {
 
     public float Interval = 0.1f;
-    public float Power = 100f;
+    float Power = 500f;
 
 
     [ShowInInspector]
@@ -40,10 +40,11 @@ public class Shooter : MonoBehaviour
                 //if (_rb.GetComponent<Ball>().isReady == true)
                 //{
                 DOTween.Kill(_rb);
-                _rb.transform.position = transform.position + Vector3.right * Random.Range(-0.5f, 0.5f);
+                _rb.gameObject.SetActive(true);
+                _rb.transform.position = transform.position;// + Vector3.right * Random.Range(-0.5f, 0.5f);
                 _rb.velocity = Vector3.zero;
                 _rb.angularVelocity = Vector3.zero;
-                _rb.isKinematic = false;
+                //_rb.isKinematic = false;
                 _rb.AddForce(transform.up * Power);
                 _rb.GetComponent<TrailRenderer>().enabled = true;
                 _rb.GetComponent<Collider>().isTrigger = false;
@@ -61,10 +62,10 @@ public class Shooter : MonoBehaviour
         if (Ball_Pref == null)
             Ball_Pref = Resources.Load<GameObject>("Ball");
         Rigidbody _ball = Managers.Pool.Pop(Ball_Pref, transform).GetComponent<Rigidbody>(); // Instantiate(Ball_Pref).GetComponent<Rigidbody>();
-        _ball.transform.position = transform.position + Vector3.up * 2f;
+        _ball.transform.position = transform.position; //+ Vector3.up * 2f;
         //_ball.velocity = Vector3.up * Force /*Random.Range(Force * 0.8f, Force * 1.2f)*/;
-        _ball.velocity = Vector3.zero;
-        _ball.AddForce(Vector3.up * Power);
+        //_ball.velocity = Vector3.zero;
+        //_ball.AddForce(Vector3.up * Power);
 
 
         return _ball.GetComponent<Ball>();
@@ -74,7 +75,7 @@ public class Shooter : MonoBehaviour
     public void MergeShoot(Ball _ball)
     {
         _ball.GetComponent<Ball>().isReady = true;
-        _ball.GetComponent<Rigidbody>().isKinematic = true;
+        //_ball.GetComponent<Rigidbody>().isKinematic = true;
         _ball.transform.position = transform.position;
         Ball_Queue.Enqueue(_ball.GetComponent<Rigidbody>());
 

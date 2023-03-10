@@ -24,6 +24,9 @@ public class GridManager : MonoBehaviour
     public Shooter _shooter;
     public Transform Point_Group;
 
+    [ShowInInspector]
+    public Pin.PinType[] PinType_Array = new Pin.PinType[1];
+
     // ======================================
     //public double addBall_BasePrice = 20;
     //public double mergeBalls_BasePrice = 80;
@@ -33,6 +36,10 @@ public class GridManager : MonoBehaviour
 
     // public Material SkyBox_Mat;
 
+
+    [Space(10)]
+    [Header("Test")]
+    [ReadOnly]public string Buttons;
 
     private void Start()
     {
