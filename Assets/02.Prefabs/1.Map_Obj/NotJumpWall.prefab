@@ -11,11 +11,10 @@ GameObject:
   - component: {fileID: 3627080111846702686}
   - component: {fileID: 8559426035985037729}
   - component: {fileID: 6451239157149684213}
-  - component: {fileID: 4229351833239888719}
   - component: {fileID: 2202527974911433366}
   m_Layer: 0
-  m_Name: DestroyWall
-  m_TagString: Untagged
+  m_Name: NotJumpWall
+  m_TagString: NotJump
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -63,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 834473732433c44759652c1816d31588, type: 2}
+  - {fileID: 2100000, guid: 3d951d43f989345a68f749430892993e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -85,19 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4229351833239888719
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3983713254595635883}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac94e17335b74453b9aee170e5ef7fb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Effect: {fileID: 0}
 --- !u!65 &2202527974911433366
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -105,8 +91,8 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3983713254595635883}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_Material: {fileID: 13400000, guid: 739cda0857a4946c38dc67c5928cbc75, type: 2}
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
