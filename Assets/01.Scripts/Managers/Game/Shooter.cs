@@ -12,12 +12,12 @@ public class Shooter : MonoBehaviour
 
 
     [ShowInInspector]
-    public Queue<Rigidbody> Ball_Queue;
+    public List<Rigidbody> Ball_Wait_List;
     [SerializeField] GameObject Ball_Pref;
 
     void Start()
     {
-        Ball_Queue = new Queue<Rigidbody>();
+        Ball_Wait_List = new List<Rigidbody>();
 
         StartCoroutine(Cor_Shoot());
         if (Ball_Pref == null)
@@ -34,9 +34,10 @@ public class Shooter : MonoBehaviour
         WaitForSeconds _interval = new WaitForSeconds(Interval);
         while (true)
         {
-            if (Ball_Queue.Count > 0)
+            if (Ball_Wait_List.Count > 0)
             {
-                Rigidbody _rb = Ball_Queue.Dequeue().GetComponent<Rigidbody>();
+                Rigidbody _rb = Ball_Wait_List[0].GetComponent<Rigidbody>();
+                Ball_Wait_List.Remove(_rb);
                 //if (_rb.GetComponent<Ball>().isReady == true)
                 //{
                 DOTween.Kill(_rb);
@@ -51,8 +52,6 @@ public class Shooter : MonoBehaviour
                 //}
             }
 
-
-
             yield return _interval;
         }
     }
@@ -66,7 +65,7 @@ public class Shooter : MonoBehaviour
         //_ball.velocity = Vector3.up * Force /*Random.Range(Force * 0.8f, Force * 1.2f)*/;
         //_ball.velocity = Vector3.zero;
         //_ball.AddForce(Vector3.up * Power);
-
+        _ball.gameObject.SetActive(false);
 
         return _ball.GetComponent<Ball>();
     }
@@ -77,7 +76,8 @@ public class Shooter : MonoBehaviour
         _ball.GetComponent<Ball>().isReady = true;
         //_ball.GetComponent<Rigidbody>().isKinematic = true;
         _ball.transform.position = transform.position;
-        Ball_Queue.Enqueue(_ball.GetComponent<Rigidbody>());
+        //Ball_Queue.Enqueue(_ball.GetComponent<Rigidbody>());
+        Ball_Wait_List.Add(_ball.GetComponent<Rigidbody>());
 
     }
 

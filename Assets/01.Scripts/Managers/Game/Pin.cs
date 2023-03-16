@@ -22,11 +22,12 @@ public class Pin : MonoBehaviour
     public float ShootPower = 700f;
     public enum PinType
     {
-        Diamond,
-        Spring, // circle 
-        Rot, // hex
         Triangle, // tri
-        Cannon // 
+        Square,
+        Hex, // 
+        Circle, //
+        Cannon, //
+        Trampoline
 
 
     }
@@ -52,15 +53,16 @@ public class Pin : MonoBehaviour
         _clip = Resources.Load<AudioClip>("Sound/Ball_1");
         if (Handle == null)
             Handle = transform.GetChild(1).gameObject;
-        if (ChildObj == null) {
+        if (ChildObj == null)
+        {
             ChildObj = transform.GetChild(0);
         }
-        
+
     }
 
 
 
-    public void SetPin(PinType _pintype = PinType.Diamond)
+    public void SetPin(PinType _pintype = PinType.Triangle)
     {
         transform.localScale = Vector3.zero;
         transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBounce)
@@ -78,22 +80,13 @@ public class Pin : MonoBehaviour
 
         switch (_pintype)
         {
-            case PinType.Diamond:
-                transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 45f));
 
-                break;
+            //case PinType.Rot:
 
-            case PinType.Spring:
-
-                transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
-                break;
-
-            case PinType.Rot:
-
-                transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
-                transform.DORotate(new Vector3(0f, 0f, 360f), 4f, RotateMode.FastBeyond360)
-              .SetEase(Ease.Linear).SetRelative(true).SetLoops(-1, LoopType.Restart);
-                break;
+            //    transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
+            //    transform.DORotate(new Vector3(0f, 0f, 360f), 4f, RotateMode.FastBeyond360)
+            //  .SetEase(Ease.Linear).SetRelative(true).SetLoops(-1, LoopType.Restart);
+            //    break;
 
             case PinType.Triangle:
                 Handle.SetActive(true);
@@ -109,8 +102,12 @@ public class Pin : MonoBehaviour
             //    transform.localScale = Vector3.one;
             //    transform.DOScale(Vector3.one * 1.2f, 0.4f).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
             //    break;
+                    
+
 
             default:
+                transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
+
                 break;
         }
 
@@ -120,7 +117,8 @@ public class Pin : MonoBehaviour
         if (_meshCollider == null) _meshCollider = GetComponent<MeshCollider>();
 
 
-        Mesh _mesh = Meshes[(int)pinType];
+        Mesh _mesh = Meshes[((int)pinType) * 3 + Random.Range(0, 3)];
+        //Mesh _mesh = Meshes[(int)pinType];
         //_meshFilter.sharedMesh = _mesh;
         ChildObj.GetComponent<MeshFilter>().sharedMesh = _mesh;
         _meshCollider.sharedMesh = _mesh;
@@ -157,59 +155,68 @@ public class Pin : MonoBehaviour
                     , 0f), 0.5f)).SetEase(Ease.Linear)
                     .OnComplete(() => Managers.Pool.Push(_floating.GetComponent<Poolable>()));
 
-            //Managers.Game.Money += (double)_ball.Price;
-            //Managers.Game.MoneyUpdate();
+
+
             Managers.Game.AddMoney(_ball.Price);
-            //Managers.UI.
+
 
             Managers.Sound.Play(_clip);
         }
         if (isInit)
         {
-
+            DOTween.Kill(ChildObj);
+            DOTween.Sequence().Append(ChildObj.DOScale(Vector3.one * 0.5f, 0.1f).SetEase(Ease.Linear))
+                .Append(ChildObj.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
             switch (pinType)
             {
 
-                case PinType.Diamond:
-                    DOTween.Kill(ChildObj);
-                    DOTween.Sequence().Append(ChildObj.DOScale(Vector3.one * 0.5f, 0.1f).SetEase(Ease.Linear))
-                        .Append(ChildObj.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
-                    break;
+                //case PinType.Square:
+                //    DOTween.Kill(ChildObj);
+                //    DOTween.Sequence().Append(ChildObj.DOScale(Vector3.one * 0.5f, 0.1f).SetEase(Ease.Linear))
+                //        .Append(ChildObj.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
+                //    break;
 
 
-                case PinType.Spring:
-                    DOTween.Kill(ChildObj);
-                    Rigidbody _rb = collision.transform.GetComponent<Rigidbody>();
-                    _rb.velocity = new Vector3(_rb.velocity.x, Force, 0f);
+                //case PinType.:
+                //    DOTween.Kill(ChildObj);
+                //    Rigidbody _rb = collision.transform.GetComponent<Rigidbody>();
+                //    _rb.velocity = new Vector3(_rb.velocity.x, Force, 0f);
 
 
-                    //transform.GetChild(0).DOScaleZ(0.5f, 0.2f).SetEase(Ease.Linear).SetLoops(2, LoopType.Yoyo);
-                    DOTween.Sequence().Append(ChildObj.DOScaleZ(0.5f, 0.1f).SetEase(Ease.Linear))
-                        .Append(ChildObj.DOScaleZ(1f, 0.1f).SetEase(Ease.Linear));
-                    break;
+                //    //transform.GetChild(0).DOScaleZ(0.5f, 0.2f).SetEase(Ease.Linear).SetLoops(2, LoopType.Yoyo);
+                //    DOTween.Sequence().Append(ChildObj.DOScaleZ(0.5f, 0.1f).SetEase(Ease.Linear))
+                //        .Append(ChildObj.DOScaleZ(1f, 0.1f).SetEase(Ease.Linear));
+                //    break;
 
-                case PinType.Rot:
+                //case PinType.Rot:
 
-                    DOTween.Sequence().Append(ChildObj.DOScale(Vector3.one * 0.8f, 0.1f).SetEase(Ease.Linear))
-                        .Append(ChildObj.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
-                    break;
+                //    DOTween.Sequence().Append(ChildObj.DOScale(Vector3.one * 0.8f, 0.1f).SetEase(Ease.Linear))
+                //        .Append(ChildObj.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
+                //    break;
 
-                case PinType.Triangle:
-                    DOTween.Kill(ChildObj);
-                    DOTween.Sequence().Append(ChildObj.DOScale(Vector3.one * 0.5f, 0.1f).SetEase(Ease.Linear))
-                        .Append(ChildObj.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
-                    break;
+                //case PinType.Triangle:
+                //    DOTween.Kill(ChildObj);
+                //    DOTween.Sequence().Append(ChildObj.DOScale(Vector3.one * 0.5f, 0.1f).SetEase(Ease.Linear))
+                //        .Append(ChildObj.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
+                //    break;
 
                 case PinType.Cannon:
-                    DOTween.Kill(ChildObj);
-                    DOTween.Sequence().Append(ChildObj.DOScale(Vector3.one * 0.5f, 0.1f).SetEase(Ease.Linear))
-                        .Append(ChildObj.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
+                    //DOTween.Kill(ChildObj);
+                    //DOTween.Sequence().Append(ChildObj.DOScale(Vector3.one * 0.5f, 0.1f).SetEase(Ease.Linear))
+                    //    .Append(ChildObj.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
 
                     collision.transform.position = transform.position + transform.up;
                     collision.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     collision.transform.GetComponent<Rigidbody>().AddForce(transform.up * ShootPower);
                     break;
 
+
+                case PinType.Trampoline:
+                    
+                    Rigidbody _rb = collision.transform.GetComponent<Rigidbody>();
+                    _rb.velocity = new Vector3(_rb.velocity.x, Force, 0f);
+
+                    break;
 
                 //case PinType.Fire:
 
@@ -227,7 +234,6 @@ public class Pin : MonoBehaviour
 
                 default:
                     //transform.DOShakePosition(_time, 0.2f); // 진
-
 
                     break;
             }

@@ -17,6 +17,7 @@ public class Portal : MonoBehaviour
             if (isInput)
             {
                 other.transform.position = PairPortal.transform.position;
+                other.GetComponent<TrailRenderer>().Clear();
                 Power = other.GetComponent<Rigidbody>().velocity.magnitude;
                 other.GetComponent<Rigidbody>().velocity = Vector3.zero;
                 //other.GetComponent<Rigidbody>().AddForce(PairPortal.transform.up * Power);

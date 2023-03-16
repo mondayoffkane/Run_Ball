@@ -1387,7 +1387,7 @@ MonoBehaviour:
   Point: {fileID: 9180895871384503841, guid: c4863bcb4ec7649c6a4d816f70a3cfbe, type: 3}
   _shooter: {fileID: 819681140088835867}
   Point_Group: {fileID: 1872575146038087952}
-  PinType_Array: 0000000004000000
+  PinType_Array: 0000000002000000
   Buttons: 
 --- !u!1 &4345615643820878396
 GameObject:
@@ -2901,11 +2901,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3721428624795193723, guid: 6d5099241cf2f43bb85d2dc319b20908, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.63
+      value: -2.32
       objectReference: {fileID: 0}
     - target: {fileID: 3721428624795193723, guid: 6d5099241cf2f43bb85d2dc319b20908, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.07
+      value: 0.14
       objectReference: {fileID: 0}
     - target: {fileID: 3721428624795193723, guid: 6d5099241cf2f43bb85d2dc319b20908, type: 3}
       propertyPath: m_LocalPosition.z

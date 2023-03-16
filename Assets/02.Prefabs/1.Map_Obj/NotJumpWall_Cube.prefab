@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 8559426035985037729}
   - component: {fileID: 6451239157149684213}
   - component: {fileID: 2202527974911433366}
+  - component: {fileID: 5628846542791482135}
   m_Layer: 0
-  m_Name: NotJumpWall
+  m_Name: NotJumpWall_Cube
   m_TagString: NotJump
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 3983713254595635883}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 8, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -41,7 +42,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3983713254595635883}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: -6219663013511824272, guid: 6abcb1e8b3b834b30bc82c676b3bfec9, type: 3}
 --- !u!23 &6451239157149684213
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -62,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3d951d43f989345a68f749430892993e, type: 2}
+  - {fileID: 2100000, guid: 72378cc80669d48b89f1bf71afb57f7c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -95,5 +96,24 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 2.137626, y: 2.1376243, z: 2.1376247}
+  m_Center: {x: 0.00000011920929, y: 0.00000029802322, z: -0.000000059604645}
+--- !u!114 &5628846542791482135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3983713254595635883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b135e3d25375f44cfaa29aeb6d551066, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshList:
+  - {fileID: -6219663013511824272, guid: 6abcb1e8b3b834b30bc82c676b3bfec9, type: 3}
+  - {fileID: 8422663726684218467, guid: f2694c6efba9243eda6cc97e8e48a58d, type: 3}
+  - {fileID: -4287008160516521155, guid: 3a13ff6d7c41849528583c79e18c8e2c, type: 3}
+  - {fileID: -5156117752794334105, guid: 9cef06be5fea949d88cc875990a4fc12, type: 3}
+  - {fileID: 5359264070668912877, guid: 8a053bf6b75684b7d88b762f36823474, type: 3}
+  - {fileID: -3036678871622942084, guid: 0cf00b7b218524ff2a4b130562f215b5, type: 3}

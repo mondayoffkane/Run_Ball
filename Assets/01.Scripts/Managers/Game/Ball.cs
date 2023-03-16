@@ -32,13 +32,18 @@ public class Ball : MonoBehaviour
 
 
 
-    public void Init(int _level = 0, int _basePrice = 5)
+    public void Init(int _level = 0, float _scope =4)
     {
 
         Level = _level;
 
-        Price = Level == 0 ? 1 * (Managers.Game.Current_Stage_Level + 1)
-            : _basePrice * Mathf.Pow(3, Level - 1) * (Managers.Game.Current_Stage_Level + 1);
+
+        Price = (Managers.Game.ballBasePrice + Managers.Game.ball_PriceScope * (double)Managers.Game.Current_Stage_Level) *Mathf.Pow(_scope,Level);
+
+        //Price = Managers.Game.ballBasePrice[Managers.Game.Current_Stage_Level % Managers.Game.ballBasePrice.Length] * Mathf.Pow(_scope, Level);
+
+        //Price = Level == 0 ? 1 * (Managers.Game.Current_Stage_Level + 1)
+        //    : _basePrice * Mathf.Pow(3, Level - 1) * (Managers.Game.Current_Stage_Level + 1);
 
         //_mat = Resources.Load<Material>("Material/" + Level) as Material;
         //if (_renderer == null) _renderer = GetComponent<Renderer>();
@@ -71,12 +76,7 @@ public class Ball : MonoBehaviour
             {
                 _rb.velocity = _rb.velocity.normalized * 13f;
             }
-        }
-        //else
-        //{
-        //    _rb.velocity *= 1.3f;
-        //}
-
+        }     
 
     }
 

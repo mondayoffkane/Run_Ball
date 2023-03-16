@@ -7,10 +7,10 @@ public class GridManager : MonoBehaviour
 {
     public class LimitSize
     {
-        public float Top = 8;
-        public float Bottom = -6;
-        public float Left = -5;
-        public float Right = 5;
+        public float Top = 8.5f;
+        public float Bottom = -3;
+        public float Left = -4.5f;
+        public float Right = 4.5f;
     }
     [ShowInInspector]
     public LimitSize limitSize;
