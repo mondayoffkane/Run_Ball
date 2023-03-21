@@ -10,8 +10,20 @@ public class Portal : MonoBehaviour
 
     [SerializeField] float Power;
 
+    public Mesh[] _cupMeshes;
+
+
+    private void Start()
+    {
+        GetComponent<MeshFilter>().sharedMesh = isInput ?
+            _cupMeshes[0] : _cupMeshes[1];
+    }
+
+
+
     private void OnTriggerEnter(Collider other)
     {
+
         if (other.CompareTag("Ball"))
         {
             if (isInput)

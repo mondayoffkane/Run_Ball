@@ -17,13 +17,17 @@ public class ClearGate : MonoBehaviour
 
     Text _countText;
 
-    double Money=0d;
+    double Money = 0d;
 
     private void Start()
     {
-        clearMoney = Managers.Game.ClearMoney;
-        _countText = transform.GetComponentInChildren<Text>();
-        _countText.text = $"{(Managers.Game.currentClearMoney / clearMoney * 100d):0}%";
+        gameObject.SetActive(false);
+
+
+        //clearMoney = Managers.Game.ClearMoney;
+        //_countText = transform.GetComponentInChildren<Text>();
+        //_countText.text = $"{(Managers.Game.currentClearMoney / clearMoney * 100d):0}%";
+
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -38,7 +42,7 @@ public class ClearGate : MonoBehaviour
 
                 Text _floatingText;
                 _floatingText = _floating.transform.GetComponentInChildren<Text>();
-                _floatingText.text = $"${Money}";
+                _floatingText.text = $"${GameManager.ToCurrencyString(Money)}";
 
                 _floatingText.color = new Vector4(
                         _floatingText.color.r
@@ -62,7 +66,7 @@ public class ClearGate : MonoBehaviour
                     Managers.Game.currentClearMoney = clearMoney;
                     StartCoroutine(OpenGate());
                 }
-                _countText.text = $"{(Managers.Game.currentClearMoney / clearMoney*100d):0}%";
+                _countText.text = $"{(Managers.Game.currentClearMoney / clearMoney * 100d):0}%";
 
 
 

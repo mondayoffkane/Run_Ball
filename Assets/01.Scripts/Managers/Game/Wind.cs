@@ -47,7 +47,15 @@ public class Wind : MonoBehaviour
                 _rb2.velocity = new Vector3(_rb2.velocity.x, _rb2.velocity.y * reduece_scope, 0f);
             }
             if (_dis <= transform.lossyScale.y)
+            {
                 _rb2.AddForce(transform.up * addForce * (1 - _dis / transform.lossyScale.y));
+
+            }
+            if (_dis <= 0.8f)
+            {
+                _rb2.velocity = new Vector3(_rb2.velocity.x, addForce*0.2f, 0f);
+                
+            }
         }
     }
 }

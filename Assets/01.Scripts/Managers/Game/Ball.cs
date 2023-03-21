@@ -32,13 +32,13 @@ public class Ball : MonoBehaviour
 
 
 
-    public void Init(int _level = 0, float _scope =4)
+    public void Init(int _level = 0, float _scope = 4)
     {
 
         Level = _level;
 
 
-        Price = (Managers.Game.ballBasePrice + Managers.Game.ball_PriceScope * (double)Managers.Game.Current_Stage_Level) *Mathf.Pow(_scope,Level);
+        Price = (Managers.Game.ballBasePrice + Managers.Game.ball_PriceScope * (double)Managers.Game.Current_Stage_Level) * Mathf.Pow(_scope, Level);
 
         //Price = Managers.Game.ballBasePrice[Managers.Game.Current_Stage_Level % Managers.Game.ballBasePrice.Length] * Mathf.Pow(_scope, Level);
 
@@ -76,7 +76,26 @@ public class Ball : MonoBehaviour
             {
                 _rb.velocity = _rb.velocity.normalized * 13f;
             }
-        }     
+        }
+
+        float _X = _rb.velocity.x;
+
+        switch (_X)
+        {
+
+            case float n when n > -0.2f && n < 0:
+                _X = -0.5f;
+
+                break;
+            case float n when n >= 0f && n < 0.2:
+                _X = 0.5f;
+                break;
+            default:
+                break;
+        }
+
+
+        _rb.velocity = new Vector3(_X, _rb.velocity.y, 0f);
 
     }
 

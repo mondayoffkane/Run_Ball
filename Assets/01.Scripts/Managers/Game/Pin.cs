@@ -102,7 +102,7 @@ public class Pin : MonoBehaviour
             //    transform.localScale = Vector3.one;
             //    transform.DOScale(Vector3.one * 1.2f, 0.4f).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
             //    break;
-                    
+
 
 
             default:
@@ -139,7 +139,7 @@ public class Pin : MonoBehaviour
 
             Text _floatingText;
             _floatingText = _floating.transform.GetComponentInChildren<Text>();
-            _floatingText.text = $"$ {_ball.Price}";
+            _floatingText.text = $"$ {GameManager.ToCurrencyString(_ball.Price)}";
 
             _floatingText.color = new Vector4(
                     _floatingText.color.r
@@ -212,7 +212,7 @@ public class Pin : MonoBehaviour
 
 
                 case PinType.Trampoline:
-                    
+
                     Rigidbody _rb = collision.transform.GetComponent<Rigidbody>();
                     _rb.velocity = new Vector3(_rb.velocity.x, Force, 0f);
 

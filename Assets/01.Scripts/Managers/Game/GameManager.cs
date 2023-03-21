@@ -371,18 +371,30 @@ public class GameManager : SerializedMonoBehaviour
                     {
                         Temp_Next_Point = hits[i].transform;
                     }
+                    else if (hits[i].transform.CompareTag("Delete"))
+                    {
+                        Managers.Pool.Push(Pick_Obj.GetComponent<Poolable>());
+                        
+
+                        Temp_Prev_Point.GetComponent<Point>().Reset_Pin();
+                        
+
+                    }
+
                 }
                 if (Temp_Next_Point != null)
                 {
                     if (Temp_Next_Point.GetComponent<Point>().Fix_Pin == null)
                     {
                         Pick_Obj.GetComponent<Pin>().Prev_Point = Temp_Next_Point;
-                        Temp_Prev_Point.GetComponent<Point>().Fix_Pin = null;
-                        Temp_Next_Point.GetComponent<Point>().Fix_Pin = Pick_Obj;
+                        Temp_Prev_Point.GetComponent<Point>().Reset_Pin();
+                        //Temp_Prev_Point.GetComponent<Point>().Fix_Pin = null;
+                        Temp_Next_Point.GetComponent<Point>().Set_Pin(Pick_Obj);
+                        //Temp_Next_Point.GetComponent<Point>().Fix_Pin = Pick_Obj;
                         Pick_Obj.transform.position = Temp_Next_Point.position;
 
-                        Temp_Prev_Point.GetComponent<Renderer>().enabled = true;
-                        Temp_Next_Point.GetComponent<Renderer>().enabled = false;
+                        //Temp_Prev_Point.GetComponent<Renderer>().enabled = true;
+                        //Temp_Next_Point.GetComponent<Renderer>().enabled = false;
 
                     }
                     else
@@ -699,13 +711,14 @@ public class GameManager : SerializedMonoBehaviour
             Money += _money;
             MoneyUpdate();
 
-            //currentClearMoney += _money;
-            //Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney)}";
-            //Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney);
-            //if (currentClearMoney >= /*_gridManager.ClearMoney*/ ClearMoney[Current_Stage_Level & Max_Stage])
-            //{
-            //    StageClear();
-            //}
+            // clear gate delete. clear Money check
+            currentClearMoney += _money;
+            Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney)}";
+            Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney);
+            if (currentClearMoney >= ClearMoney)
+            {
+                StageClear();
+            }
         }
     }
 

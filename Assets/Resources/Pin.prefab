@@ -295,6 +295,9 @@ MonoBehaviour:
   - {fileID: 4300000, guid: c9df854cd1bee4cd2bcf68f823c56c64, type: 2}
   - {fileID: 4300000, guid: 18cd7fe331c894a6f84caf6793516620, type: 2}
   - {fileID: 4300000, guid: 4ea348f44f7b147c29dd09ef3d4104e3, type: 2}
+  - {fileID: 5027791669274954456, guid: 4805526a3da114d93b4c115f8aaed509, type: 3}
+  - {fileID: 5027791669274954456, guid: 4805526a3da114d93b4c115f8aaed509, type: 3}
+  - {fileID: 5027791669274954456, guid: 4805526a3da114d93b4c115f8aaed509, type: 3}
   _physicMat: {fileID: 13400000, guid: 92c7d9fcc514343618ef6c72ddb9aed4, type: 2}
   Prev_Point: {fileID: 0}
   ShootPower: 700
