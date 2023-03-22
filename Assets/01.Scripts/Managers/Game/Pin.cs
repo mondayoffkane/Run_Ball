@@ -22,6 +22,7 @@ public class Pin : MonoBehaviour
     public float ShootPower = 700f;
     public enum PinType
     {
+        Stick,
         Triangle, // tri
         Square,
         Hex, // 
@@ -87,6 +88,9 @@ public class Pin : MonoBehaviour
             //    transform.DORotate(new Vector3(0f, 0f, 360f), 4f, RotateMode.FastBeyond360)
             //  .SetEase(Ease.Linear).SetRelative(true).SetLoops(-1, LoopType.Restart);
             //    break;
+            case PinType.Stick:
+                Handle.SetActive(true);
+                break;
 
             case PinType.Triangle:
                 Handle.SetActive(true);
@@ -132,33 +136,32 @@ public class Pin : MonoBehaviour
         if (collision.transform.CompareTag("Ball"))
         {
             Ball _ball = collision.transform.GetComponent<Ball>();
-            Transform _floating = Managers.Pool.Pop(Resources.Load<GameObject>("Floating_Money"), Managers.Game.transform).transform;
-            _floating.position = new Vector3(collision.transform.position.x, collision.transform.position.y, -1);
+            //Transform _floating = Managers.Pool.Pop(Resources.Load<GameObject>("Floating_Money"), Managers.Game.transform).transform;
+            //_floating.position = new Vector3(collision.transform.position.x, collision.transform.position.y, -1);
 
 
 
-            Text _floatingText;
-            _floatingText = _floating.transform.GetComponentInChildren<Text>();
-            _floatingText.text = $"$ {GameManager.ToCurrencyString(_ball.Price)}";
+            //Text _floatingText;
+            //_floatingText = _floating.transform.GetComponentInChildren<Text>();
+            //_floatingText.text = $"$ {GameManager.ToCurrencyString(_ball.Price)}";
 
-            _floatingText.color = new Vector4(
-                    _floatingText.color.r
-                    , _floatingText.color.g
-                    , _floatingText.color.b
-                    , 1f);
+            //_floatingText.color = new Vector4(
+            //        _floatingText.color.r
+            //        , _floatingText.color.g
+            //        , _floatingText.color.b
+            //        , 1f);
 
-            DOTween.Sequence().Append(_floating.DOMoveY(_floating.position.y + 1f, 0.5f).SetEase(Ease.Linear))
-                .Join(_floatingText.DOColor(new Vector4(
-                    _floatingText.color.r
-                    , _floatingText.color.g
-                    , _floatingText.color.b
-                    , 0f), 0.5f)).SetEase(Ease.Linear)
-                    .OnComplete(() => Managers.Pool.Push(_floating.GetComponent<Poolable>()));
+            //DOTween.Sequence().Append(_floating.DOMoveY(_floating.position.y + 1f, 0.5f).SetEase(Ease.Linear))
+            //    .Join(_floatingText.DOColor(new Vector4(
+            //        _floatingText.color.r
+            //        , _floatingText.color.g
+            //        , _floatingText.color.b
+            //        , 0f), 0.5f)).SetEase(Ease.Linear)
+            //        .OnComplete(() => Managers.Pool.Push(_floating.GetComponent<Poolable>()));
 
+            //Managers.Game.AddMoney(_ball.Price);
 
-
-            Managers.Game.AddMoney(_ball.Price);
-
+            Managers.Game.FloatingTextFunc(_ball.Price, transform);
 
             Managers.Sound.Play(_clip);
         }

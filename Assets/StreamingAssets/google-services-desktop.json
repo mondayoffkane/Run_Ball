@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "938285697107",
+    "project_id": "pinball-pong",
+    "storage_bucket": "pinball-pong.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938285697107:android:657a97713f256dab68dea6",
+        "android_client_info": {
+          "package_name": "com.mondayoff.pinball"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "938285697107-pq3bqu0aqtkp8o1u2a51l0n0pgmnpi5b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwJ3HFC_5vmBOwq_KZ5gK0TDmfwYnocy8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "938285697107-pq3bqu0aqtkp8o1u2a51l0n0pgmnpi5b.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "938285697107-5i0qcjpdukoup9thkd42ojo97lnql30i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mondayoff.pinball"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

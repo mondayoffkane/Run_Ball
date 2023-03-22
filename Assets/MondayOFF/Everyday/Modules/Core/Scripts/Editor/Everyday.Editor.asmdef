@@ -1,0 +1,20 @@
+{
+    "name": "Everyday.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Everyday",
+        "Everyday.Ads",
+        "MaxSdk.Scripts.IntegrationManager.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

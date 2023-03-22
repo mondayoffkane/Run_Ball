@@ -85,6 +85,16 @@ static void handleConversionValueUpdated(int value) {
     sendSdkMessage("ConversionValueUpdated", [NSString stringWithFormat:@"%d",value]);
 }
 
+static void handleConversionValuesUpdated(int value, int coarse, bool lock) {
+    // UnitySendMessage only accepts strings
+    NSString * jsonString = dictionaryToJson(@{
+                @"value": [NSString stringWithFormat:@"%d",value],
+                @"coarse": [NSString stringWithFormat:@"%d",coarse],
+                @"lock": lock? @"true":@"false"
+            });
+    sendSdkMessage("ConversionValuesUpdated", jsonString);
+}
+
 extern "C" {
 
 
@@ -144,6 +154,10 @@ extern "C" {
         
         singularConfig.conversionValueUpdatedCallback = ^(NSInteger conversionValue) {
             handleConversionValueUpdated(conversionValue);
+        };
+
+        singularConfig.conversionValuesUpdatedCallback = ^(NSNumber * conversionValue, NSNumber * coarse, BOOL lock) {
+            handleConversionValuesUpdated(conversionValue ? [conversionValue intValue] : -1, coarse ? [coarse intValue] :  -1, lock);
         };
         
         if ([globalProperties count] > 0){
@@ -473,6 +487,10 @@ extern "C" {
 
     bool SkanUpdateConversionValue_(int conversionValue) {
         return [Singular skanUpdateConversionValue:conversionValue];
+    }
+
+    void SkanUpdateConversionValues_(int conversionValue, int coarse, bool lock) {
+        return [Singular skanUpdateConversionValue:conversionValue coarse:coarse lock:lock];
     }
 
     int SkanGetConversionValue_() {

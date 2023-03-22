@@ -1,0 +1,31 @@
+{
+    "name": "Everyday.IAP",
+    "rootNamespace": "",
+    "references": [
+        "UnityEngine.Purchasing",
+        "UnityEngine.Purchasing.Security",
+        "UnityEngine.Purchasing.SecurityCore",
+        "UnityEngine.Purchasing.SecurityStub",
+        "UnityEngine.Purchasing.Stores",
+        "Unity.Services.Core",
+        "Unity.Services.Core.Environments",
+        "SingularSDK",
+        "Everyday.Ads",
+        "Everyday"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.purchasing",
+            "expression": "0",
+            "define": "UNITY_PURCHASING"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -5,7 +5,9 @@ using System.Collections;
 //using UnityEditor.iOS;
 using UnityEditor;
 using Unity.VisualScripting;
-
+using DG.Tweening;
+using MondayOFF;
+using UnityEngine.UI;
 
 public class GameManager : SerializedMonoBehaviour
 {
@@ -76,6 +78,10 @@ public class GameManager : SerializedMonoBehaviour
     public Vector3 startMousePos, offset, _rotation;
     public Transform _rotObj;
 
+    public bool isDoubleMoney;
+    public float doubleMoney_Time;
+
+
 
     [SerializeField] double tempAddBall_Price, tempMergeBalls_Price, tempAddPin_Price;
 
@@ -129,6 +135,9 @@ public class GameManager : SerializedMonoBehaviour
 
     public void SetStage(int _level = 0)
     {
+        MondayOFF.EventTracker.TryStage(_level);
+
+
         //for (int i = 0; i < Max_Stage; i++)
         //{
         //    Stages[i].SetActive(false);
@@ -333,7 +342,7 @@ public class GameManager : SerializedMonoBehaviour
                 Vector3 _testpos = (mousePos - _rotObj.transform.position).normalized;
 
                 //_rotObj.rotation = Quaternion.FromToRotation(Vector3.up, Vector3.right - _testpos);
-                _rotObj.rotation = Quaternion.FromToRotation(Vector3.left, _testpos);
+                _rotObj.rotation = Quaternion.FromToRotation(Vector3.down, _testpos);
 
             }
 
@@ -374,10 +383,10 @@ public class GameManager : SerializedMonoBehaviour
                     else if (hits[i].transform.CompareTag("Delete"))
                     {
                         Managers.Pool.Push(Pick_Obj.GetComponent<Poolable>());
-                        
+
 
                         Temp_Prev_Point.GetComponent<Point>().Reset_Pin();
-                        
+
 
                     }
 
@@ -709,6 +718,9 @@ public class GameManager : SerializedMonoBehaviour
         if (isRunning)
         {
             Money += _money;
+
+            //Money += isDoubleMoney ? _money * 2d : _money;
+
             MoneyUpdate();
 
             // clear gate delete. clear Money check
@@ -724,6 +736,9 @@ public class GameManager : SerializedMonoBehaviour
 
     public void StageClear()
     {
+
+        MondayOFF.EventTracker.ClearStage(Current_Stage_Level);
+
         isRunning = false;
         Current_Stage_Level++;
 
@@ -742,6 +757,7 @@ public class GameManager : SerializedMonoBehaviour
 
     public void NextStage_Button()
     {
+        MondayOFF.AdsManager.ShowInterstitial();
         isRunning = false;
         currentClearMoney = 0;
         //Managers._uiGameScene.FillGuage.fillAmount = 0f;
@@ -788,4 +804,82 @@ public class GameManager : SerializedMonoBehaviour
     }
 
 
+    public void FloatingTextFunc(double _price, Transform _trans)
+    {
+        double _PriceValue = isDoubleMoney ? _price * 2d : _price;
+
+
+        Transform _floating = Managers.Pool.Pop(Resources.Load<GameObject>("Floating_Money"), Managers.Game.transform).transform;
+        _floating.position = new Vector3(_trans.position.x, _trans.position.y, -1);
+
+        Text _floatingText;
+        _floatingText = _floating.transform.GetComponentInChildren<Text>();
+        _floatingText.text = $"$ {ToCurrencyString(_PriceValue)}";
+
+        _floatingText.color = new Vector4(
+                _floatingText.color.r
+                , _floatingText.color.g
+                , _floatingText.color.b
+                , 1f);
+
+        DOTween.Sequence().Append(_floating.DOMoveY(_floating.position.y + 1f, 0.5f).SetEase(Ease.Linear))
+            .Join(_floatingText.DOColor(new Vector4(
+                _floatingText.color.r
+                , _floatingText.color.g
+                , _floatingText.color.b
+                , 0f), 0.5f)).SetEase(Ease.Linear)
+                .OnComplete(() => Managers.Pool.Push(_floating.GetComponent<Poolable>()));
+
+
+
+        AddMoney(_PriceValue);
+
+
+
+    }
+
+
+
+    /////////////// RV Func ////////////////////
+
+
+
+    public void RV_AddMoney()
+    {
+        EventTracker.LogCustomEvent("RV", new Dictionary<string, string> { { "Right_RV", "AddMoney" } });
+        double _tempMoney = 0;
+        foreach (Ball _ball in ballList)
+        {
+            _tempMoney += _ball.Price;
+        }
+
+        Money += _tempMoney * 50d;
+
+        MoneyUpdate();
+    }
+
+    public void RV_AddBall(int _count = 10)
+    {
+        EventTracker.LogCustomEvent("RV", new Dictionary<string, string> { { "Right_RV", "AddBall" } });
+        for (int i = 0; i < _count; i++)
+        {
+            AddBall(false);
+        }
+    }
+
+    public void RV_DoubleMoney()
+    {
+        if (!isDoubleMoney)
+        {
+            DOTween.Sequence().AppendCallback(() =>
+            {
+                isDoubleMoney = true;
+                DOTween.To(() => 30f, x => doubleMoney_Time = x, 0, 30f).SetEase(Ease.Linear);
+                EventTracker.LogCustomEvent("RV", new Dictionary<string, string> { { "Right_RV", "DoubleMoney" } });
+            })
+                .AppendInterval(30f).
+                AppendCallback(() => isDoubleMoney = false);
+
+        }
+    }
 }

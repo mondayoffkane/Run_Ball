@@ -81,26 +81,26 @@ public class Managers : MonoBehaviour
 
 
     //============Check Internet============ 지워도 됨!
-    bool isInternetOn = true;
-    UI_PopupInternet popup;
-    float _oriTimeScale = 1;
-    private void Update()
-    {
-        if (isInternetOn && Application.internetReachability == NetworkReachability.NotReachable)
-        {
-            isInternetOn = false;
-            popup = Managers.UI.ShowPopupUI<UI_PopupInternet>();
-            _oriTimeScale = Time.timeScale;
-            Time.timeScale = 0;
-        }
-        else if (!isInternetOn && Application.internetReachability != NetworkReachability.NotReachable)
-        {
-            isInternetOn = true;
-            if (popup != null)
-                Managers.UI.ClosePopupUI(popup);
-            Time.timeScale = _oriTimeScale;
-        }
-    }
+    //bool isInternetOn = true;
+    //UI_PopupInternet popup;
+    //float _oriTimeScale = 1;
+    //private void Update()
+    //{
+    //    if (isInternetOn && Application.internetReachability == NetworkReachability.NotReachable)
+    //    {
+    //        isInternetOn = false;
+    //        popup = Managers.UI.ShowPopupUI<UI_PopupInternet>();
+    //        _oriTimeScale = Time.timeScale;
+    //        Time.timeScale = 0;
+    //    }
+    //    else if (!isInternetOn && Application.internetReachability != NetworkReachability.NotReachable)
+    //    {
+    //        isInternetOn = true;
+    //        if (popup != null)
+    //            Managers.UI.ClosePopupUI(popup);
+    //        Time.timeScale = _oriTimeScale;
+    //    }
+    //}
     //============Check Internet============ 지워도 됨!
 
 
