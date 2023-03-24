@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using DG.Tweening;
 using MondayOFF;
 using UnityEngine.UI;
+using MoreMountains.NiceVibrations;
 
 public class GameManager : SerializedMonoBehaviour
 {
@@ -79,11 +80,19 @@ public class GameManager : SerializedMonoBehaviour
     public Transform _rotObj;
 
     public bool isDoubleMoney;
-    public float doubleMoney_Time;
+    public float doubleMoney_Time = 30f;
 
+    public double Mps = 0;
 
+    double tempRewardMoney = 0d;
+    double RV_RewardMoney = 0d;
 
     [SerializeField] double tempAddBall_Price, tempMergeBalls_Price, tempAddPin_Price;
+    bool isMerging = false;
+    Ball _newBall;
+    Transform MergeRot;
+    ParticleSystem MergeEffect;
+
 
     // ===================================
     public void Init()
@@ -100,8 +109,22 @@ public class GameManager : SerializedMonoBehaviour
 
         SkyBox_Mats = new Material[7];
         SkyBox_Mats = Resources.LoadAll<Material>("SkyBox");
-
+        StartCoroutine(Cor_MPS_Update());
+        MergeRot = GameObject.FindGameObjectWithTag("MergeRot").transform;
+        MergeEffect = GameObject.FindGameObjectWithTag("MergeEffect").GetComponent<ParticleSystem>();
     }
+    IEnumerator Cor_MPS_Update()
+    {
+        WaitForSeconds _interval = new WaitForSeconds(1f);
+        Text _moneytime = Managers._uiGameScene.RV_DoubleMoney_Button.transform.GetChild(1).GetComponent<Text>();
+        while (true)
+        {
+            yield return _interval;
+            Managers._uiGameScene.MPSText.text = $"${ToCurrencyString(Mps)} / Sec";
+            _moneytime.text = $"{doubleMoney_Time:0}s";
+        }
+    }
+
 
     void CheckMaxStage()
     {
@@ -136,7 +159,7 @@ public class GameManager : SerializedMonoBehaviour
     public void SetStage(int _level = 0)
     {
         MondayOFF.EventTracker.TryStage(_level);
-
+        Managers._uiGameScene.StageText.text = $"Stage {Current_Stage_Level + 1}";
 
         //for (int i = 0; i < Max_Stage; i++)
         //{
@@ -523,6 +546,9 @@ public class GameManager : SerializedMonoBehaviour
 
     public void AddBall(bool isPay = true)
     {
+
+        AdsManager.ShowInterstitial();
+
         if (isPay == true)
         {
             Money -= tempAddBall_Price;
@@ -547,31 +573,76 @@ public class GameManager : SerializedMonoBehaviour
 
     public void MergeBalls()
     {
+        AdsManager.ShowInterstitial();
 
         Money -= tempMergeBalls_Price;
         //mergeBalls_BasePrice[Current_Stage_Level % Max_Stage] + mergeBalls_Level * StageScope * (Current_Stage_Level + 1);    // _gridManager.mergeBalls_BasePrice * mergeBalls_Level;
         mergeBalls_Level++;
 
-        int tempLevel = 0;
-        foreach (Ball _ball in tempMergeBalls)
-        {
-            tempLevel = _ball.Level;
-            Managers.Pool.Push(_ball.GetComponent<Poolable>());
-            ballList.Remove(_ball);
-            _currentShooter.Ball_Wait_List.Remove(_ball.GetComponent<Rigidbody>());
-        }
-        tempMergeBalls.Clear();
-        Ball _newBall = _currentShooter.AddBall();
-        _newBall.Init(tempLevel + 1);
-        ballList.Add(_newBall);
-        _currentShooter.MergeShoot(_newBall);
-        CheckMergeList();
 
-        MoneyUpdate();
+
+
+        int tempLevel = 0;
+
+        Button_OnOff(Managers._uiGameScene.MergeBalls_Button, false);
+        isMerging = true;
+
+        DOTween.Sequence().AppendCallback(() =>
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                tempMergeBalls[i].GetComponent<Rigidbody>().isKinematic = true;
+                tempMergeBalls[i].transform.SetParent(MergeRot);
+                tempMergeBalls[i].gameObject.SetActive(true);
+                tempMergeBalls[i].GetComponent<TrailRenderer>().Clear();
+
+            }
+        })
+            .Append(tempMergeBalls[0].transform.DOMove(MergeRot.transform.GetChild(0).position, 0.5f)).SetEase(Ease.Linear)
+            .Join(tempMergeBalls[1].transform.DOMove(MergeRot.transform.GetChild(1).position, 0.5f)).SetEase(Ease.Linear)
+            .Join(tempMergeBalls[2].transform.DOMove(MergeRot.transform.GetChild(2).position, 0.5f)).SetEase(Ease.Linear)
+            .Append(tempMergeBalls[0].transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.Linear))
+            .Join(tempMergeBalls[1].transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.Linear))
+            .Join(tempMergeBalls[2].transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.Linear))
+            .AppendCallback(() =>
+            {
+                foreach (Ball _ball in tempMergeBalls)
+                {
+                    tempLevel = _ball.Level;
+                    Managers.Pool.Push(_ball.GetComponent<Poolable>());
+                    ballList.Remove(_ball);
+                    _currentShooter.Ball_Wait_List.Remove(_ball.GetComponent<Rigidbody>());
+                }
+                tempMergeBalls.Clear();
+
+                //MergeRot.transform.GetChild(3).GetComponent<ParticleSystem>().Play();
+                MergeEffect.Play();
+
+                _newBall = _currentShooter.AddBall();
+                _newBall.gameObject.SetActive(true);
+                _newBall.transform.position = MergeRot.transform.position;
+                _newBall.Init(tempLevel + 1);
+            })
+            .AppendInterval(0.5f)
+            .OnComplete(() =>
+            {
+
+                _newBall.gameObject.SetActive(false);
+                ballList.Add(_newBall);
+                _currentShooter.MergeShoot(_newBall);
+                CheckMergeList();
+
+                MoneyUpdate();
+                isMerging = false;
+                CheckButtons();
+            });
+
     }
 
     public void AddPin(int _num = 0, bool isPay = true)
     {
+        AdsManager.ShowInterstitial();
+
         if (isPay == true)
         {
             Money -= tempAddPin_Price;
@@ -669,6 +740,16 @@ public class GameManager : SerializedMonoBehaviour
         Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney)}";
         Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney);
 
+        tempRewardMoney = 0d;
+        foreach (Ball _ball in ballList)
+        {
+            tempRewardMoney += _ball.Price;
+        }
+
+
+        RV_RewardMoney = tempRewardMoney * 50d;
+        Managers._uiGameScene.RV_AddMoney_Button.GetComponentInChildren<Text>().text = $"{ToCurrencyString(RV_RewardMoney)}";
+
         CheckButtons();
     }
 
@@ -678,11 +759,6 @@ public class GameManager : SerializedMonoBehaviour
         tempMergeBalls_Price = mergeBalls_BasePrice * (Current_Stage_Level) + (mergeBalls_PriceScope * mergeBalls_Level * (Current_Stage_Level + 1));
         tempAddPin_Price = addPin_BasePrice * (Current_Stage_Level) + (addPin_PriceScope * addPin_Level * (Current_Stage_Level + 1));
 
-        //tempAddBall_Price = addBall_BasePrice[Current_Stage_Level % addBall_BasePrice.Length] + addBall_Level * StageScope * (Current_Stage_Level + 1);
-        //tempMergeBalls_Price = mergeBalls_BasePrice[Current_Stage_Level % mergeBalls_BasePrice.Length] + mergeBalls_Level * StageScope * (Current_Stage_Level + 1);
-        //tempAddPin_Price = addPin_BasePrice[Current_Stage_Level % addPin_BasePrice.Length] + addPin_Level * StageScope * (Current_Stage_Level + 1);
-
-
         // 버튼 텍스트 업데이트
         Managers._uiGameScene.AddBallText.text = $"${ToCurrencyString(tempAddBall_Price)}"; // /*_gridManager.addBall_BasePrice * addBall_Level*/)}"
         Managers._uiGameScene.MergeBallsText.text = $"${ToCurrencyString(tempMergeBalls_Price)}";
@@ -691,26 +767,25 @@ public class GameManager : SerializedMonoBehaviour
 
         // 금액 비교후 버튼 활성화 결정
 
-        Managers._uiGameScene.AddBall_Button.interactable
-            = Money >= tempAddBall_Price
-            //addBall_BasePrice[Current_Stage_Level % Max_Stage] + addBall_Level * StageScope * (Current_Stage_Level + 1)
-            //_gridManager.addBall_BasePrice * addBall_Level
-            ? true : false;
 
-        Managers._uiGameScene.MergeBalls_Button.interactable
-             = Money >= tempMergeBalls_Price
-             //(Money >= mergeBalls_BasePrice[Current_Stage_Level % Max_Stage] + mergeBalls_Level * StageScope * (Current_Stage_Level + 1) /*_gridManager.mergeBalls_BasePrice * mergeBalls_Level*/)
-             && (tempMergeBalls.Count >= 3) ? true : false;
+        Button_OnOff(Managers._uiGameScene.AddBall_Button,
+           (Money >= tempAddBall_Price));
+        Button_OnOff(Managers._uiGameScene.MergeBalls_Button,
+           (Money >= tempMergeBalls_Price && (tempMergeBalls.Count >= 3) && !isMerging));
 
-        Managers._uiGameScene.AddPin_Button.interactable
-        = Money >= tempAddPin_Price
-        //(Money >= addPin_BasePrice[Current_Stage_Level % Max_Stage] + addPin_Level * StageScope * (Current_Stage_Level + 1))
-        && (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null)
-        //_gridManager.addPin_BasePrice * addPin_Level
-        ? true : false;
+        Button_OnOff(Managers._uiGameScene.AddPin_Button,
+            (Money >= tempAddPin_Price && (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null)));
 
 
 
+    }
+
+    public void Button_OnOff(Button _button, bool isTrue)
+    {
+        _button.interactable = isTrue;
+        _button.transform.GetChild(0).GetComponent<Text>().color = new Color32(255, 255, 255, 255);
+        _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 255);
+        _button.transform.GetChild(1).GetComponent<Outline>().enabled = true;
     }
 
     public void AddMoney(double _money)
@@ -834,10 +909,23 @@ public class GameManager : SerializedMonoBehaviour
 
         AddMoney(_PriceValue);
 
+        DOTween.Sequence().AppendCallback(() => MPS_Update(_PriceValue))
+            .AppendInterval(1f)
+            .AppendCallback(() => MPS_Update(-_PriceValue));
+
+
+
 
 
     }
 
+    public void MPS_Update(double _val)
+    {
+        Mps += _val;
+        //Managers._uiGameScene.MPSText.text = $"${ToCurrencyString(Mps)} / Sec";
+
+
+    }
 
 
     /////////////// RV Func ////////////////////
@@ -847,14 +935,8 @@ public class GameManager : SerializedMonoBehaviour
     public void RV_AddMoney()
     {
         EventTracker.LogCustomEvent("RV", new Dictionary<string, string> { { "Right_RV", "AddMoney" } });
-        double _tempMoney = 0;
-        foreach (Ball _ball in ballList)
-        {
-            _tempMoney += _ball.Price;
-        }
 
-        Money += _tempMoney * 50d;
-
+        Money += RV_RewardMoney;
         MoneyUpdate();
     }
 
@@ -876,10 +958,45 @@ public class GameManager : SerializedMonoBehaviour
                 isDoubleMoney = true;
                 DOTween.To(() => 30f, x => doubleMoney_Time = x, 0, 30f).SetEase(Ease.Linear);
                 EventTracker.LogCustomEvent("RV", new Dictionary<string, string> { { "Right_RV", "DoubleMoney" } });
+                Managers._uiGameScene.RV_DoubleMoney_Button.interactable = false;
             })
                 .AppendInterval(30f).
-                AppendCallback(() => isDoubleMoney = false);
+                AppendCallback(() =>
+                {
+                    isDoubleMoney = false;
+                    doubleMoney_Time = 30f;
+                    Managers._uiGameScene.RV_DoubleMoney_Button.interactable = true;
+                });
 
         }
     }
+
+
+    public void GameObjectOnOnff(GameObject _obj)
+    {
+        _obj.SetActive(!_obj.activeSelf);
+    }
+
+    public void Vibe(int _num = 0)
+    {
+        switch (_num)
+        {
+            case 0:
+                MMVibrationManager.Haptic(HapticTypes.LightImpact);
+                break;
+
+            case 1:
+                MMVibrationManager.Haptic(HapticTypes.MediumImpact);
+                break;
+
+            case 2:
+                MMVibrationManager.Haptic(HapticTypes.HeavyImpact);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
 }

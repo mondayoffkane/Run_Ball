@@ -20,7 +20,13 @@ public class UI_GameScene : UI_Scene
         RV_AddMoney,
         RV_AddBalls,
         RV_DoubleMoney,
-        BallReset
+        BallReset,
+        Setting,
+        Setting_Close,
+        Sound,
+        Haptic,
+        Restore
+
     }
 
     enum Texts
@@ -37,16 +43,18 @@ public class UI_GameScene : UI_Scene
         Base_Panel,
         Upgrade_Panel,
         Clear_Panel,
-        Store_Panel
+        Store_Panel,
+        Setting_Panel
     }
 
     public Text MoneyText;
 
     public Text AddBallText, MergeBallsText, AddPinText, GuageText, StageText, MPSText;
     public Button AddBall_Button, MergeBalls_Button, AddPin_Button, NextStage_Button
-        , RV_AddMoney_Button, RV_AddBalls_Button, RV_DoubleMoney_Button, BallReset_Button;
+        , RV_AddMoney_Button, RV_AddBalls_Button, RV_DoubleMoney_Button, BallReset_Button
+        , Setting_Button, Setting_Close_Button, Sound_Button, Haptic_Button, Restore_Button;
 
-    public GameObject Base_Panel, Upgrade_Panel, Clear_Panel, Store_Panel;
+    public GameObject Base_Panel, Upgrade_Panel, Clear_Panel, Store_Panel, Setting_Panel;
     public Image FillGuage;
 
 
@@ -110,6 +118,39 @@ public class UI_GameScene : UI_Scene
         // ///////// Stage, MPS
         StageText = GetText(Texts.Stage_Text);
         MPSText = GetText(Texts.MPS_Text);
+
+        // //////// Setting buttons
+        Setting_Panel = GetObject(GameObjects.Setting_Panel);
+        Setting_Button = GetButton(Buttons.Setting);
+        Setting_Close_Button = GetButton(Buttons.Setting_Close);
+        Sound_Button = GetButton(Buttons.Sound);
+        Haptic_Button = GetButton(Buttons.Haptic);
+        Restore_Button = GetButton(Buttons.Restore);
+
+        Setting_Button.AddButtonEvent(() =>
+        {
+            Managers.Game.GameObjectOnOnff(Setting_Panel);
+            Sound_Button.GetComponent<Image>().sprite = Resources.Load<Sprite>("Img/Sound_" + Managers.Data.UseSound);
+            Haptic_Button.GetComponent<Image>().sprite = Resources.Load<Sprite>("Img/Haptic_" + Managers.Data.UseHaptic);
+        });
+        Setting_Close_Button.AddButtonEvent(() => Managers.Game.GameObjectOnOnff(Setting_Panel));
+        Sound_Button.AddButtonEvent(() =>
+        {
+            Managers.Data.UseSound = !Managers.Data.UseSound;
+            Sound_Button.GetComponent<Image>().sprite = Resources.Load<Sprite>("Img/Sound_" + Managers.Data.UseSound);
+            Debug.Log("Img/Sound_" + Managers.Data.UseSound);
+
+        });
+        Haptic_Button.AddButtonEvent(() =>
+        {
+            Managers.Data.UseHaptic = !Managers.Data.UseHaptic;
+            Haptic_Button.GetComponent<Image>().sprite = Resources.Load<Sprite>("Img/Haptic_" + Managers.Data.UseHaptic);
+            Debug.Log("Img/Haptic_" + Managers.Data.UseHaptic);
+        });
+
+        Restore_Button.AddButtonEvent(() => MondayOFF.IAPManager.RestorePurchase());
+
+
 
     }
     public void TestFunc()

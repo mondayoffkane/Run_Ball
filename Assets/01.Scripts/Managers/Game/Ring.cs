@@ -44,6 +44,8 @@ public class Ring : MonoBehaviour
 
             Managers.Game.FloatingTextFunc(_ball.Price, transform);
 
+            
+
         }
     }
 }

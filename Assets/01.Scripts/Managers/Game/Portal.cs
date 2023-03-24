@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Portal : MonoBehaviour
 {
@@ -12,11 +13,20 @@ public class Portal : MonoBehaviour
 
     public Mesh[] _cupMeshes;
 
+    [SerializeField] Image[] Arrow_Img;
 
     private void Start()
     {
         GetComponent<MeshFilter>().sharedMesh = isInput ?
             _cupMeshes[0] : _cupMeshes[1];
+
+        Arrow_Img = new Image[2];
+        Arrow_Img = transform.GetComponentsInChildren<Image>();
+
+        Arrow_Img[0].enabled = !isInput;
+        Arrow_Img[1].enabled = isInput;
+
+
     }
 
 

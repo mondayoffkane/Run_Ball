@@ -7,6 +7,13 @@ public class ReturnHole : MonoBehaviour
 
     public GameObject Effect;
 
+
+    private void Start()
+    {
+        GetComponent<Renderer>().enabled = false;
+    }
+
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Ball"))

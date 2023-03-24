@@ -45,7 +45,7 @@ public class Shooter : MonoBehaviour
                 _rb.transform.position = transform.position;// + Vector3.right * Random.Range(-0.5f, 0.5f);
                 _rb.velocity = Vector3.zero;
                 _rb.angularVelocity = Vector3.zero;
-                //_rb.isKinematic = false;
+                _rb.isKinematic = false;
                 _rb.AddForce(transform.up * Power);
                 _rb.GetComponent<TrailRenderer>().enabled = true;
                 _rb.GetComponent<Collider>().isTrigger = false;

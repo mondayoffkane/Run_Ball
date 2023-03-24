@@ -167,7 +167,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a4aa6961af1ba4e9e9e10a83b909b94e, type: 2}
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -188,7 +188,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.05
+  m_Time: 0.08
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -198,28 +198,28 @@ TrailRenderer:
       - serializedVersion: 3
         time: 0
         value: 0.9195804
-        inSlope: -0.8552442
-        outSlope: -0.8552442
+        inSlope: -0.5017783
+        outSlope: -0.5017783
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.07358953
+        outWeight: 0.075746745
       - serializedVersion: 3
         time: 1
-        value: 0.19015503
-        inSlope: -0.7765828
-        outSlope: -0.7765828
+        value: 0
+        inSlope: -1.0237263
+        outSlope: -1.0237263
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.07931316
+        inWeight: 0.05992782
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 1}
-      key1: {r: 1, g: 1, b: 1, a: 1}
+      key0: {r: 1, g: 1, b: 1, a: 0.7058824}
+      key1: {r: 1, g: 1, b: 1, a: 0.12941177}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -235,8 +235,8 @@ TrailRenderer:
       ctime6: 0
       ctime7: 0
       atime0: 0
-      atime1: 65535
-      atime2: 0
+      atime1: 42598
+      atime2: 65535
       atime3: 0
       atime4: 0
       atime5: 0
@@ -244,7 +244,7 @@ TrailRenderer:
       atime7: 0
       m_Mode: 0
       m_NumColorKeys: 2
-      m_NumAlphaKeys: 2
+      m_NumAlphaKeys: 3
     numCornerVertices: 11
     numCapVertices: 21
     alignment: 0
