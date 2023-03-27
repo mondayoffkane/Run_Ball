@@ -5,6 +5,10 @@ using System.Text;
 using AppLovinMax.ThirdParty.MiniJson;
 using UnityEngine;
 
+#if UNITY_IOS && !UNITY_EDITOR
+using System.Runtime.InteropServices;
+#endif
+
 public abstract class MaxSdkBase
 {
     // Shared Properties
@@ -566,6 +570,157 @@ internal static class AdPositionExtenstion
         else // position == MaxSdkBase.AdViewPosition.BottomRight
         {
             return "bottom_right";
+        }
+    }
+}
+
+namespace AppLovinMax.Internal.API
+{
+    public class CFError
+    {
+        /// <summary>
+        /// Indicates that the flow ended in an unexpected state.
+        /// </summary>
+        public const int ErrorCodeUnspecified = -1;
+
+        /// <summary>
+        /// Indicates that the consent flow has not been integrated correctly.
+        /// </summary>
+        public const int ErrorCodeInvalidIntegration = -100;
+
+        /// <summary>
+        /// Indicates that the consent flow is already being shown.
+        /// </summary>
+        public const int ErrorCodeFlowAlreadyInProgress = -200;
+
+        /// <summary>
+        /// Indicates that the user is not in a GDPR region.
+        /// </summary>
+        public const int ErrorCodeNotInGdprRegion = -300;
+
+        /// <summary>
+        /// The error code for this error. Will be one of the error codes listed in this file.
+        /// </summary>
+        public int Code { get; private set; }
+
+        /// <summary>
+        /// The error message for this error.
+        /// </summary>
+        public string Message { get; private set; }
+
+        public static CFError Create(IDictionary<string, object> errorObject)
+        {
+            if (!errorObject.ContainsKey("code") && !errorObject.ContainsKey("message")) return null;
+
+            var code = MaxSdkUtils.GetIntFromDictionary(errorObject, "code", ErrorCodeUnspecified);
+            var message = MaxSdkUtils.GetStringFromDictionary(errorObject, "message");
+            return new CFError(code, message);
+        }
+
+        private CFError(int code, string message)
+        {
+            Code = code;
+            Message = message;
+        }
+
+        public override string ToString()
+        {
+            return "[CFError Code: " + Code +
+                   ", Message: " + Message + "]";
+        }
+    }
+
+    public enum CFType
+    {
+        /// <summary>
+        /// The flow type is not known.
+        /// </summary>
+        Unknown,
+
+        /// <summary>
+        /// A standard flow where a TOS/PP alert is shown.
+        /// </summary>
+        Standard,
+
+        /// <summary>
+        /// A detailed modal shown to users in GDPR region.
+        /// </summary>
+        Detailed
+    }
+
+    public class CFService
+    {
+        private static Action<CFError> OnConsentFlowCompletedAction;
+
+#if UNITY_EDITOR
+#elif UNITY_ANDROID
+        private static readonly AndroidJavaClass MaxUnityPluginClass = new AndroidJavaClass("com.applovin.mediation.unity.MaxUnityPlugin");
+#elif UNITY_IOS
+        [DllImport("__Internal")]
+        private static extern string _MaxGetCFType();
+
+        [DllImport("__Internal")]
+        private static extern void _MaxStartConsentFlow();
+#endif
+
+        /// <summary>
+        /// The consent flow type that will be displayed.
+        /// </summary>
+        public static CFType CFType
+        {
+            get
+            {
+                var cfType = "0";
+#if UNITY_EDITOR
+#elif UNITY_ANDROID
+                cfType = MaxUnityPluginClass.CallStatic<string>("getCFType");
+#elif UNITY_IOS
+                cfType = _MaxGetCFType();
+#endif
+
+                if ("1".Equals(cfType))
+                {
+                    return CFType.Standard;
+                }
+                else if ("2".Equals(cfType))
+                {
+                    return CFType.Detailed;
+                }
+
+                return CFType.Unknown;
+            }
+        }
+
+        /// <summary>
+        /// Starts the consent flow. Call this method to re-show the consent flow for a user in GDPR region.
+        ///
+        /// Note: The flow will only be shown to users in GDPR regions.
+        /// </summary>
+        /// <param name="onFlowCompletedAction">Called when we finish showing the consent flow. Error object will be <c>null</c> if the flow completed successfully.</param>
+        public static void SCF(Action<CFError> onFlowCompletedAction)
+        {
+            OnConsentFlowCompletedAction = onFlowCompletedAction;
+
+#if UNITY_EDITOR
+            var errorDict = new Dictionary<string, object>()
+            {
+                {"code", CFError.ErrorCodeUnspecified},
+                {"message", "Consent flow is not supported in Unity Editor."}
+            };
+
+            NotifyConsentFlowCompletedIfNeeded(errorDict);
+#elif UNITY_ANDROID
+            MaxUnityPluginClass.CallStatic("startConsentFlow");
+#elif UNITY_IOS
+            _MaxStartConsentFlow();
+#endif
+        }
+
+        public static void NotifyConsentFlowCompletedIfNeeded(IDictionary<string, object> error)
+        {
+            if (OnConsentFlowCompletedAction == null) return;
+
+            OnConsentFlowCompletedAction(CFError.Create(error));
         }
     }
 }

@@ -15,7 +15,7 @@ MonoBehaviour:
   verboseLogging: 0
   adSettings:
     initializeOnLoad: 1
-    showBannerOnLoad: 0
+    showBannerOnLoad: 1
     adInitializationOrder: 84
     delay: 2
     interstitialInterval: 30

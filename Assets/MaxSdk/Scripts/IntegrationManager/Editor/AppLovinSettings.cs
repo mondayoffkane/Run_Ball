@@ -63,6 +63,8 @@ public class AppLovinSettings : ScriptableObject
     [SerializeField] private string adMobAndroidAppId = string.Empty;
     [SerializeField] private string adMobIosAppId = string.Empty;
 
+    [SerializeField] private bool showInternalSettingsInIntegrationManager;
+
     /// <summary>
     /// An instance of AppLovin Setting.
     /// </summary>
@@ -336,6 +338,12 @@ public class AppLovinSettings : ScriptableObject
     {
         get { return Instance.adMobIosAppId; }
         set { Instance.adMobIosAppId = value; }
+    }
+
+    public bool ShowInternalSettingsInIntegrationManager
+    {
+        get { return Instance.showInternalSettingsInIntegrationManager; }
+        set { Instance.showInternalSettingsInIntegrationManager = value; }
     }
 
     /// <summary>
