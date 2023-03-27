@@ -24,6 +24,7 @@ namespace MondayOFF {
             AdsManager.DisableAdType(AdType.Banner | AdType.Interstitial);
 
             // Disable RV, PlayOn, Adverty too?
+
             OnNoAds?.Invoke();
 
             PlayerPrefs.SetInt(NoAdsProductKey, 1);

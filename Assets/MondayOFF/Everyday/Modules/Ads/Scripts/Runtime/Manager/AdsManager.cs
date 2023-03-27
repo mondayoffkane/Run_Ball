@@ -26,13 +26,14 @@ namespace MondayOFF {
         public static bool HAS_USER_CONSENT = false;
 
         public static void Initialize(in AdType activeAdTypes = AdType.All) {
-            if (_isInitializeRequested) {
+            if (_isInitialized) {
                 Debug.LogWarning("[EVERYDAY] AdsManager is already initialized!");
                 return;
             }
-            _isInitializeRequested = true;
+            _isInitialized = true;
 
             Debug.Log("[EVERYDAY] Initializing AdsManager..");
+            // _isInitialized = true;
             _activeAdTypes = activeAdTypes;
 
             InitializeAdTypes();
@@ -129,7 +130,7 @@ namespace MondayOFF {
         }
 
         public static bool LinkLogoToRectTransform(in PlayOnSDK.Position position, in RectTransform rectTransform, in Canvas canvas) {
-            if (_playOn == null) {
+            if (!IsPlayOnReady()) {
                 return false;
             }
 

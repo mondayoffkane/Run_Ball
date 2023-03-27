@@ -21,30 +21,28 @@ namespace MondayOFF {
         private static void CopyAndroidManifest() {
             const string manifestPath = "Assets/Plugins/Android/AndroidManifest.xml";
             if (!File.Exists(manifestPath)) {
-                Facebook.Unity.Editor.ManifestMod.GenerateManifest();
-                Debug.Log("[EVERYDAY] AndroidManifest.xml not found in Plugins/Android. Using Facebook SDK to generate manifest.");
-//                 string unityManifestPath;
-// #if UNITY_EDITOR_OSX
-//                 unityManifestPath = Directory.GetParent(EditorApplication.applicationPath).FullName;
-// #else
-//                 unityManifestPath = Path.Combine(Directory.GetParent(EditorApplication.applicationPath).FullName, "Data");
-// #endif
-//                 unityManifestPath = Path.Combine(unityManifestPath, "PlaybackEngines/AndroidPlayer/Apk");
+                string unityManifestPath;
+#if UNITY_EDITOR_OSX
+                unityManifestPath = Directory.GetParent(EditorApplication.applicationPath).FullName;
+#else
+                unityManifestPath = Path.Combine(Directory.GetParent(EditorApplication.applicationPath).FullName, "Data");
+#endif
+                unityManifestPath = Path.Combine(unityManifestPath, "PlaybackEngines/AndroidPlayer/Apk");
 
-// #if UNITY_2019_1_OR_NEWER
-//                 unityManifestPath = Path.Combine(unityManifestPath, "UnityManifest.xml");
-// #else
-//                 unityManifestPath = Path.Combine(unityManifestPath, "AndroidManifest.xml");
-// #endif
+#if UNITY_2019_1_OR_NEWER
+                unityManifestPath = Path.Combine(unityManifestPath, "UnityManifest.xml");
+#else
+                unityManifestPath = Path.Combine(unityManifestPath, "AndroidManifest.xml");
+#endif
 
-//                 if (!File.Exists(unityManifestPath)) {
-//                     var playerSettingsWindow = SettingsService.OpenProjectSettings("Project/Player");
-//                     Debug.LogError("[EVERYDAY] Failed to locate Unity default manifest! Enable ProjectSettings > Player > Publishing Settings > Custom Main Manifest");
-//                     return;
-//                 }
+                if (!File.Exists(unityManifestPath)) {
+                    var playerSettingsWindow = SettingsService.OpenProjectSettings("Project/Player");
+                    Debug.LogError("[EVERYDAY] Failed to locate Unity default manifest! Enable ProjectSettings > Player > Publishing Settings > Custom Main Manifest");
+                    return;
+                }
 
-//                 File.Copy(unityManifestPath, manifestPath);
-//                 Debug.Log("[EVERYDAY] AndroidManifest.xml not found in Plugins/Android. Copying Unity default manifest to Plugins/Android.");
+                File.Copy(unityManifestPath, manifestPath);
+                Debug.Log("[EVERYDAY] AndroidManifest.xml not found in Plugins/Android. Copying Unity default manifest to Plugins/Android.");
             }
         }
 

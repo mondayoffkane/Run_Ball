@@ -108,7 +108,7 @@ public class EverydayAdTestScript : MonoBehaviour {
     }
 
     public void IAP_InitializeIAPManager() {
-        // IAPManager.Initialize();
+        // IAPManager.Initialze();
     }
 
     public void IAP_RegisterCallbackConsumable() {

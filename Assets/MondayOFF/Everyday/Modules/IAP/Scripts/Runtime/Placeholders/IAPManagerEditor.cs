@@ -42,7 +42,7 @@ namespace MondayOFF {
             Debug.LogWarning("[EVERYDAY] IAP is not enabled! Please add In-App Purchasing Package to the project.");
         }
 
-        public static void Initialize() {
+        public static void Initialze() {
             Debug.Log("[EVERYDAY] UNITY_PURCHASING is not defined.");
         }
     }

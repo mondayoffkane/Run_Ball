@@ -3,14 +3,12 @@
 typedef void (*PlayOnVoidDelegateNative) ();
 
 @interface PlayOnManagerListener: NSObject <PlayOnManagerDelegate> {
-    PlayOnNoArgsDelegateNative _onInitializationFinishedCallback;
-    PlayOnNoArgsDelegateNative _onInitializationFailedCallback;
+    PlayOnNoArgsDelegateNative _onInitializationCallback;
     POTypeCallbackClientRef* _clientRef;
 }
 
--(instancetype) initWithListenersOnInitialization:(POTypeCallbackClientRef* )client with:(PlayOnNoArgsDelegateNative)onInitializationFinishedRef and:(PlayOnNoArgsDelegateNative)onInitializationFailedRef;
+-(instancetype) initWithListenersOnInitialization:(POTypeCallbackClientRef* )client with:(PlayOnNoArgsDelegateNative)onInitializationRef;
 
-- (void)onInitializationFinished;
-- (void)onInitializationFailed:(int)code description:(NSString *)description;
+- (void)onInitialization;
 
 @end

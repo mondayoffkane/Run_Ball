@@ -93,9 +93,6 @@ typedef void (*ALUnityBackgroundCallback)(const char* args);
 // User Service
 - (void)didDismissUserConsentDialog;
 
-// Consent Flow
-- (void)startConsentFlow;
-
 // Utils
 + (NSString *)serializeParameters:(NSDictionary<NSString *, NSString *> *)dict;
 

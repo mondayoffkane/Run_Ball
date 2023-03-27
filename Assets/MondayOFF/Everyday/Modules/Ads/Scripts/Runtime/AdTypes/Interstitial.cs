@@ -15,7 +15,6 @@ namespace MondayOFF {
             MaxSdkCallbacks.Interstitial.OnAdHiddenEvent -= ResetTimer;
 
             MaxSdkCallbacks.Rewarded.OnAdHiddenEvent -= ResetTimer;
-            MaxSdkCallbacks.Rewarded.OnAdReceivedRewardEvent -= ResetTimerForRewarded;
         }
 
         internal override bool IsReady() {
@@ -52,8 +51,6 @@ namespace MondayOFF {
 
             if (_settings.resetTimerOnRewarded) {
                 MaxSdkCallbacks.Rewarded.OnAdHiddenEvent += ResetTimer;
-                // Temporal fix for rewarded ad not resetting interstitial timer
-                MaxSdkCallbacks.Rewarded.OnAdReceivedRewardEvent += ResetTimerForRewarded;
             }
 
             LoadInterstitialAd();
@@ -95,10 +92,6 @@ namespace MondayOFF {
         }
 
         private void ResetTimer(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            _lastInterstitialTimestamp = Time.realtimeSinceStartup;
-        }
-
-        private void ResetTimerForRewarded(string adUnitId, MaxSdkBase.Reward reward, MaxSdkBase.AdInfo adInfo) {
             _lastInterstitialTimestamp = Time.realtimeSinceStartup;
         }
     }

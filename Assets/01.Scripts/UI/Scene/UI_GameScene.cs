@@ -67,7 +67,7 @@ public class UI_GameScene : UI_Scene
         Bind<UnityEngine.UI.Text>(typeof(Texts));
         Bind<GameObject>(typeof(GameObjects));
         Bind<UnityEngine.UI.Image>(typeof(Images));
-
+        
 
         SetButton();
     }

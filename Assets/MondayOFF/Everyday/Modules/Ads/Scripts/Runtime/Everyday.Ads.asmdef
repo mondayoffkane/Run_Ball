@@ -3,8 +3,7 @@
     "rootNamespace": "",
     "references": [
         "MaxSdk.Scripts",
-        "PlayOn",
-        "SingularSDK"
+        "PlayOn"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

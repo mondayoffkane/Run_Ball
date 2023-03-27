@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dependencies>
     <androidPackages>
+        <!-- These are already required by other plugins
 
-        <androidPackage spec="com.google.android.gms:play-services-ads-identifier:17.1.0" />
+        <androidPackage spec="com.google.android.gms:play-services-ads-identifier:17.1.0"/>
         <androidPackage spec="com.google.android.gms:play-services-basement:17.6.0" />
 
+        -->
     </androidPackages>
 </dependencies>

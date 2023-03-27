@@ -1,25 +1,20 @@
 #import "PlayOnManagerListener.h"
 
-@implementation PlayOnManagerListener
+@implementation PlayOnManagerListener 
 
--(instancetype) initWithListenersOnInitialization:(POTypeCallbackClientRef* )client with:(PlayOnNoArgsDelegateNative)onInitializationFinishedRef and:(PlayOnNoArgsDelegateNative)onInitializationFailedRef
-
+-(instancetype) initWithListenersOnInitialization:(POTypeCallbackClientRef* )client with:(PlayOnNoArgsDelegateNative)onInitializationRef
 {
     self = [super init];
     _clientRef = client;
-    _onInitializationFinishedCallback = onInitializationFinishedRef;
-    _onInitializationFailedCallback = onInitializationFailedRef;
+    _onInitializationCallback = onInitializationRef;
     return self;
 }
 
 #pragma mark - PlayOnManagerListener
 
--(void) onInitializationFinished{
-    _onInitializationFinishedCallback(_clientRef);
-}
-
-- (void)onInitializationFailed:(int)code description:(NSString *)description {
-    _onInitializationFailedCallback(_clientRef);
+-(void) onInitialization{
+    NSLog(@"onInitialization");
+    _onInitializationCallback(_clientRef);
 }
 
 @end

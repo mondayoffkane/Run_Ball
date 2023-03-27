@@ -40,16 +40,6 @@ namespace AppLovinMax.Scripts.Editor
         private const string AppLovinMaxResourcesDirectoryName = "AppLovinMAXResources";
         private const string AppLovinAdvertisingAttributionEndpoint = "https://postbacks-app.com";
 
-        private const string AppLovinSettingsPlistFileName = "AppLovin-Settings.plist";
-        private const string KeyConsentFlowInfo = "ConsentFlowInfo";
-        private const string KeyConsentFlowEnabled = "ConsentFlowEnabled";
-        private const string KeyConsentFlowTermsOfService = "ConsentFlowTermsOfService";
-        private const string KeyConsentFlowPrivacyPolicy = "ConsentFlowPrivacyPolicy";
-        private const string KeyConsentFlowAdvertisingPartners = "ConsentFlowAdvertisingPartners";
-        private const string KeyConsentFlowIncludeDefaultAdvertisingPartners = "ConsentFlowIncludeDefaultAdvertisingPartners";
-        private const string KeyConsentFlowAnalyticsPartners = "ConsentFlowAnalyticsPartners";
-        private const string KeyConsentFlowIncludeDefaultAnalyticsPartners = "ConsentFlowIncludeDefaultAnalyticsPartners";
-
         private static readonly List<string> AtsRequiringNetworks = new List<string>
         {
             "AdColony",
@@ -125,23 +115,14 @@ namespace AppLovinMax.Scripts.Editor
 #endif
             EmbedDynamicLibrariesIfNeeded(buildPath, project, unityMainTargetGuid);
 
-            var internalSettingsEnabled = AppLovinSettings.Instance.ShowInternalSettingsInIntegrationManager;
-            var userTrackingUsageDescriptionDe = internalSettingsEnabled ? AppLovinInternalSettings.Instance.UserTrackingUsageDescriptionDe : AppLovinSettings.Instance.UserTrackingUsageDescriptionDe;
-            LocalizeUserTrackingDescriptionIfNeeded(userTrackingUsageDescriptionDe, "de", buildPath, project, unityMainTargetGuid);
-            var userTrackingUsageDescriptionEn = internalSettingsEnabled ? AppLovinInternalSettings.Instance.UserTrackingUsageDescriptionEn : AppLovinSettings.Instance.UserTrackingUsageDescriptionEn;
-            LocalizeUserTrackingDescriptionIfNeeded(userTrackingUsageDescriptionEn, "en", buildPath, project, unityMainTargetGuid);
-            var userTrackingUsageDescriptionEs = internalSettingsEnabled ? AppLovinInternalSettings.Instance.UserTrackingUsageDescriptionEs : AppLovinSettings.Instance.UserTrackingUsageDescriptionEs;
-            LocalizeUserTrackingDescriptionIfNeeded(userTrackingUsageDescriptionEs, "es", buildPath, project, unityMainTargetGuid);
-            var userTrackingUsageDescriptionFr = internalSettingsEnabled ? AppLovinInternalSettings.Instance.UserTrackingUsageDescriptionFr : AppLovinSettings.Instance.UserTrackingUsageDescriptionFr;
-            LocalizeUserTrackingDescriptionIfNeeded(userTrackingUsageDescriptionFr, "fr", buildPath, project, unityMainTargetGuid);
-            var userTrackingUsageDescriptionJa = internalSettingsEnabled ? AppLovinInternalSettings.Instance.UserTrackingUsageDescriptionJa : AppLovinSettings.Instance.UserTrackingUsageDescriptionJa;
-            LocalizeUserTrackingDescriptionIfNeeded(userTrackingUsageDescriptionJa, "ja", buildPath, project, unityMainTargetGuid);
-            var userTrackingUsageDescriptionKo = internalSettingsEnabled ? AppLovinInternalSettings.Instance.UserTrackingUsageDescriptionKo : AppLovinSettings.Instance.UserTrackingUsageDescriptionKo;
-            LocalizeUserTrackingDescriptionIfNeeded(userTrackingUsageDescriptionKo, "ko", buildPath, project, unityMainTargetGuid);
-            var userTrackingUsageDescriptionZhHans = internalSettingsEnabled ? AppLovinInternalSettings.Instance.UserTrackingUsageDescriptionZhHans : AppLovinSettings.Instance.UserTrackingUsageDescriptionZhHans;
-            LocalizeUserTrackingDescriptionIfNeeded(userTrackingUsageDescriptionZhHans, "zh-Hans", buildPath, project, unityMainTargetGuid);
-            var userTrackingUsageDescriptionZhHant = internalSettingsEnabled ? AppLovinInternalSettings.Instance.UserTrackingUsageDescriptionZhHant : AppLovinSettings.Instance.UserTrackingUsageDescriptionZhHant;
-            LocalizeUserTrackingDescriptionIfNeeded(userTrackingUsageDescriptionZhHant, "zh-Hant", buildPath, project, unityMainTargetGuid);
+            LocalizeUserTrackingDescriptionIfNeeded(AppLovinSettings.Instance.UserTrackingUsageDescriptionDe, "de", buildPath, project, unityMainTargetGuid);
+            LocalizeUserTrackingDescriptionIfNeeded(AppLovinSettings.Instance.UserTrackingUsageDescriptionEn, "en", buildPath, project, unityMainTargetGuid);
+            LocalizeUserTrackingDescriptionIfNeeded(AppLovinSettings.Instance.UserTrackingUsageDescriptionEs, "es", buildPath, project, unityMainTargetGuid);
+            LocalizeUserTrackingDescriptionIfNeeded(AppLovinSettings.Instance.UserTrackingUsageDescriptionFr, "fr", buildPath, project, unityMainTargetGuid);
+            LocalizeUserTrackingDescriptionIfNeeded(AppLovinSettings.Instance.UserTrackingUsageDescriptionJa, "ja", buildPath, project, unityMainTargetGuid);
+            LocalizeUserTrackingDescriptionIfNeeded(AppLovinSettings.Instance.UserTrackingUsageDescriptionKo, "ko", buildPath, project, unityMainTargetGuid);
+            LocalizeUserTrackingDescriptionIfNeeded(AppLovinSettings.Instance.UserTrackingUsageDescriptionZhHans, "zh-Hans", buildPath, project, unityMainTargetGuid);
+            LocalizeUserTrackingDescriptionIfNeeded(AppLovinSettings.Instance.UserTrackingUsageDescriptionZhHant, "zh-Hant", buildPath, project, unityMainTargetGuid);
 
             AddSwiftSupportIfNeeded(buildPath, project, unityFrameworkTargetGuid);
             EmbedSwiftStandardLibrariesIfNeeded(buildPath, project, unityMainTargetGuid);
@@ -207,7 +188,8 @@ namespace AppLovinMax.Scripts.Editor
             var infoPlistStringsFilePath = Path.Combine(localeSpecificDirectoryPath, "InfoPlist.strings");
 
             // Check if localization has been disabled between builds, and remove them as needed.
-            if (ShouldRemoveLocalization(localizedUserTrackingDescription))
+            var settings = AppLovinSettings.Instance;
+            if (!settings.ConsentFlowEnabled || !settings.UserTrackingUsageLocalizationEnabled || string.IsNullOrEmpty(localizedUserTrackingDescription))
             {
                 if (!File.Exists(infoPlistStringsFilePath)) return;
 
@@ -262,21 +244,6 @@ namespace AppLovinMax.Scripts.Editor
             var localeSpecificDirectoryRelativePath = Path.Combine(resourcesDirectoryName, localeSpecificDirectoryName);
             var guid = project.AddFolderReference(localeSpecificDirectoryRelativePath, localeSpecificDirectoryRelativePath);
             project.AddFileToBuild(targetGuid, guid);
-        }
-
-        private static bool ShouldRemoveLocalization(string localizedUserTrackingDescription)
-        {
-            if (string.IsNullOrEmpty(localizedUserTrackingDescription)) return true;
-
-            var settings = AppLovinSettings.Instance;
-            var internalSettingsEnabled = settings.ShowInternalSettingsInIntegrationManager;
-            if (internalSettingsEnabled)
-            {
-                var internalSettings = AppLovinInternalSettings.Instance;
-                return !internalSettings.ConsentFlowEnabled || !internalSettings.UserTrackingUsageLocalizationEnabled;
-            }
-
-            return !settings.ConsentFlowEnabled || !settings.UserTrackingUsageLocalizationEnabled;
         }
 
         private static void AddSwiftSupportIfNeeded(string buildPath, PBXProject project, string targetGuid)
@@ -364,29 +331,18 @@ namespace AppLovinMax.Scripts.Editor
             var plist = new PlistDocument();
             plist.ReadFromFile(plistPath);
 
-            SetSdkKeyIfNeeded(plist);
             SetAttributionReportEndpointIfNeeded(plist);
 
 #if UNITY_2018_2_OR_NEWER
             EnableVerboseLoggingIfNeeded(plist);
             AddGoogleApplicationIdIfNeeded(plist);
+            AddGoogleAdManagerAppIfNeeded(plist);
 #endif
-
-            AddSdkSettingsIfNeeded(plist, path);
-            EnableTermsFlowIfNeeded(plist);
+            EnableConsentFlowIfNeeded(plist);
             AddSkAdNetworksInfoIfNeeded(plist);
             UpdateAppTransportSecuritySettingsIfNeeded(plist);
 
             plist.WriteToFile(plistPath);
-        }
-
-        private static void SetSdkKeyIfNeeded(PlistDocument plist)
-        {
-            var sdkKey = AppLovinSettings.Instance.SdkKey;
-            if (string.IsNullOrEmpty(sdkKey)) return;
-
-            const string AppLovinVerboseLoggingOnKey = "AppLovinSdkKey";
-            plist.root.SetString(AppLovinVerboseLoggingOnKey, sdkKey);
         }
 
         private static void SetAttributionReportEndpointIfNeeded(PlistDocument plist)
@@ -427,111 +383,39 @@ namespace AppLovinMax.Scripts.Editor
 
         private static void AddGoogleApplicationIdIfNeeded(PlistDocument plist)
         {
-            if (!AppLovinIntegrationManager.IsAdapterInstalled("Google") && !AppLovinIntegrationManager.IsAdapterInstalled("GoogleAdManager")) return;
-
             const string googleApplicationIdentifier = "GADApplicationIdentifier";
+            if (!AppLovinIntegrationManager.IsAdapterInstalled("Google"))
+            {
+                plist.root.values.Remove(googleApplicationIdentifier);
+                return;
+            }
+
             var appId = AppLovinSettings.Instance.AdMobIosAppId;
             // Log error if the App ID is not set.
             if (string.IsNullOrEmpty(appId) || !appId.StartsWith("ca-app-pub-"))
             {
-                Debug.LogError("[AppLovin MAX] Google App ID is not set. Please enter a valid app ID within the AppLovin Integration Manager window.");
+                Debug.LogError("[AppLovin MAX] AdMob App ID is not set. Please enter a valid app ID within the AppLovin Integration Manager window.");
                 return;
             }
-
+            
             plist.root.SetString(googleApplicationIdentifier, appId);
         }
-#endif
 
-        private static void AddSdkSettingsIfNeeded(PlistDocument infoPlist, string buildPath)
+        private static void AddGoogleAdManagerAppIfNeeded(PlistDocument plist)
         {
-            if (!AppLovinSettings.Instance.ShowInternalSettingsInIntegrationManager) return;
-
-            // Right now internal settings is only needed for Consent Flow. Remove this setting once we add more settings.
-            if (!AppLovinInternalSettings.Instance.ConsentFlowEnabled) return;
-
-            var sdkSettingsPlistPath = Path.Combine(buildPath, AppLovinSettingsPlistFileName);
-            var sdkSettingsPlist = new PlistDocument();
-            if (File.Exists(sdkSettingsPlistPath))
+            const string googleAdManagerApp = "GADIsAdManagerApp";
+            if (!AppLovinIntegrationManager.IsAdapterInstalled("GoogleAdManager"))
             {
-                sdkSettingsPlist.ReadFromFile(sdkSettingsPlistPath);
-            }
-
-            EnableConsentFlowIfNeeded(sdkSettingsPlist, infoPlist);
-
-            sdkSettingsPlist.WriteToFile(sdkSettingsPlistPath);
-
-            var projectPath = PBXProject.GetPBXProjectPath(buildPath);
-            var project = new PBXProject();
-            project.ReadFromFile(projectPath);
-
-#if UNITY_2019_3_OR_NEWER
-            var unityMainTargetGuid = project.GetUnityMainTargetGuid();
-#else
-            var unityMainTargetGuid = project.TargetGuidByName(UnityMainTargetName);
-#endif
-
-            var guid = project.AddFile(AppLovinSettingsPlistFileName, AppLovinSettingsPlistFileName, PBXSourceTree.Source);
-            project.AddFileToBuild(unityMainTargetGuid, guid);
-            project.WriteToFile(projectPath);
-        }
-
-        private static void EnableConsentFlowIfNeeded(PlistDocument applovinSettingsPlist, PlistDocument infoPlist)
-        {
-            var consentFlowEnabled = AppLovinInternalSettings.Instance.ConsentFlowEnabled;
-            var userTrackingUsageDescription = AppLovinInternalSettings.Instance.UserTrackingUsageDescriptionEn;
-            var privacyPolicyUrl = AppLovinInternalSettings.Instance.ConsentFlowPrivacyPolicyUrl;
-            if (string.IsNullOrEmpty(userTrackingUsageDescription) || string.IsNullOrEmpty(privacyPolicyUrl))
-            {
-                AppLovinIntegrationManager.ShowBuildFailureDialog("You cannot use the AppLovin SDK's consent flow without defining a Privacy Policy URL and the `User Tracking Usage Description` in the AppLovin Integration Manager. \n\n" +
-                                                                  "Both values must be included to enable the SDK's consent flow.");
-
-                // No need to update the info.plist here. Default consent flow state will be determined on the SDK side.
+                plist.root.values.Remove(googleAdManagerApp);
                 return;
             }
 
-            var consentFlowInfoRoot = applovinSettingsPlist.root.CreateDict(KeyConsentFlowInfo);
-            consentFlowInfoRoot.SetBoolean(KeyConsentFlowEnabled, consentFlowEnabled);
-            consentFlowInfoRoot.SetString(KeyConsentFlowPrivacyPolicy, privacyPolicyUrl);
-
-            var termsOfServiceUrl = AppLovinInternalSettings.Instance.ConsentFlowTermsOfServiceUrl;
-            if (!string.IsNullOrEmpty(termsOfServiceUrl))
-            {
-                consentFlowInfoRoot.SetString(KeyConsentFlowTermsOfService, termsOfServiceUrl);
-            }
-
-            var advertisingPartnerUrls = AppLovinInternalSettings.Instance.ConsentFlowAdvertisingPartnerUrls;
-            if (MaxSdkUtils.IsValidString(advertisingPartnerUrls))
-            {
-                var advertisingPartnerUrlsList = advertisingPartnerUrls.Split(',');
-                var advertisingPartnersArray = consentFlowInfoRoot.CreateArray(KeyConsentFlowAdvertisingPartners);
-                foreach (var advertisingPartner in advertisingPartnerUrlsList)
-                {
-                    advertisingPartnersArray.AddString(advertisingPartner);
-                }
-            }
-
-            consentFlowInfoRoot.SetBoolean(KeyConsentFlowIncludeDefaultAdvertisingPartners, AppLovinInternalSettings.Instance.ConsentFlowIncludeDefaultAdvertisingPartnerUrls);
-
-            var analyticsPartnerUrls = AppLovinInternalSettings.Instance.ConsentFlowAnalyticsPartnerUrls;
-            if (MaxSdkUtils.IsValidString(analyticsPartnerUrls))
-            {
-                var analyticsPartnerUrlsList = analyticsPartnerUrls.Split(',');
-                var analyticsPartnersArray = consentFlowInfoRoot.CreateArray(KeyConsentFlowAnalyticsPartners);
-                foreach (var analyticsPartnerUrl in analyticsPartnerUrlsList)
-                {
-                    analyticsPartnersArray.AddString(analyticsPartnerUrl);
-                }
-            }
-
-            consentFlowInfoRoot.SetBoolean(KeyConsentFlowIncludeDefaultAnalyticsPartners, AppLovinInternalSettings.Instance.ConsentFlowIncludeDefaultAnalyticsPartnerUrls);
-
-            infoPlist.root.SetString("NSUserTrackingUsageDescription", userTrackingUsageDescription);
+            plist.root.SetBoolean(googleAdManagerApp, true);
         }
-        
-        private static void EnableTermsFlowIfNeeded(PlistDocument plist)
+#endif
+
+        private static void EnableConsentFlowIfNeeded(PlistDocument plist)
         {
-            if (AppLovinSettings.Instance.ShowInternalSettingsInIntegrationManager) return;
-            
             // Check if consent flow is enabled. No need to update info.plist if consent flow is disabled.
             var consentFlowEnabled = AppLovinSettings.Instance.ConsentFlowEnabled;
             if (!consentFlowEnabled) return;

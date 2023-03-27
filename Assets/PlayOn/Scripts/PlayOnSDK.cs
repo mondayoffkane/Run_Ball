@@ -69,11 +69,7 @@ public class PlayOnSDK
     [DllImport("__Internal")]
     public static extern void _playOnRemoveCustomAttribute(string key);
     [DllImport("__Internal")]
-    public static extern void _playOnSetPlayerID(string id);
-    [DllImport("__Internal")]
-    public static extern string _playOnGetPlayerID();
-    [DllImport("__Internal")]
-    public static extern IntPtr _playOnSetOnInitializationListener(IntPtr callbackRef, PlayOnListener.PlayOnNoArgsDelegateNative onInitializationFinished, PlayOnListener.PlayOnNoArgsDelegateNative onInitializationFailed);
+    public static extern IntPtr _playOnSetOnInitializationListener(IntPtr callbackRef, PlayOnListener.PlayOnNoArgsDelegateNative onInitialization);
     [DllImport("__Internal")]
     public static extern List<SortedDictionary<String, String>> _playOnGetCustomAttributes();
     [DllImport("__Internal")]
@@ -87,12 +83,11 @@ public class PlayOnSDK
 #endif
 
 #if UNITY_EDITOR
-    private static int _editorDpi = 0;
-    private static bool settedDPI = false;
+    private static int _editorDpi = 440;
     private static LogLevel editorloglevel = LogLevel.Debug;
 #endif
 
-    public static string SDK_VERSION = "2.2.2";
+    public static string SDK_VERSION = "2.0.9";
 
     public enum LogLevel
     {
@@ -100,7 +95,7 @@ public class PlayOnSDK
         Info,
         Debug
     }
-
+    
     public enum Position
     {
         TopLeft,
@@ -128,31 +123,24 @@ public class PlayOnSDK
         EndLevel
     }
 
-    public enum AdUnitActionButtonType
-    {
+    public enum AdUnitActionButtonType{
         Mute,
         Close,
         None
     }
 
-    public enum ConsentType
-    {
+    public enum ConsentType{
         Undefined,
         None,
         Gdpr,
         Ccpa
     }
 
-    public enum AdSizingMethod{
-        Flexible,
-        Strict
-    }
-
     public delegate void PlayOnNoArgsDelegate();
     public delegate void PlayOnStateDelegate(bool flag);
     public delegate void PlayOnImpressionDelegate(AdUnit.ImpressionData data);
     public delegate void PlayOnFloatDelegate(float amount);
-    public delegate void PlayOnErrorDelegate(int errorParam, String error);
+
 
     public class PlayOnListener
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -160,17 +148,12 @@ public class PlayOnSDK
 #endif
     {
         public PlayOnSDK.PlayOnNoArgsDelegate OnInitializationFinished = () => { };
-        public PlayOnSDK.PlayOnErrorDelegate OnInitializationFailed = (errorParam, error) => { };
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         public PlayOnListener() : base ("com.playon.bridge.common.SdkInitializationListener") { }
 
         void onInitializationFinished () {
             UnityMainThreadDispatcher.Instance().Enqueue( () => OnInitializationFinished() ) ;
-        }
-
-        void onInitializationFailed (int errorParam, String error) {
-            UnityMainThreadDispatcher.Instance().Enqueue( () => OnInitializationFailed(errorParam, error) ) ;
         }
 #endif
 
@@ -185,15 +168,9 @@ public class PlayOnSDK
         }
 
         [MonoPInvokeCallback(typeof(PlayOnNoArgsDelegateNative ))]
-        public static void OnInitializationFinishedNative(IntPtr client){
+        public static void OnInitializationNative(IntPtr client){
             PlayOnListener listener = IntPtrToClient(client);
             UnityMainThreadDispatcher.Instance().Enqueue( () => listener.OnInitializationFinished() ) ;
-        }
-
-        [MonoPInvokeCallback(typeof(PlayOnNoArgsDelegateNative ))]
-        public static void OnInitializationFailedNative(IntPtr client){
-            PlayOnListener listener = IntPtrToClient(client);
-            UnityMainThreadDispatcher.Instance().Enqueue( () => listener.OnInitializationFailed(0, "") ) ;
         }
 #endif
     }
@@ -202,25 +179,11 @@ public class PlayOnSDK
 
     public static PlayOnSDK.PlayOnNoArgsDelegate OnInitializationFinished
     {
-        get
-        {
+        get {
             return playOnListener.OnInitializationFinished;
         }
-        set
-        {
+        set {
             playOnListener.OnInitializationFinished = value;
-        }
-    }
-
-    public static PlayOnSDK.PlayOnErrorDelegate OnInitializationFailed
-    {
-        get
-        {
-            return playOnListener.OnInitializationFailed;
-        }
-        set
-        {
-            playOnListener.OnInitializationFailed = value;
         }
     }
 
@@ -237,11 +200,10 @@ public class PlayOnSDK
             getBridge ().Call("initialize", activity, apiKey);
         }));
 #elif UNITY_IOS && !UNITY_EDITOR
-        playOnListener.playOnNativeListenerRef = _playOnSetOnInitializationListener((IntPtr)GCHandle.Alloc(playOnListener), PlayOnListener.OnInitializationFinishedNative, PlayOnListener.OnInitializationFailedNative);
+        playOnListener.playOnNativeListenerRef = _playOnSetOnInitializationListener((IntPtr)GCHandle.Alloc(playOnListener), PlayOnListener.OnInitializationNative);
         _playOnSetEngineInfo("unity", SDK_VERSION);
         _playOnInitialize(apiKey, iosStoreId);
 #else
-
         PlayOnSDK.LogI(LogLevel.Info, "Initialization");
         OnInitializationFinished();
 #endif
@@ -254,13 +216,12 @@ public class PlayOnSDK
 #elif UNITY_IOS && !UNITY_EDITOR
         return _playOnIsInitialized();
 #else
-        LogI(LogLevel.Info,"Dummy Initialization. Default value true");
+	    LogI(LogLevel.Info,"Dummy Initialization. Default value true");
         return true;
 #endif
     }
 
-    public static void SetIsChildDirected(bool flag)
-    {
+    public static void SetIsChildDirected(bool flag){
 #if UNITY_ANDROID && !UNITY_EDITOR
         getBridge ().Call("setIsChildDirected", flag);
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -268,11 +229,12 @@ public class PlayOnSDK
 #endif  
     }
 
+
+    
     /// <summary>
     /// Returns current device volume in Percentages from 0 to 100
     /// </summary>
-    public static float GetDeviceVolumeLevel()
-    {
+    public static float GetDeviceVolumeLevel(){
 #if UNITY_ANDROID && !UNITY_EDITOR
         return getBridge ().Call<float>("getDeviceVolumeLevel");
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -357,8 +319,7 @@ public class PlayOnSDK
 #endif
     }
 
-    public static void ForceRegulationType(ConsentType type)
-    {
+    public static void ForceRegulationType(ConsentType type){
 #if UNITY_ANDROID && !UNITY_EDITOR
         AndroidJavaClass consentEnum = new AndroidJavaClass ("com.playon.bridge.dto.consent.ConsentType");
         AndroidJavaObject curType = consentEnum.CallStatic<AndroidJavaObject> ("valueOf", type.ToString ());
@@ -368,8 +329,7 @@ public class PlayOnSDK
 #endif
     }
 
-    public static void ClearForceRegulationType()
-    {
+    public static void ClearForceRegulationType(){
 #if UNITY_ANDROID && !UNITY_EDITOR
         getBridge ().Call("clearForceRegulationType");
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -390,8 +350,7 @@ public class PlayOnSDK
         return ConsentType.Undefined;
     }
 
-    public static void AddCustomAttribute(string key, string value)
-    {
+    public static void AddCustomAttribute(string key, string value){
 #if UNITY_ANDROID && !UNITY_EDITOR
         getBridge ().Call("addCustomAttribute", key, value);
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -399,8 +358,7 @@ public class PlayOnSDK
 #endif
     }
 
-    public static void ClearCustomAttributes()
-    {
+    public static void ClearCustomAttributes(){
 #if UNITY_ANDROID && !UNITY_EDITOR
         getBridge ().Call("clearCustomAttributes");
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -408,8 +366,7 @@ public class PlayOnSDK
 #endif
     }
 
-    public static void RemoveCustomAttribute(string key)
-    {
+    public static void RemoveCustomAttribute(string key){
 #if UNITY_ANDROID && !UNITY_EDITOR
         getBridge ().Call("removeCustomAttribute", key);
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -417,8 +374,7 @@ public class PlayOnSDK
 #endif
     }
 
-    public static List<SortedDictionary<String, String>> GetCustomAttributes()
-    {
+    public static List<SortedDictionary<String, String>> GetCustomAttributes(){
 #if UNITY_ANDROID && !UNITY_EDITOR
         return getBridge ().Call<List<SortedDictionary<String, String>>>("getCustomAttributes");
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -428,8 +384,7 @@ public class PlayOnSDK
 #endif
     }
 
-    public static List<SortedDictionary<String, String>> GetCustomAttributes(string key)
-    {
+    public static List<SortedDictionary<String, String>> GetCustomAttributes(string key){
 #if UNITY_ANDROID && !UNITY_EDITOR
         return getBridge ().Call<List<SortedDictionary<String, String>>>("getCustomAttributes", key);
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -458,16 +413,16 @@ public class PlayOnSDK
         switch (editorloglevel)
         {
             case LogLevel.Debug:
-            Debug.LogError("PlayOnSDK: " +message);
-            break;
-            
-            case LogLevel.Info:
-            if(type == LogLevel.Info)
                 Debug.LogError("PlayOnSDK: " +message);
-            break;
+                break;
+            
+            case LogLevel.Info: 
+                if(type == LogLevel.Info) 
+                    Debug.LogError("PlayOnSDK: " +message);
+                break;
             
             case LogLevel.None:
-            break;
+                break;
         }
 #endif
     }
@@ -521,58 +476,19 @@ public class PlayOnSDK
 #endif
     }
 
-    public static void SetPlayerID(string id){
-#if UNITY_ANDROID && !UNITY_EDITOR
-        getBridge ().Call("setPlayerID", id);
-#elif UNITY_IOS && !UNITY_EDITOR
-       _playOnSetPlayerID(id);
-#endif    
-    }
-
-    public static string GetPlayerID(){
-        string id = "";
-#if UNITY_ANDROID && !UNITY_EDITOR
-        id = getBridge ().Call<string>("getPlayerID");
-#elif UNITY_IOS && !UNITY_EDITOR
-       id = _playOnGetPlayerID();
-#endif  
-        return id;
-    }
-
     public delegate void OnApplicationPause(bool isPaused);
-    public static OnApplicationPause onApplicationPause = (isPaused) =>
-    {
+    public static OnApplicationPause onApplicationPause = (isPaused) => {         
         if (isPaused) onPause();
-        else onResume();
+        else onResume(); 
     };
 
-    public static void SetOptimalDPI()
-    {
-#if UNITY_EDITOR
-        SetUnityEditorDPI(96);
-
-        float shortSide = Screen.width < Screen.height ? Screen.width : Screen.height;
-        if(shortSide >= 1440)
-            SetUnityEditorDPI(440);
-        else if(shortSide >= 1080)
-            SetUnityEditorDPI(323);
-        else if(shortSide >= 720)
-            SetUnityEditorDPI(252);
-        else if(shortSide >= 480)
-            SetUnityEditorDPI(170);
-#endif
-    }
-    
-    public static void SetUnityEditorDPI(int dpi)
-    {
+    public static void SetUnityEditorDPI (int dpi) {
 #if UNITY_EDITOR
         _editorDpi = dpi;
-        settedDPI = true;
 #endif
     }
 
-    public static float GetUnityEditorDPI()
-    {
+    public static float GetUnityEditorDPI () {
 #if UNITY_EDITOR
         return _editorDpi;
 #else
@@ -580,15 +496,7 @@ public class PlayOnSDK
 #endif
     }
 
-    public static bool DPISettedByUser() {
-#if UNITY_EDITOR
-        return settedDPI;
-#else
-        return false;
-#endif
-    }
-    public static float GetDeviceScale()
-    {
+    public static float GetDeviceScale(){
 #if UNITY_ANDROID && !UNITY_EDITOR
         return GetUnityEditorDPI() / 160f;
 #elif UNITY_IOS && !UNITY_EDITOR

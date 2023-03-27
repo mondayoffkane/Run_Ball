@@ -163,7 +163,7 @@ public class Pin : MonoBehaviour
 
             Managers.Game.FloatingTextFunc(_ball.Price, transform);
 
-
+            Managers.Game.Vibe();
             Managers.Sound.Play(_clip);
         }
         if (isInit)

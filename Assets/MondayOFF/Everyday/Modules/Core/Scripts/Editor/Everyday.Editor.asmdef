@@ -3,8 +3,7 @@
     "rootNamespace": "",
     "references": [
         "Everyday",
-        "Everyday.Ads",
-        "MaxSdk.Scripts.IntegrationManager.Editor"
+        "Everyday.Ads"
     ],
     "includePlatforms": [
         "Editor"

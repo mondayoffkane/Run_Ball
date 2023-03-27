@@ -13,9 +13,13 @@ public static class Attributes{
 	public const string sngAttrHotelScore = "sng_attr_hotel_score";
 	public const string sngAttrItemDescription = "sng_attr_item_description";
 	public const string sngAttrItemPrice = "sng_attr_item_price";
+	public const string sngAttrLatitude = "sng_attr_latitude";
 	public const string sngAttrLevel = "sng_attr_level";
-	public const string sngAttrCountry = "sng_attr_country";
-	public const string sngAttrRegion = "sng_attr_region";
+	public const string sngAttrLocation = "sng_attr_location";
+	public const string sngAttrLocationAddressCountry = "sng_attr_location_address_country";
+	public const string sngAttrLocationAddressRegionOrProvince = "sng_attr_location_address_region_or_province";
+	public const string sngAttrLocationAddressStreet = "sng_attr_location_address_street";
+	public const string sngAttrLongitude = "sng_attr_longitude";
 	public const string sngAttrMax = "sng_attr_max";
 	public const string sngAttrNewVersion = "sng_attr_new_version";
 	public const string sngAttrOrigin = "sng_attr_origin";

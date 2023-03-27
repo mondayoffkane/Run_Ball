@@ -59,9 +59,6 @@ namespace MondayOFF {
             _list.DoLayoutList();
 
             serializedObject.ApplyModifiedProperties();
-            if(GUI.changed) {
-                EditorUtility.SetDirty(target);
-            }
         }
     }
 
@@ -165,11 +162,6 @@ namespace MondayOFF {
                     var indexString = path.Substring(startingIndex + 1, path.Length - startingIndex - 2);
                     if (System.Int32.TryParse(indexString, out int index)) {
                         list.RemoveAt(index);
-                        (property.serializedObject.targetObject as CPVideoList).list = list;
-                        property.serializedObject.Update();
-                        property.serializedObject.ApplyModifiedProperties();
-
-                        EditorUtility.SetDirty(property.serializedObject.targetObject);
                     }
                 }
             }

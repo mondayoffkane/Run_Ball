@@ -8,7 +8,7 @@ namespace MondayOFF {
         [SerializeField] internal bool initializeOnLoad = true;
 
         [Header("Show Banner upon initialization")]
-        [SerializeField] internal bool showBannerOnLoad = true;
+        [SerializeField] internal bool showBannerOnLoad = false;
 
         [Header("Ad initialization order")]
         [SerializeField] internal AdInitializationOrder adInitializationOrder = AdInitializationOrder.Banner_Inter_Reward;

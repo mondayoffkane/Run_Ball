@@ -30,7 +30,7 @@ This package consists of these third party SDKs
     - **Enable Verbose Logging**
         - Enable it to use default Unity Debug logger. Disabling it will hide **ALL** Unity log messages. It is recommended to disable verbose logging on release products.
     - **Initialize On Load**
-        - Enable it to initialize AdsManager upon initialization. 
+        - Enable it to initialze AdsManager upon initialization. 
         > Call `MondayOFF.AdsManager.Initialize()` if you want to manually initialize AdsManager.
     - **Show Banner On Load**
         - Enable it to show banner when AdsManager is initialized.
@@ -201,7 +201,7 @@ public class SampleScript: MonoBehaviour {
 ## Adverty
 > See [Documentation](https://adverty.com/4.1/documentation) for more details
 - Check `initializeAdvertyOnAwake` if your game have main camera at the start of game scene and is the only camera throughout the gameplay.
-- Call `InitializeAdverty(Camera)` if you want to manually initialize Adverty.
+- Call `InitializeAdverty(Camera)` if you want to manually initialze Adverty.
 - Call `ChangeAdvertyCamera(Camera)` if your main camera changes during gameplay.
 
 ## Events

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MondayOFF {
     public static partial class AdsManager {
-        private static bool _isInitializeRequested = false;
+        private static bool _isInitialized = false;
         private static AdSettings _settings = default;
         private static AdType _activeAdTypes = AdType.All;
 
@@ -21,10 +21,6 @@ namespace MondayOFF {
         internal static void PrepareManager(AdSettings settings) {
             Debug.Log($"[EVERYDAY] Preparing Ads Manager");
             _settings = settings;
-
-            if (_isInitializeRequested) {
-                InitializeAdTypes();
-            }
 
 #if UNITY_EDITOR
             Application.quitting -= OnEditorStop;

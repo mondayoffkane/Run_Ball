@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0da90100806d46409dc5f2bb6272482, type: 3}
   m_Name: EverydaySettings
   m_EditorClassIdentifier: 
-  verboseLogging: 1
+  verboseLogging: 0
   adSettings:
     initializeOnLoad: 1
-    showBannerOnLoad: 1
+    showBannerOnLoad: 0
     adInitializationOrder: 84
     delay: 2
-    interstitialInterval: 60
+    interstitialInterval: 30
     resetTimerOnRewarded: 1
     bannerPosition: 7
     iOS_IS_AdUnitID: 
