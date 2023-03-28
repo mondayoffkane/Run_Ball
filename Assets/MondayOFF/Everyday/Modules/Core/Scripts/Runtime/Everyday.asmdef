@@ -1,0 +1,18 @@
+{
+    "name": "Everyday",
+    "rootNamespace": "",
+    "references": [
+        "SingularSDK",
+        "MaxSdk.Scripts",
+        "Everyday.Ads"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

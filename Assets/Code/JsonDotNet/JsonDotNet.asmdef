@@ -1,0 +1,22 @@
+{
+    "name": "JsonDotNet",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "!DISABLE_SINGULAR_JSON"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.nuget.newtonsoft-json",
+            "expression": "0",
+            "define": "DISABLE_SINGULAR_JSON"
+        }
+    ],
+    "noEngineReferences": false
+}

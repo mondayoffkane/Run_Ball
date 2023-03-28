@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ff2231f593164f408bf5bc2b9b36a3a, type: 3}
+  m_Name: CP_Video_List
+  m_EditorClassIdentifier: 
+  list:
+  - name: Gun Head Run
+    videoClip: {fileID: 32900000, guid: c99ed30b7e20742c698003e11b0415ef, type: 3}
+    weight: 15
+    iosUrl: https://apps.apple.com/app/id1633171432
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.gunheadrun
+  - name: Like a Pizza
+    videoClip: {fileID: 32900000, guid: e2b895bcd3b544837a9d81f39fd7f1f0, type: 3}
+    weight: 7
+    iosUrl: https://apps.apple.com/app/id1621988938
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.pizza
+  - name: Wacky Jelly
+    videoClip: {fileID: 32900000, guid: ae00ea080d9e84184bd3c3ee551ae730, type: 3}
+    weight: 1
+    iosUrl: https://apps.apple.com/app/id1566969578
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.jelly
+  - name: Life of Mellow
+    videoClip: {fileID: 32900000, guid: 4edaef07ad0eb481eb2fbcf6051a67e8, type: 3}
+    weight: 1
+    iosUrl: https://apps.apple.com/app/id1578810061
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.mellow
+  - name: Wanted Fish
+    videoClip: {fileID: 32900000, guid: 1fafd4afc8a46477c945f3ba39ca3ceb, type: 3}
+    weight: 1
+    iosUrl: https://apps.apple.com/app/id1606318335
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.wantedfish
+  - name: Change and Drop
+    videoClip: {fileID: 32900000, guid: c215c915d76c443f89f4a93107e28782, type: 3}
+    weight: 1
+    iosUrl: https://apps.apple.com/app/id1575647531
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.drop
+  - name: Sneak Out 3D
+    videoClip: {fileID: 32900000, guid: e911ffab9f5594efea6e7dc018e4c2e7, type: 3}
+    weight: 1
+    iosUrl: https://apps.apple.com/app/id1551261574
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.sneak
+  - name: Number Run 3D
+    videoClip: {fileID: 32900000, guid: f2cc560086b794663a6bc3684d01641f, type: 3}
+    weight: 1
+    iosUrl: https://apps.apple.com/app/id1580683101
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.number
+  - name: TankBall!
+    videoClip: {fileID: 32900000, guid: e8d6df9fea790446a9000b1f20ac06c5, type: 3}
+    weight: 1
+    iosUrl: https://apps.apple.com/app/id1593507763
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.tank
+  - name: Slide balls!
+    videoClip: {fileID: 32900000, guid: 52b8218129d2a4b37b90375c439ff9ae, type: 3}
+    weight: 1
+    iosUrl: https://apps.apple.com/app/id1593512763
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.slideballs
+  - name: domino
+    videoClip: {fileID: 32900000, guid: 52b8218129d2a4b37b90375c439ff9ae, type: 3}
+    weight: 1
+    iosUrl: https://apps.apple.com/app/id1593512763
+    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.domino

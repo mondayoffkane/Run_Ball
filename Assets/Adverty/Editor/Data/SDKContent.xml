@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<SDKContent>
+  <Files>
+    <file action="Check" optional="false">Editor/AdvertyDependencies.xml</file>
+    <file action="Check" optional="false">Editor/Plugins/AdvertyEditorDirectory.dll</file>
+    <file action="Check" optional="false">Editor/Plugins/AdvertySDKEditor.dll</file>
+    <file action="Check" optional="false">Plugins/AdvertySDK.dll</file>
+    <file action="Check" optional="false">Plugins/Android/AdvertyAndroidPlugin.aar</file>
+    <file action="Check" optional="false">Plugins/iOS/AdvertyiOSPlugin.a</file>
+    <file action="Check" optional="false">Plugins/AdvertyDirectory.dll</file>
+    <file action="Check" optional="false">Plugins/LitJson.dll</file>
+    <file action="Check" optional="false">Plugins/utils.bundle/Contents/Info.plist</file>
+    <file action="Check" optional="false">Prefabs/InPlayUnit.prefab</file>
+    <file action="Check" optional="false">Prefabs/InMenuUnitBox.prefab</file>
+    <file action="Check" optional="false">Prefabs/InMenuUnitPortrait.prefab</file>
+    <file action="Check" optional="false">Prefabs/InMenuUnitLandscape.prefab</file>
+    <file action="Check" optional="false">Prefabs/InMenuUnitWideLandscape.prefab</file>
+    <file action="Check" optional="false">Resources/ComputeShaders/VisibilityCheckCS.compute</file>
+    <file action="Check" optional="false">Resources/Materials/Lit/BoxUnitMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Materials/Lit/PortraitUnitMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Materials/Lit/LandscapeUnitMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Materials/Lit/WideLandscapeUnitMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Materials/Lit/SpriteMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Materials/Unlit/BoxUnitMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Materials/Unlit/PortraitUnitMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Materials/Unlit/LandscapeUnitMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Materials/Unlit/WideLandscapeUnitMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Materials/Unlit/SpriteMaterial.mat</file>
+    <file action="Check" optional="false">Resources/Meshes/SimpleUnit.asset</file>
+    <file action="Check" optional="false">Resources/Meshes/SimpleUnitOneSided.asset</file>
+    <file action="Check" optional="false">Resources/Meshes/UnitMesh.asset</file>
+    <file action="Check" optional="false">Resources/Shaders/AdShader.shader</file>
+    <file action="Check" optional="false">Resources/Shaders/AdUnlitShader.shader</file>
+    <file action="Check" optional="false">Resources/Shaders/VisibilityCheckStencilShader.shader</file>
+    <file action="Check" optional="false">Resources/Shaders/WatermarkShader.shader</file>
+    <file action="Check" optional="false">Resources/Shaders/AdSpriteLitShader.shader</file>
+    <file action="Check" optional="false">Resources/Shaders/AdSpriteUnlitShader.shader</file>
+    <file action="Check" optional="false">Resources/Shaders/AdvertyCG.cginc</file>
+    <file action="Check" optional="false">Resources/Shaders/AdvertyURP.hlsl</file>
+    <file action="Check" optional="false">Resources/Textures/ad_placeholder.png</file>
+    <file action="Check" optional="false">Textures/advertyBox.png</file>
+    <file action="Check" optional="false">Textures/advertyPortrait.png</file>
+    <file action="Check" optional="false">Textures/advertyLandscape.png</file>
+    <file action="Check" optional="false">Textures/advertyWLandscape.png</file>
+    <file action="Check" optional="false">Textures/Sprites/advertyBox.png</file>
+    <file action="Check" optional="false">Textures/Sprites/advertyPortrait.png</file>
+    <file action="Check" optional="false">Textures/Sprites/advertyLandscape.png</file>
+    <file action="Check" optional="false">Textures/Sprites/advertyWLandscape.png</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/AndroidNativeUtils.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/AndroidRenderingPlugin.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/AndroidWebViewTextureBridge.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/BaseWebViewTextureBridge.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/IosNativeUtils.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/IOSWebViewTexture.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/IosWebViewTextureBridge.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/NativeAssemblyGetter.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/NativeBridge.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/NativeDebug.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/NativeLogger.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/NativeMessageSystem.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/NativeRedirectionDialogBridge.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/OsxNativeUtils.cs</file>
+    <file action="Check" optional="false">Scripts/PlatformSpecific/SystemVersion.cs</file>
+    <!-- Files to move 4.0.1 -> 4.0.2 -->
+    <file action="Move" optional="true" dst="Example/Models/Box/Box_Shutter_Box.fbx">Example/Models/Box_shutter/Box_Shutter_Box.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Box/Static_Frame_Box_Dark.fbx">Example/Models/Static_frames/Static_Frame_Box_Dark.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Box/Static_Frame_Box_Light.fbx">Example/Models/Static_frames/Static_Frame_Box_Light.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Landscape/Billboard_Landscape.fbx">Example/Models/Billboard/Billboard_Landscape.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Landscape/Box_Shutter_Landscape.fbx">Example/Models/Billboard/Box_Shutter_Landscape.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Landscape/Static_Frame_Landscape_Dark.fbx">Example/Models/Static_frames/Static_Frame_Landscape_Dark.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Landscape/Static_Frame_Landscape_Light.fbx">Example/Models/Static_frames/Static_Frame_Landscape_Light.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Portrait/Box_Shutter_Portrait.fbx">Example/Models/Box_shutter/Box_Shutter_Portrait.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Portrait/Poster_Portrait.fbx">Example/Models/Poster/Poster_Portrait.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Portrait/Static_Frame_Portrait_Dark.fbx">Example/Models/Static_frames/Static_Frame_Portrait_Dark.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Portrait/Static_Frame_Portrait_Light.fbx">Example/Models/Static_frames/Static_Frame_Portrait_Light.fbx</file>
+    <file action="Move" optional="true" dst="Example/Models/Materials/Box shutter.mat">Example/Models/Box_Shutter/Materials/Box shutter.mat</file>
+    <file action="Move" optional="true" dst="Example/Models/Materials/bilboard.mat">Example/Models/Billboard/Materials/bilboard.mat</file>
+    <file action="Move" optional="true" dst="Example/Models/Materials/bilboard_screen.mat">Example/Models/Billboard/Materials/bilboard_screen.mat</file>
+    <file action="Move" optional="true" dst="Example/Models/Materials/poster_frame.mat">Example/Models/Poster/Materials/poster_frame.mat</file>
+    <file action="Move" optional="true" dst="Example/Models/Materials/screen.mat">Example/Models/Poster/Materials/screen.mat</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Box/Box_Shutter_Box.prefab">Example/Prefabs/UnitPresets/Box_Shutter_Box.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Landscape/Box_Shutter_Landscape.prefab">Example/Prefabs/UnitPresets/Box_Shutter_Landscape.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Portrait/Box_Shutter_Portrait.prefab">Example/Prefabs/UnitPresets/Box_Shutter_Portrait.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Box/Static_Frame_Box_Dark.prefab">Example/Prefabs/UnitPresets/Static_Frame_Box_Dark.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Box/Static_Frame_Box_Light.prefab">Example/Prefabs/UnitPresets/Static_Frame_Box_Light.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Landscape/Billboard_Landscape.prefab">Example/Prefabs/UnitPresets/Billboard_Landscape.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Landscape/Static_Frame_Landscape_Dark.prefab">Example/Prefabs/UnitPresets/Static_Frame_Landscape_Dark.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Landscape/Static_Frame_Landscape_Light.prefab">Example/Prefabs/UnitPresets/Static_Frame_Landscape_Light.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Portrait/Poster_Portrait.prefab">Example/Prefabs/UnitPresets/Poster_Portrait.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Portrait/Static_Frame_Portrait_Dark.prefab">Example/Prefabs/UnitPresets/Static_Frame_Portrait_Dark.prefab</file>
+    <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Portrait/Static_Frame_Portrait_Light.prefab">Example/Prefabs/UnitPresets/Static_Frame_Portrait_Light.prefab</file>
+    <!-- Files to delete -->
+    <!-- 4.0.3 -> 4.1.0 -->
+    <file action="Delete">Scripts/PlatformSpecific/IOSWebView.cs</file>
+    <file action="Delete">Scripts/PlatformSpecific/AndroidWebViewPlugin.cs</file>
+    <file action="Delete">Scripts/PlatformSpecific/IOSVideoTexture.cs</file>
+    <file action="Delete">Scripts/PlatformSpecific/AndroidVideoPlayerPlugin.cs</file>
+    <!-- 4.0.1 -> 4.0.2 -->
+    <file action="Delete">Editor/Data/SDKContent.txt</file>
+    <file action="Delete">Example/Scripts/Editor/UnitPresetCreator.cs</file>
+    <!-- 3.4.0 -> 4.0.0 -->
+    <file action="Delete">Prefabs/GameUnit.prefab</file>
+    <file action="Delete">Prefabs/Unit.prefab</file>
+    <file action="Delete">Prefabs/MenuUnit.prefab</file>
+    <file action="Delete">Prefabs/InMenuUnit.prefab</file>
+    <file action="Delete">Resources/Materials/InPlayUnitMaterial.mat</file>
+    <file action="Delete">Resources/Materials/InMenuUnitMaterial.mat</file>
+    <file action="Delete">Scripts/PlatformSpecific/Editor/VulkanCompatibilityChecker.cs</file>
+    <file action="Delete">Scenes/AdvertySampleGameScene.unity</file>
+    <file action="Delete">Scenes/AdvertySampleMenuScene.unity</file>
+    <!-- 3.1.0 -> 3.4.0 -->
+    <file action="Delete">Plugins/AdvertyAndroidPlugin.aar</file>
+    <file action="Delete">Plugins/AdvertyiOSPlugin.a</file>
+    <file action="Delete">Plugins/play-services-ads-identifier-17.0.1.aar</file>
+    <file action="Delete">Plugins/play-services-basement-17.6.0.aar</file>
+    <file action="Delete">Resources/Materials/MenuUnitMaterial.mat</file>
+    <file action="Delete">Resources/Materials/UnitMaterial.mat</file>
+    <file action="Delete">Resources/Materials/UnitBoxMaterial.mat</file>
+    <file action="Delete">Resources/Materials/UnitPortraitMaterial.mat</file>
+    <file action="Delete">Resources/Materials/UnitLandscapeMaterial.mat</file>
+    <file action="Delete">Resources/Materials/UnitWideLandscapeMaterial.mat</file>
+    <!-- 3.0.0 -> 3.1.0 -->
+    <file action="Delete">Scripts/PlatformSpecific/AndroidMessageSystem.cs</file>
+    <file action="Delete">Scripts/PlatformSpecific/AndroidNativeDebug.cs</file>
+    <file action="Delete">Scripts/PlatformSpecific/AndroidNativeLogger.cs</file>
+    <file action="Delete">Scripts/PlatformSpecific/IosMessageSystem.cs</file>
+    <file action="Delete">Scripts/PlatformSpecific/IosNativeDebug.cs</file>
+    <file action="Delete">Scripts/PlatformSpecific/IosNativeLogger.cs</file>
+  </Files>
+  <Version>4.1.4</Version>
+</SDKContent>
