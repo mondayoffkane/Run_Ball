@@ -979,22 +979,25 @@ public class GameManager : SerializedMonoBehaviour
 
     public void Vibe(int _num = 0)
     {
-        switch (_num)
+        if (Managers.Data.UseHaptic)
         {
-            case 0:
-                MMVibrationManager.Haptic(HapticTypes.LightImpact);
-                break;
+            switch (_num)
+            {
+                case 0:
+                    MMVibrationManager.Haptic(HapticTypes.LightImpact);
+                    break;
 
-            case 1:
-                MMVibrationManager.Haptic(HapticTypes.MediumImpact);
-                break;
+                case 1:
+                    MMVibrationManager.Haptic(HapticTypes.MediumImpact);
+                    break;
 
-            case 2:
-                MMVibrationManager.Haptic(HapticTypes.HeavyImpact);
-                break;
+                case 2:
+                    MMVibrationManager.Haptic(HapticTypes.HeavyImpact);
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
     }
 
