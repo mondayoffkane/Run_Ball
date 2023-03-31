@@ -9,11 +9,9 @@ public class Ball : MonoBehaviour
     public double Price;
 
     public int Level;
-    //public Material[] Mats;
+  
 
-    [SerializeField] MeshFilter _meshfilter;
-    //[SerializeField] Renderer _renderer;
-    //public Material _mat;
+    [SerializeField] MeshFilter _meshfilter;   
 
     [SerializeField] Rigidbody _rb;
 
@@ -40,15 +38,7 @@ public class Ball : MonoBehaviour
 
         Price = (Managers.Game.ballBasePrice + Managers.Game.ball_PriceScope * (double)Managers.Game.Current_Stage_Level) * Mathf.Pow(_scope, Level);
 
-        //Price = Managers.Game.ballBasePrice[Managers.Game.Current_Stage_Level % Managers.Game.ballBasePrice.Length] * Mathf.Pow(_scope, Level);
-
-        //Price = Level == 0 ? 1 * (Managers.Game.Current_Stage_Level + 1)
-        //    : _basePrice * Mathf.Pow(3, Level - 1) * (Managers.Game.Current_Stage_Level + 1);
-
-        //_mat = Resources.Load<Material>("Material/" + Level) as Material;
-        //if (_renderer == null) _renderer = GetComponent<Renderer>();
-        //_renderer.sharedMaterial = Resources.Load<Material>("Material/" + Level) as Material;
-
+      
 
         if (_meshfilter == null) _meshfilter = GetComponent<MeshFilter>();
         _meshfilter.sharedMesh = Resources.Load<Mesh>("BallMeshes/" + Level) as Mesh;

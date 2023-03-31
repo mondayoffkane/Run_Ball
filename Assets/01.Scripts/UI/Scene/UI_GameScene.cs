@@ -25,7 +25,9 @@ public class UI_GameScene : UI_Scene
         Setting_Close,
         Sound,
         Haptic,
-        Restore
+        Restore,
+        RV_Merge_Reward,
+        Close_Merge_Reward
 
     }
 
@@ -44,7 +46,8 @@ public class UI_GameScene : UI_Scene
         Upgrade_Panel,
         Clear_Panel,
         Store_Panel,
-        Setting_Panel
+        Setting_Panel,
+        Merge_RV_Panel
     }
 
     public Text MoneyText;
@@ -52,10 +55,13 @@ public class UI_GameScene : UI_Scene
     public Text AddBallText, MergeBallsText, AddPinText, GuageText, StageText, MPSText;
     public Button AddBall_Button, MergeBalls_Button, AddPin_Button, NextStage_Button
         , RV_AddMoney_Button, RV_AddBalls_Button, RV_DoubleMoney_Button, BallReset_Button
-        , Setting_Button, Setting_Close_Button, Sound_Button, Haptic_Button, Restore_Button;
+        , Setting_Button, Setting_Close_Button, Sound_Button, Haptic_Button, Restore_Button
+        , RV_Merge_Reward, Close_Merge_Reward;
 
-    public GameObject Base_Panel, Upgrade_Panel, Clear_Panel, Store_Panel, Setting_Panel;
+    public GameObject Base_Panel, Upgrade_Panel, Clear_Panel, Store_Panel, Setting_Panel, Merge_RV_Panel;
     public Image FillGuage;
+
+    public RawImage[] Ball_Render_Imgs;
 
 
     private void Awake()
@@ -67,7 +73,7 @@ public class UI_GameScene : UI_Scene
         Bind<UnityEngine.UI.Text>(typeof(Texts));
         Bind<GameObject>(typeof(GameObjects));
         Bind<UnityEngine.UI.Image>(typeof(Images));
-        
+
 
         SetButton();
     }
@@ -150,6 +156,14 @@ public class UI_GameScene : UI_Scene
 
         Restore_Button.AddButtonEvent(() => MondayOFF.IAPManager.RestorePurchase());
 
+        Merge_RV_Panel = GetObject(GameObjects.Merge_RV_Panel);
+        Ball_Render_Imgs = Merge_RV_Panel.transform.GetComponentsInChildren<RawImage>();
+
+        RV_Merge_Reward = GetButton(Buttons.RV_Merge_Reward);
+        Close_Merge_Reward = GetButton(Buttons.Close_Merge_Reward);
+
+        RV_Merge_Reward.AddButtonEvent(() => AdsManager.ShowRewarded(() => Managers.Game.RV_Merge_Reward()));
+        Close_Merge_Reward.AddButtonEvent(() => Merge_RV_Panel.SetActive(false));
 
 
     }

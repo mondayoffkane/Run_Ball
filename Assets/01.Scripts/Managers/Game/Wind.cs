@@ -15,24 +15,6 @@ public class Wind : MonoBehaviour
     }
 
 
-    //private void OnTriggerEnter(Collider other)
-    //{
-
-    //    if (other.CompareTag("Ball"))
-    //    {
-    //        _rb = other.GetComponent<Rigidbody>();
-    //        other.GetComponent<Rigidbody>().velocity = other.GetComponent<Rigidbody>().velocity.normalized;
-
-    //        if (_rb.velocity.y < 0)
-    //        {
-    //            _rb.velocity = new Vector3(_rb.velocity.x, 0f, 0f);
-    //        }
-
-
-
-    //    }
-    //}
-
 
     private void OnTriggerStay(Collider other)
     {

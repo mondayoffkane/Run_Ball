@@ -93,7 +93,9 @@ public class GameManager : SerializedMonoBehaviour
     Transform MergeRot;
     ParticleSystem MergeEffect;
 
+    [SerializeField] int RV_Max_MergeLevel = 0;
 
+    [SerializeField] bool NoAds = false;
     // ===================================
     public void Init()
     {
@@ -143,14 +145,6 @@ public class GameManager : SerializedMonoBehaviour
 
     public void InitStage()
     {
-        //_currentShooter = GameObject.FindGameObjectWithTag("Shooter").GetComponent<Shooter>();
-        //Stages = new GameObject[Max_Stage];
-
-        //for (int i = 0; i < Max_Stage; i++)
-        //{
-        //    Stages[i] = Instantiate(Resources.Load<GameObject>("Stage_" + i));
-        //}
-
         LoadData();
 
         SetStage(Current_Stage_Level);
@@ -161,10 +155,6 @@ public class GameManager : SerializedMonoBehaviour
         MondayOFF.EventTracker.TryStage(_level);
         Managers._uiGameScene.StageText.text = $"Stage {Current_Stage_Level + 1}";
 
-        //for (int i = 0; i < Max_Stage; i++)
-        //{
-        //    Stages[i].SetActive(false);
-        //}
         if (Current_Stage != null)
         {
             Destroy(Current_Stage);
@@ -173,12 +163,6 @@ public class GameManager : SerializedMonoBehaviour
         Current_Stage = Instantiate(Resources.Load<GameObject>("Stages/Stage_" + _level % Max_Stage));
         _gridManager = Current_Stage.GetComponent<GridManager>();
         _currentShooter = _gridManager._shooter;
-
-        //UnityEditor.EditorApplication.isPaused = true;
-        //GameObject _stage = Current_Stage;
-        //_stage.SetActive(true);
-
-        //_currentShooter = _stage.GetComponent<GridManager>()._shooter;
 
         if (ballList.Count > 0)
         {
@@ -218,7 +202,7 @@ public class GameManager : SerializedMonoBehaviour
     public void StartStage()
     {
         Camera.main.transform.GetComponent<Skybox>().material =
-           //_stage.GetComponent<GridManager>().SkyBox_Mat;
+
            SkyBox_Mats[Current_Stage_Level % 7];
 
         // 스테이지 시작시 최초 1회 제공
@@ -289,6 +273,9 @@ public class GameManager : SerializedMonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
             ES3.DeleteFile();
+            Money = 0;
+            SaveData();
+            SetStage(Current_Stage_Level);
         }
 
         else if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -301,7 +288,7 @@ public class GameManager : SerializedMonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             Current_Stage_Level++;
-            //if (Current_Stage_Level > Max_Stage) Current_Stage_Level = Max_Stage;
+
             SaveData();
             SetStage(Current_Stage_Level);
         }
@@ -310,10 +297,6 @@ public class GameManager : SerializedMonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-
-            //mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 30f));
-            //dir = (mousePos - Camera.main.transform.position);
-            //Debug.DrawRay(Camera.main.transform.position, dir);
 
             startMousePos = Input.mousePosition;
 
@@ -357,24 +340,12 @@ public class GameManager : SerializedMonoBehaviour
 
             if (_rotObj != null)
             {
-                //offset = (Input.mousePosition - startMousePos);
-                //_rotation.z = -(offset.x + offset.y) * Time.deltaTime * 30f;
-                //_rotObj.Rotate(_rotation);
-                //startMousePos = Input.mousePosition;
-
                 Vector3 _testpos = (mousePos - _rotObj.transform.position).normalized;
 
                 //_rotObj.rotation = Quaternion.FromToRotation(Vector3.up, Vector3.right - _testpos);
                 _rotObj.rotation = Quaternion.FromToRotation(Vector3.down, _testpos);
 
             }
-
-            //dir = (mousePos - Camera.main.transform.position);
-            //Debug.DrawRay(Camera.main.transform.position, dir);
-
-            //mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10f));
-            //dir = new Vector3(dir.x, dir.y, 50f);
-            //Debug.DrawRay(mousePos, dir);
 
             Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -388,9 +359,6 @@ public class GameManager : SerializedMonoBehaviour
             _rotObj = null;
             if (isPick)
             {
-                //mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 30f));
-                //dir = (mousePos - Camera.main.transform.position);
-                //hits = Physics.RaycastAll(mousePos, dir);
 
                 Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 hits = Physics.RaycastAll(_ray);
@@ -405,6 +373,7 @@ public class GameManager : SerializedMonoBehaviour
                     }
                     else if (hits[i].transform.CompareTag("Delete"))
                     {
+                        pinList.Remove(Pick_Obj.GetComponent<Pin>());
                         Managers.Pool.Push(Pick_Obj.GetComponent<Poolable>());
 
 
@@ -420,14 +389,8 @@ public class GameManager : SerializedMonoBehaviour
                     {
                         Pick_Obj.GetComponent<Pin>().Prev_Point = Temp_Next_Point;
                         Temp_Prev_Point.GetComponent<Point>().Reset_Pin();
-                        //Temp_Prev_Point.GetComponent<Point>().Fix_Pin = null;
                         Temp_Next_Point.GetComponent<Point>().Set_Pin(Pick_Obj);
-                        //Temp_Next_Point.GetComponent<Point>().Fix_Pin = Pick_Obj;
                         Pick_Obj.transform.position = Temp_Next_Point.position;
-
-                        //Temp_Prev_Point.GetComponent<Renderer>().enabled = true;
-                        //Temp_Next_Point.GetComponent<Renderer>().enabled = false;
-
                     }
                     else
                     {
@@ -544,166 +507,232 @@ public class GameManager : SerializedMonoBehaviour
         return string.Format("{0}{1}{2}", significant, showNumber, unityString);
     }
 
-    public void AddBall(bool isPay = true)
+    #region "Base Upgrade"
+    public void AddBall(bool isPlay = true)
     {
-
-        AdsManager.ShowInterstitial();
-
-        if (isPay == true)
+        if (isPlay == false)
         {
-            Money -= tempAddBall_Price;
-            //addBall_BasePrice[Current_Stage_Level % Max_Stage] + addBall_Level * StageScope * (Current_Stage_Level + 1);
-            addBall_Level++;
+            addBallFunc();
         }
+        else
+        {
+            if (Money >= tempAddBall_Price)
+            {
+                if (NoAds == false)
+                {
+                    AdsManager.ShowInterstitial();
+                }
 
-        Ball _newBall = _currentShooter.AddBall();
-        _newBall.gameObject.SetActive(false);
-        //_currentShooter.Ball_Queue.Enqueue(_newBall.GetComponent<Rigidbody>());
-        _currentShooter.Ball_Wait_List.Add(_newBall.GetComponent<Rigidbody>());
-        ballList.Add(_newBall);
-        _newBall.Init();
+                Money -= tempAddBall_Price;
+                addBall_Level++;
+                addBallFunc();
+            }
+            else
+            {
+                if (NoAds == false)
+                {
+                    addBall_Level++;
+                    AdsManager.ShowRewarded(() => addBallFunc());
+                }
+            }
 
-        CheckMergeList(); // 위치 변경 예정 , 돈 체크도 같이 해야함
+        }
+        /////////////////
+        void addBallFunc()
+        {
+            Ball _newBall = _currentShooter.AddBall();
+            _newBall.gameObject.SetActive(false);
+            _currentShooter.Ball_Wait_List.Add(_newBall.GetComponent<Rigidbody>());
+            ballList.Add(_newBall);
+            _newBall.Init();
 
-        MoneyUpdate();
+            CheckMergeList(); // 위치 변경 예정 , 돈 체크도 같이 해야함
 
+            MoneyUpdate();
+        }
 
 
     }
 
     public void MergeBalls()
     {
-        AdsManager.ShowInterstitial();
 
-        Money -= tempMergeBalls_Price;
-        //mergeBalls_BasePrice[Current_Stage_Level % Max_Stage] + mergeBalls_Level * StageScope * (Current_Stage_Level + 1);    // _gridManager.mergeBalls_BasePrice * mergeBalls_Level;
-        mergeBalls_Level++;
-
-
-
-
-        int tempLevel = 0;
-
-        Button_OnOff(Managers._uiGameScene.MergeBalls_Button, false);
-        isMerging = true;
-
-        DOTween.Sequence().AppendCallback(() =>
+        if (Money >= tempMergeBalls_Price)
         {
-            for (int i = 0; i < 3; i++)
+            if (NoAds == false)
             {
-                tempMergeBalls[i].GetComponent<Rigidbody>().isKinematic = true;
-                tempMergeBalls[i].transform.SetParent(MergeRot);
-                tempMergeBalls[i].gameObject.SetActive(true);
-                tempMergeBalls[i].GetComponent<TrailRenderer>().Clear();
-
+                AdsManager.ShowInterstitial();
             }
-        })
-            .Append(tempMergeBalls[0].transform.DOMove(MergeRot.transform.GetChild(0).position, 0.5f)).SetEase(Ease.Linear)
-            .Join(tempMergeBalls[1].transform.DOMove(MergeRot.transform.GetChild(1).position, 0.5f)).SetEase(Ease.Linear)
-            .Join(tempMergeBalls[2].transform.DOMove(MergeRot.transform.GetChild(2).position, 0.5f)).SetEase(Ease.Linear)
-            .Append(tempMergeBalls[0].transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.Linear))
-            .Join(tempMergeBalls[1].transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.Linear))
-            .Join(tempMergeBalls[2].transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.Linear))
-            .AppendCallback(() =>
+
+            Money -= tempMergeBalls_Price;
+            mergeBalls_Level++;
+            mergeBallsFunc();
+        }
+        else
+        {
+            if (NoAds == false)
             {
-                foreach (Ball _ball in tempMergeBalls)
+                addBall_Level++;
+                AdsManager.ShowRewarded(() => mergeBallsFunc());
+            }
+        }
+
+
+
+        void mergeBallsFunc()
+        {
+            int tempLevel = 0;
+
+            Button_OnOff(Managers._uiGameScene.MergeBalls_Button, false);
+            isMerging = true;
+
+            DOTween.Sequence().AppendCallback(() =>
+            {
+                for (int i = 0; i < 3; i++)
                 {
-                    tempLevel = _ball.Level;
-                    Managers.Pool.Push(_ball.GetComponent<Poolable>());
-                    ballList.Remove(_ball);
-                    _currentShooter.Ball_Wait_List.Remove(_ball.GetComponent<Rigidbody>());
+                    tempMergeBalls[i].GetComponent<Rigidbody>().isKinematic = true;
+                    tempMergeBalls[i].transform.SetParent(MergeRot);
+                    tempMergeBalls[i].gameObject.SetActive(true);
+                    tempMergeBalls[i].GetComponent<TrailRenderer>().Clear();
+
                 }
-                tempMergeBalls.Clear();
-
-                //MergeRot.transform.GetChild(3).GetComponent<ParticleSystem>().Play();
-                MergeEffect.Play();
-
-                _newBall = _currentShooter.AddBall();
-                _newBall.gameObject.SetActive(true);
-                _newBall.transform.position = MergeRot.transform.position;
-                _newBall.Init(tempLevel + 1);
             })
-            .AppendInterval(0.5f)
-            .OnComplete(() =>
-            {
+                .Append(tempMergeBalls[0].transform.DOMove(MergeRot.transform.GetChild(0).position, 0.5f)).SetEase(Ease.Linear)
+                .Join(tempMergeBalls[1].transform.DOMove(MergeRot.transform.GetChild(1).position, 0.5f)).SetEase(Ease.Linear)
+                .Join(tempMergeBalls[2].transform.DOMove(MergeRot.transform.GetChild(2).position, 0.5f)).SetEase(Ease.Linear)
+                .Append(tempMergeBalls[0].transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.Linear))
+                .Join(tempMergeBalls[1].transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.Linear))
+                .Join(tempMergeBalls[2].transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.Linear))
+                .AppendCallback(() =>
+                {
+                    foreach (Ball _ball in tempMergeBalls)
+                    {
+                        tempLevel = _ball.Level;
+                        Managers.Pool.Push(_ball.GetComponent<Poolable>());
+                        ballList.Remove(_ball);
+                        _currentShooter.Ball_Wait_List.Remove(_ball.GetComponent<Rigidbody>());
+                    }
+                    tempMergeBalls.Clear();
 
-                _newBall.gameObject.SetActive(false);
-                ballList.Add(_newBall);
-                _currentShooter.MergeShoot(_newBall);
-                CheckMergeList();
+                    MergeEffect.Play();
 
-                MoneyUpdate();
-                isMerging = false;
-                CheckButtons();
-            });
+                    _newBall = _currentShooter.AddBall();
+                    _newBall.gameObject.SetActive(true);
+                    _newBall.transform.position = MergeRot.transform.position;
+                    _newBall.Init(tempLevel + 1);
+                })
+                .AppendInterval(0.5f)
+                .OnComplete(() =>
+                {
 
+                    _newBall.gameObject.SetActive(false);
+                    ballList.Add(_newBall);
+                    _currentShooter.MergeShoot(_newBall);
+                    CheckMergeList();
+
+                    MoneyUpdate();
+                    isMerging = false;
+                    CheckButtons();
+
+                    if ((tempLevel + 1 > RV_Max_MergeLevel))
+                    {
+                        RV_Max_MergeLevel = tempLevel + 1;
+                        Managers._uiGameScene.Merge_RV_Panel.SetActive(true);
+                        // add panel
+                        foreach (RawImage _img in Managers._uiGameScene.Ball_Render_Imgs)
+                        {
+                            _img.enabled = false;
+                        }
+                        Managers._uiGameScene.Ball_Render_Imgs[RV_Max_MergeLevel].enabled = true;
+                    }
+                });
+        }
     }
 
     public void AddPin(int _num = 0, bool isPay = true)
     {
-        AdsManager.ShowInterstitial();
-
-        if (isPay == true)
+        if (isPay == false)
         {
-            Money -= tempAddPin_Price;
-            //addPin_BasePrice[Current_Stage_Level % Max_Stage] + addPin_Level * StageScope * (Current_Stage_Level + 1);  //_gridManager.addPin_BasePrice * addPin_Level;
-            addPin_Level++;
+            addPinFunc();
+        }
+        else
+        {
+            if (Money >= tempAddPin_Price)
+            {
+                if (NoAds == false)
+                {
+                    AdsManager.ShowInterstitial();
+                }
+                Money -= tempAddPin_Price;
+                addPin_Level++;
+                addPinFunc();
+            }
+            else
+            {
+                if (NoAds == false)
+                {
+                    addPin_Level++;
+                    AdsManager.ShowRewarded(() => addPinFunc());
+                }
+            }
         }
 
-        //Transform _obj = Instantiate(_gridManager.Pin_Pref).transform;
-        Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref, transform).GetComponent<Pin>();
-
-        Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
-
-        if (_point == null)
+        void addPinFunc()
         {
-            return;
+            Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref, transform).GetComponent<Pin>();
 
+            Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
+
+            if (_point == null)
+            {
+                return;
+
+            }
+
+            _point.Fix_Pin = _pin.transform;
+            _pin.transform.position = _point.transform.position;
+            _point.GetComponent<Renderer>().enabled = false;
+            switch (_num)
+            {
+                case 0:
+                    _pin.GetComponent<Pin>().SetPin(_gridManager
+                        .PinType_Array[new System.Random().Next(0, _gridManager.PinType_Array.Length)]);
+                    break;
+
+
+                case 1:
+                    _pin.GetComponent<Pin>().SetPin(Pin.PinType.Triangle);
+                    break;
+
+                case 2:
+                    _pin.GetComponent<Pin>().SetPin(Pin.PinType.Square);
+                    break;
+
+                case 3:
+                    _pin.GetComponent<Pin>().SetPin(Pin.PinType.Hex);
+                    break;
+
+                case 4:
+                    _pin.GetComponent<Pin>().SetPin(Pin.PinType.Circle);
+
+                    break;
+
+                case 5:
+                    _pin.GetComponent<Pin>().SetPin(Pin.PinType.Cannon);
+                    break;
+
+                default:
+                    break;
+            }
+
+            _pin.GetComponent<Pin>().Prev_Point = _point.transform;
+            pinList.Add(_pin);
+            MoneyUpdate();
+            Managers.Sound.Play(Resources.Load<AudioClip>("Sound/Spawn"));
         }
-
-        _point.Fix_Pin = _pin.transform;
-        _pin.transform.position = _point.transform.position;
-        _point.GetComponent<Renderer>().enabled = false;
-        switch (_num)
-        {
-            case 0:
-                //_pin.GetComponent<Pin>().SetPin((Pin.PinType)Random.Range(0, 3));
-                //System.Random _rand = new System.Random();
-                _pin.GetComponent<Pin>().SetPin(_gridManager
-                    .PinType_Array[new System.Random().Next(0, _gridManager.PinType_Array.Length)]);
-                break;
-
-
-            case 1:
-                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Triangle);
-                break;
-
-            case 2:
-                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Square);
-                break;
-
-            case 3:
-                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Hex);
-                break;
-
-            case 4:
-                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Circle);
-
-                break;
-
-            case 5:
-                _pin.GetComponent<Pin>().SetPin(Pin.PinType.Cannon);
-                break;
-
-            default:
-                break;
-        }
-
-        _pin.GetComponent<Pin>().Prev_Point = _point.transform;
-        pinList.Add(_pin);
-        MoneyUpdate();
-        Managers.Sound.Play(Resources.Load<AudioClip>("Sound/Spawn"));
     }
+
+    #endregion
 
     public void CheckMergeList()
     {
@@ -766,26 +795,46 @@ public class GameManager : SerializedMonoBehaviour
 
 
         // 금액 비교후 버튼 활성화 결정
+        if (NoAds == true)
+        {
+            Button_OnOff(Managers._uiGameScene.AddBall_Button,
+               (Money >= tempAddBall_Price));
+            Button_OnOff(Managers._uiGameScene.MergeBalls_Button,
+               (Money >= tempMergeBalls_Price && (tempMergeBalls.Count >= 3) && !isMerging));
+            Button_OnOff(Managers._uiGameScene.AddPin_Button,
+                (Money >= tempAddPin_Price && (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null)));
+        }
+        else
+        {
 
-
-        Button_OnOff(Managers._uiGameScene.AddBall_Button,
-           (Money >= tempAddBall_Price));
-        Button_OnOff(Managers._uiGameScene.MergeBalls_Button,
-           (Money >= tempMergeBalls_Price && (tempMergeBalls.Count >= 3) && !isMerging));
-
-        Button_OnOff(Managers._uiGameScene.AddPin_Button,
-            (Money >= tempAddPin_Price && (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null)));
+            Button_OnOff(Managers._uiGameScene.AddBall_Button, true,
+               (Money >= tempAddBall_Price));
+            Button_OnOff(Managers._uiGameScene.MergeBalls_Button, true && (tempMergeBalls.Count >= 3) && !isMerging,
+               (Money >= tempMergeBalls_Price));
+            Button_OnOff(Managers._uiGameScene.AddPin_Button, true && (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null),
+                (Money >= tempAddPin_Price));
+        }
 
 
 
     }
 
-    public void Button_OnOff(Button _button, bool isTrue)
+    public void Button_OnOff(Button _button, bool isTrue, bool enoughMoney = true)
     {
+
         _button.interactable = isTrue;
-        _button.transform.GetChild(0).GetComponent<Text>().color = new Color32(255, 255, 255, 255);
-        _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 255);
-        _button.transform.GetChild(1).GetComponent<Outline>().enabled = true;
+        _button.transform.GetChild(0).GetComponent<Text>().color = isTrue ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
+        _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().enabled = enoughMoney;
+        _button.transform.GetChild(0).GetChild(1).GetComponent<Image>().enabled = !enoughMoney;
+        _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = isTrue ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
+        _button.transform.GetChild(0).GetChild(1).GetComponent<Image>().color = isTrue ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
+        _button.transform.GetChild(1).GetComponent<Outline>().enabled = isTrue;
+
+        if (!enoughMoney)
+        {
+            _button.transform.GetChild(0).GetComponent<Text>().text = $"Free";
+        }
+
     }
 
     public void AddMoney(double _money)
@@ -793,9 +842,6 @@ public class GameManager : SerializedMonoBehaviour
         if (isRunning)
         {
             Money += _money;
-
-            //Money += isDoubleMoney ? _money * 2d : _money;
-
             MoneyUpdate();
 
             // clear gate delete. clear Money check
@@ -825,9 +871,6 @@ public class GameManager : SerializedMonoBehaviour
 
         SaveData();
 
-
-        // Enable Clear UI
-        // Hide Upgrade UI
     }
 
     public void NextStage_Button()
@@ -835,9 +878,6 @@ public class GameManager : SerializedMonoBehaviour
         MondayOFF.AdsManager.ShowInterstitial();
         isRunning = false;
         currentClearMoney = 0;
-        //Managers._uiGameScene.FillGuage.fillAmount = 0f;
-        //Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney[Current_Stage_Level & Max_Stage])}";
-
 
         Managers._uiGameScene.Upgrade_Panel.SetActive(true);
         Managers._uiGameScene.Clear_Panel.SetActive(false);
@@ -922,15 +962,13 @@ public class GameManager : SerializedMonoBehaviour
     public void MPS_Update(double _val)
     {
         Mps += _val;
-        //Managers._uiGameScene.MPSText.text = $"${ToCurrencyString(Mps)} / Sec";
-
 
     }
 
 
     /////////////// RV Func ////////////////////
 
-
+    #region "RV Func"
 
     public void RV_AddMoney()
     {
@@ -970,6 +1008,24 @@ public class GameManager : SerializedMonoBehaviour
 
         }
     }
+
+    public void RV_Merge_Reward()
+    {
+        _newBall = _currentShooter.AddBall();
+        _newBall.gameObject.SetActive(true);
+        _newBall.transform.position = MergeRot.transform.position;
+        _newBall.Init(RV_Max_MergeLevel);
+
+        _newBall.gameObject.SetActive(false);
+        ballList.Add(_newBall);
+        _currentShooter.MergeShoot(_newBall);
+        CheckMergeList();
+
+        Managers._uiGameScene.Merge_RV_Panel.SetActive(false);
+    }
+
+    #endregion
+    // /// ////////////////////////////
 
 
     public void GameObjectOnOnff(GameObject _obj)

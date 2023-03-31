@@ -27,32 +27,15 @@ public class GridManager : MonoBehaviour
     [ShowInInspector]
     public Pin.PinType[] PinType_Array = new Pin.PinType[1];
 
-    // ======================================
-    //public double addBall_BasePrice = 20;
-    //public double mergeBalls_BasePrice = 80;
-    //public double addPin_BasePrice = 100;
-    //public double ClearMoney = 1000;
-    //public Color BackGround_Color;
-
-    // public Material SkyBox_Mat;
-
-
     [Space(10)]
     [Header("Test")]
     [ReadOnly]public string Buttons;
 
     private void Start()
     {
-        //Managers.Game._gridManager = this;
-        //if (_shooter == null)
-        //{
-        //    _shooter = transform.GetComponentInChildren<Shooter>();
-        //}
-        //Managers.Game._currentShooter = _shooter;
-        Managers.Game.MoneyUpdate();
-        //Managers.Game.StartStage();
+        Managers.Game.MoneyUpdate();       
         Pin_Pref = Resources.Load<GameObject>("Pin");
-        // Camera.main.backgroundColor = BackGround_Color;
+   
     }
 
     [Button]
@@ -64,9 +47,6 @@ public class GridManager : MonoBehaviour
         {
             DestroyImmediate(Point_Group.GetChild(0).gameObject);
         }
-
-        //X = Mathf.CeilToInt((limitSize.Right - limitSize.Left) / Offset_X);
-        //Y = Mathf.CeilToInt((limitSize.Top - limitSize.Bottom) / Offset_Y);
 
         Offset_X = (limitSize.Right - limitSize.Left) / (float)(Width - 1);
         Offset_Y = (limitSize.Top - limitSize.Bottom) / (float)(Height - 1);

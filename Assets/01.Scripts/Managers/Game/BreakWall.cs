@@ -51,21 +51,12 @@ public class BreakWall : MonoBehaviour
         Count_Text.gameObject.SetActive(false);
         foreach (Transform _obj in _Pices)
         {
-            _obj.GetComponent<Rigidbody>().isKinematic = false;
-            //_obj.GetComponent<Rigidbody>().AddForce(Vector3.one * Random.Range(-1, 1f) * Power);
+            _obj.GetComponent<Rigidbody>().isKinematic = false;          
             _obj.GetComponent<Rigidbody>().AddExplosionForce(Power, transform.position, _Radius);
             _obj.transform.DOScale(Vector3.zero, _time);
 
         }
-        //Collider[] _cols = Physics.OverlapSphere(transform.position, _Radius);
-
-        //foreach (Collider _col in _cols)
-        //{
-        //    _col.GetComponent<Rigidbody>().isKinematic = false;
-        //    _col.GetComponent<Rigidbody>().AddExplosionForce(Power, transform.position, _Radius);
-        //}
-
-
+      
         GetComponent<Collider>().isTrigger = true;
 
     }
@@ -102,10 +93,6 @@ public class BreakWall : MonoBehaviour
 
     public void CollBall()
     {
-        //DOTween.Kill(transform);
-        //DOTween.Sequence().Append(transform.DOScale(Vector3.one * 0.95f, 0.1f).SetEase(Ease.Linear))
-        //              .Append(transform.DOScale(Vector3.one * 1f, 0.1f).SetEase(Ease.Linear));
-
         Current_Count++;
         Count_Text.text = $"{Break_Count - Current_Count}";
         foreach (Transform _obj in _Pices)

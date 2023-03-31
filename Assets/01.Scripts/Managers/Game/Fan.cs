@@ -7,7 +7,6 @@ public class Fan : MonoBehaviour
     public float Force = 5f;
 
 
-
     private void Start()
     {
         GetComponent<Renderer>().enabled = false;

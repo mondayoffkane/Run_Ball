@@ -23,11 +23,6 @@ public class ClearGate : MonoBehaviour
     {
         gameObject.SetActive(false);
 
-
-        //clearMoney = Managers.Game.ClearMoney;
-        //_countText = transform.GetComponentInChildren<Text>();
-        //_countText.text = $"{(Managers.Game.currentClearMoney / clearMoney * 100d):0}%";
-
     }
 
     private void OnCollisionEnter(Collision collision)

@@ -23,8 +23,6 @@ public class Shooter : MonoBehaviour
         if (Ball_Pref == null)
             Ball_Pref = Resources.Load<GameObject>("Ball");
 
-        //Managers.Pool.CreatePool(Ball_Pref);
-
     }
 
 
@@ -38,8 +36,7 @@ public class Shooter : MonoBehaviour
             {
                 Rigidbody _rb = Ball_Wait_List[0].GetComponent<Rigidbody>();
                 Ball_Wait_List.Remove(_rb);
-                //if (_rb.GetComponent<Ball>().isReady == true)
-                //{
+            
                 DOTween.Kill(_rb);
                 _rb.gameObject.SetActive(true);
                 _rb.transform.position = transform.position;// + Vector3.right * Random.Range(-0.5f, 0.5f);
@@ -49,7 +46,7 @@ public class Shooter : MonoBehaviour
                 _rb.AddForce(transform.up * Power);
                 _rb.GetComponent<TrailRenderer>().enabled = true;
                 _rb.GetComponent<Collider>().isTrigger = false;
-                //}
+             
             }
 
             yield return _interval;
@@ -62,9 +59,7 @@ public class Shooter : MonoBehaviour
             Ball_Pref = Resources.Load<GameObject>("Ball");
         Rigidbody _ball = Managers.Pool.Pop(Ball_Pref, transform).GetComponent<Rigidbody>(); // Instantiate(Ball_Pref).GetComponent<Rigidbody>();
         _ball.transform.position = transform.position; //+ Vector3.up * 2f;
-        //_ball.velocity = Vector3.up * Force /*Random.Range(Force * 0.8f, Force * 1.2f)*/;
-        //_ball.velocity = Vector3.zero;
-        //_ball.AddForce(Vector3.up * Power);
+      
         _ball.gameObject.SetActive(false);
 
         return _ball.GetComponent<Ball>();
@@ -74,25 +69,12 @@ public class Shooter : MonoBehaviour
     public void MergeShoot(Ball _ball)
     {
         _ball.GetComponent<Ball>().isReady = true;
-        //_ball.GetComponent<Rigidbody>().isKinematic = true;
+    
         _ball.transform.position = transform.position;
-        //Ball_Queue.Enqueue(_ball.GetComponent<Rigidbody>());
+  
         Ball_Wait_List.Add(_ball.GetComponent<Rigidbody>());
 
     }
 
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.CompareTag("Ball"))
-    //    {
-    //        if (other.GetComponent<Ball>().isReady == false)
-    //        {
-    //            other.GetComponent<Ball>().isReady = true;
-    //            other.GetComponent<Rigidbody>().isKinematic = true;
-    //            other.transform.position = transform.position;
-    //            //other.transform.DOMove(transform.position, 0.1f);
-    //            Ball_Queue.Enqueue(other.GetComponent<Rigidbody>());
-    //        }
-    //    }
-    //}
+    
 }
