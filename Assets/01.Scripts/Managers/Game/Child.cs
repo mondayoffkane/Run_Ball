@@ -17,7 +17,7 @@ public class Child : MonoBehaviour
     [SerializeField] Mesh[] NumberMeshs;
 
     public int Num = 1;
-    [SerializeField] int MaxNum = 99;
+    //[SerializeField] int MaxNum = 99;
 
     public List<Calc_Obj> CalcObj_List;
 

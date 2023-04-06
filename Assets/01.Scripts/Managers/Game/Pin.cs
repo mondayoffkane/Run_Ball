@@ -35,7 +35,7 @@ public class Pin : MonoBehaviour
     public PinType pinType;
     public float Force = 10f;
 
-    float _time = 0.2f;
+    //float _time = 0.2f;
     //Vector3 Start_Pos;
     // ===============================
 

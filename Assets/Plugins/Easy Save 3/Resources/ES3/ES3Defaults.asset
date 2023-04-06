@@ -42,6 +42,10 @@ MonoBehaviour:
     - Everyday.Ads.Editor
     - Everyday.Editor
     - Everyday.IAP
+    - Google.Android.AppBundle.Editor
+    - Google.Play.Common
+    - Google.Play.Core
+    - Google.Play.Review
     - LeTai.TrueShadow
     - LeTai.TrueShadow.Editor
     - Lofelt.NiceVibrations

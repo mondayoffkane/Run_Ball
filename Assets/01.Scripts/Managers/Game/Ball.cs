@@ -9,9 +9,9 @@ public class Ball : MonoBehaviour
     public double Price;
 
     public int Level;
-  
 
-    [SerializeField] MeshFilter _meshfilter;   
+
+    [SerializeField] MeshFilter _meshfilter;
 
     [SerializeField] Rigidbody _rb;
 
@@ -38,7 +38,7 @@ public class Ball : MonoBehaviour
 
         Price = (Managers.Game.ballBasePrice + Managers.Game.ball_PriceScope * (double)Managers.Game.Current_Stage_Level) * Mathf.Pow(_scope, Level);
 
-      
+
 
         if (_meshfilter == null) _meshfilter = GetComponent<MeshFilter>();
         _meshfilter.sharedMesh = Resources.Load<Mesh>("BallMeshes/" + Level) as Mesh;
@@ -60,13 +60,36 @@ public class Ball : MonoBehaviour
 
         _rb.AddTorque(Vector3.one * Random.Range(-360f, 360f));
 
-        if (!collision.transform.CompareTag("NotJump"))
+
+        switch (collision.transform.tag)
         {
-            if (_rb.velocity.magnitude < 13)
-            {
-                _rb.velocity = _rb.velocity.normalized * 13f;
-            }
+            case "NotJump":
+
+                break;
+
+            case "CubeRock":
+                if (_rb.velocity.magnitude < 8)
+                {
+                    _rb.velocity = _rb.velocity.normalized * 8f;
+                }
+                break;
+
+            default:
+                if (_rb.velocity.magnitude < 13)
+                {
+                    _rb.velocity = _rb.velocity.normalized * 13f;
+                }
+                break;
         }
+
+
+        //if (!collision.transform.CompareTag("NotJump"))
+        //{
+        //    if (_rb.velocity.magnitude < 13)
+        //    {
+        //        _rb.velocity = _rb.velocity.normalized * 13f;
+        //    }
+        //}
 
         float _X = _rb.velocity.x;
 

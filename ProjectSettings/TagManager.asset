@@ -22,6 +22,7 @@ TagManager:
   - Delete
   - MergeRot
   - MergeEffect
+  - MainCanvas
   layers:
   - Default
   - TransparentFX

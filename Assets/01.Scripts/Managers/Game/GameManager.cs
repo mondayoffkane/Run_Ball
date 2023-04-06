@@ -153,6 +153,10 @@ public class GameManager : SerializedMonoBehaviour
     public void SetStage(int _level = 0)
     {
         MondayOFF.EventTracker.TryStage(_level);
+        if (_level == 1)
+        {
+            StartCoroutine(Cor_Review());
+        }
         Managers._uiGameScene.StageText.text = $"Stage {Current_Stage_Level + 1}";
 
         if (Current_Stage != null)
@@ -196,6 +200,11 @@ public class GameManager : SerializedMonoBehaviour
         Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney);
 
 
+        IEnumerator Cor_Review()
+        {
+            yield return new WaitForSeconds(1f);            
+            CustomReviewManager.instance.StoreReview();
+        }
 
     }
 
