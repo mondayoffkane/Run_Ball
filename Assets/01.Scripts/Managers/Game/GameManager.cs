@@ -202,7 +202,7 @@ public class GameManager : SerializedMonoBehaviour
 
         IEnumerator Cor_Review()
         {
-            yield return new WaitForSeconds(1f);            
+            yield return new WaitForSeconds(1f);
             CustomReviewManager.instance.StoreReview();
         }
 
@@ -662,7 +662,27 @@ public class GameManager : SerializedMonoBehaviour
     {
         if (isPay == false)
         {
-            addPinFunc();
+            Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref, transform).GetComponent<Pin>();
+            Point _point = _gridManager.Point_Group.GetChild(2).GetComponent<Point>();
+
+            _point.Fix_Pin = _pin.transform;
+            _pin.transform.position = _point.transform.position;
+            _point.GetComponent<Renderer>().enabled = false;
+            switch (_num)
+            {
+                case 0:
+                    _pin.GetComponent<Pin>().SetPin(_gridManager
+                        .PinType_Array[new System.Random().Next(0, _gridManager.PinType_Array.Length)]);
+                    break;
+
+                default:
+                    break;
+            }
+            _pin.GetComponent<Pin>().Prev_Point = _point.transform;
+            pinList.Add(_pin);
+            MoneyUpdate();
+            Managers.Sound.Play(Resources.Load<AudioClip>("Sound/Spawn"));
+                        
         }
         else
         {
@@ -1066,5 +1086,8 @@ public class GameManager : SerializedMonoBehaviour
         }
     }
 
+
+    /// 4.10
+    //void 
 
 }
