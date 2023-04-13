@@ -70,6 +70,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads-identifier:17.1.0' // Assets/PlayOn/Editor/PlayOnSDKDependencies.xml:4
     implementation 'com.google.android.gms:play-services-base:18.1.0' // Assets/Firebase/Editor/AppDependencies.xml:17
     implementation 'com.google.android.gms:play-services-basement:17.6.0' // Assets/PlayOn/Editor/PlayOnSDKDependencies.xml:6
+    implementation 'com.google.android.play:core:1.10.3' // Assets/Plugins/GooglePlayPlugins/com.google.play.core/Editor/PlayCoreDependencies.xml:3
     implementation 'com.google.code.gson:gson:2.9.0' // Assets/PlayOn/Editor/PlayOnSDKDependencies.xml:12
     implementation 'com.google.firebase:firebase-analytics:21.1.1' // Assets/Firebase/Editor/AppDependencies.xml:15
     implementation 'com.google.firebase:firebase-analytics-unity:9.6.0' // Assets/Firebase/Editor/AnalyticsDependencies.xml:18

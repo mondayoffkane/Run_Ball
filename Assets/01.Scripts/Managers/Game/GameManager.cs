@@ -40,7 +40,8 @@ public class GameManager : SerializedMonoBehaviour
     static readonly string[] CurrencyUnits = new string[] { "", "K", "M", "B", "T", "aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "ii", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak", "al", "am", "an", "ao", "ap", "aq", "ar", "as", "at", "au", "av", "aw", "ax", "ay", "az", "ba", "bb", "bc", "bd", "be", "bf", "bg", "bh", "bi", "bj", "bk", "bl", "bm", "bn", "bo", "bp", "bq", "br", "bs", "bt", "bu", "bv", "bw", "bx", "by", "bz", "ca", "cb", "cc", "cd", "ce", "cf", "cg", "ch", "ci", "cj", "ck", "cl", "cm", "cn", "co", "cp", "cq", "cr", "cs", "ct", "cu", "cv", "cw", "cx", };
 
     //GameObject[] Stages;
-    int Max_Stage = 10;
+    int Max_Stage = 30;
+    int Bonus_Max_Stage = 10;
     public int Current_Stage_Level;
     public GameObject Current_Stage;
 
@@ -54,12 +55,12 @@ public class GameManager : SerializedMonoBehaviour
     public double ballBasePrice = 1d;
     public double addBall_BasePrice = 5d;
     public double mergeBalls_BasePrice = 10d;
-    public double addPin_BasePrice = 20d;
+    public double addPin_BasePrice = 40d;
 
     public double ball_PriceScope = 1.2d;
     public double addBall_PriceScope = 5d;
     public double mergeBalls_PriceScope = 10d;
-    public double addPin_PriceScope = 20d;
+    public double addPin_PriceScope = 40d;
 
     public double ClearMoney = 0d;
     public double StageScope = 1.2d;
@@ -93,9 +94,26 @@ public class GameManager : SerializedMonoBehaviour
     Transform MergeRot;
     ParticleSystem MergeEffect;
 
-    [SerializeField] int RV_Max_MergeLevel = 0;
+    [SerializeField] int RV_Max_MergeLevel = 1;
 
     [SerializeField] bool NoAds = false;
+    public bool isBonusReady = true;
+
+    public enum Tutorial
+    {
+        Wait,
+        MovePin,
+        RotatePin,
+        Button_1,
+        Button_2,
+        Button_3,
+        RemovePin,
+        End
+    }
+    public Tutorial TutorialState;
+    bool isTutorial = false;
+    bool isTutorial_Rot = false;
+    public bool isBonusStage = false;
     // ===================================
     public void Init()
     {
@@ -130,9 +148,11 @@ public class GameManager : SerializedMonoBehaviour
 
     void CheckMaxStage()
     {
-        GameObject[] _stages = Resources.LoadAll<GameObject>("Stages");
+        GameObject[] _stages = Resources.LoadAll<GameObject>("Stages/Normal");
         Max_Stage = _stages.Length;
 
+        GameObject[] _bonusStages = Resources.LoadAll<GameObject>("Stages/Bonus");
+        Bonus_Max_Stage = _bonusStages.Length;
     }
 
 
@@ -150,61 +170,126 @@ public class GameManager : SerializedMonoBehaviour
         SetStage(Current_Stage_Level);
     }
 
-    public void SetStage(int _level = 0)
+    public void SetStage(int _level = 0, bool isBonus = false)
     {
-        MondayOFF.EventTracker.TryStage(_level);
-        if (_level == 1)
+        if (!isBonus) // normal stage
         {
-            StartCoroutine(Cor_Review());
-        }
-        Managers._uiGameScene.StageText.text = $"Stage {Current_Stage_Level + 1}";
-
-        if (Current_Stage != null)
-        {
-            Destroy(Current_Stage);
-            Current_Stage = null;
-        }
-        Current_Stage = Instantiate(Resources.Load<GameObject>("Stages/Stage_" + _level % Max_Stage));
-        _gridManager = Current_Stage.GetComponent<GridManager>();
-        _currentShooter = _gridManager._shooter;
-
-        if (ballList.Count > 0)
-        {
-            foreach (Ball _ball in ballList)
+            MondayOFF.EventTracker.TryStage(_level);
+            Managers._uiGameScene.Bonus_Stage_Panel.SetActive(false);
+            if (_level == 1)
             {
-                Managers.Pool.Push(_ball.GetComponent<Poolable>());
+                StartCoroutine(Cor_Review());
             }
-        }
-        ballList.Clear();
+            Managers._uiGameScene.StageText.text = $"Stage {Current_Stage_Level + 1}";
 
-        if (pinList.Count > 0)
-        {
-            foreach (Pin _pin in pinList)
+            if (Current_Stage != null)
             {
-                Managers.Pool.Push(_pin.GetComponent<Poolable>());
+                Destroy(Current_Stage);
+                Current_Stage = null;
             }
+            Current_Stage = Instantiate(Resources.Load<GameObject>("Stages/Normal/Stage_" + _level % Max_Stage));
+            _gridManager = Current_Stage.GetComponent<GridManager>();
+            _currentShooter = _gridManager._shooter;
+
+            if (ballList.Count > 0)
+            {
+                foreach (Ball _ball in ballList)
+                {
+                    Managers.Pool.Push(_ball.GetComponent<Poolable>());
+                }
+            }
+            ballList.Clear();
+
+            if (pinList.Count > 0)
+            {
+                foreach (Pin _pin in pinList)
+                {
+                    Managers.Pool.Push(_pin.GetComponent<Poolable>());
+                }
+            }
+            ClearMoney = (ballBasePrice * ball_PriceScope * (double)(Current_Stage_Level + 1)) * 5000d; // Set Stage Clear Money
+            currentClearMoney = 0d;
+            pinList.Clear();
+            ballLevelCount = new int[10];
+
+            addBall_Level = 1;
+            mergeBalls_Level = 1;
+            addPin_Level = 1;
+            isRunning = true;
+
+            Invoke("StartStage", 0.1f);
+
+            Managers._uiGameScene.FillGuage.transform.parent.gameObject.SetActive(true);
+            Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney)}";
+            Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney);
+
+
+
+            if ((Current_Stage_Level + 1) % 4 == 0 && isBonusReady)
+            {
+                Managers._uiGameScene.Bonus_Stage_Panel.SetActive(true);
+            }
+
+            isBonusReady = true;
+
+
+            IEnumerator Cor_Review()
+            {
+                yield return new WaitForSeconds(1f);
+                CustomReviewManager.instance.StoreReview();
+            }
+
+
+
         }
-        ClearMoney = (ballBasePrice * ball_PriceScope * (double)(Current_Stage_Level + 1)) * 5000d; // Set Stage Clear Money
-        currentClearMoney = 0d;
-        pinList.Clear();
-        ballLevelCount = new int[10];
-
-        addBall_Level = 1;
-        mergeBalls_Level = 1;
-        addPin_Level = 1;
-        isRunning = true;
-
-        Invoke("StartStage", 0.1f);
-
-        Managers._uiGameScene.GuageText.text = $"{ToCurrencyString(currentClearMoney)} / {ToCurrencyString(ClearMoney)}";
-        Managers._uiGameScene.FillGuage.fillAmount = (float)(currentClearMoney / ClearMoney);
-
-
-        IEnumerator Cor_Review()
+        else // Bonus Stages /////////////////////////////////////////////////////////////////////////////////
         {
-            yield return new WaitForSeconds(1f);
-            CustomReviewManager.instance.StoreReview();
+            isBonusStage = true;
+            Managers._uiGameScene.StageText.text = $"Bonus {_level + 1}";
+
+            if (Current_Stage != null)
+            {
+                Destroy(Current_Stage);
+                Current_Stage = null;
+            }
+            Current_Stage = Instantiate(Resources.Load<GameObject>("Stages/Bonus/Bonus_" + (_level % Bonus_Max_Stage)));
+            _gridManager = Current_Stage.GetComponent<GridManager>();
+            _currentShooter = _gridManager._shooter;
+
+            EventTracker.LogCustomEvent("BonusStgage_", new Dictionary<string, string> { { "BonusStage_", _level.ToString() } });
+
+            if (ballList.Count > 0)
+            {
+                foreach (Ball _ball in ballList)
+                {
+                    Managers.Pool.Push(_ball.GetComponent<Poolable>());
+                }
+            }
+            ballList.Clear();
+
+            if (pinList.Count > 0)
+            {
+                foreach (Pin _pin in pinList)
+                {
+                    Managers.Pool.Push(_pin.GetComponent<Poolable>());
+                }
+            }
+            ClearMoney = double.MaxValue; // Set Stage Clear Money
+            currentClearMoney = 0d;
+            pinList.Clear();
+            ballLevelCount = new int[10];
+
+            addBall_Level = 1;
+            mergeBalls_Level = 1;
+            addPin_Level = 1;
+            isRunning = true;
+
+            Invoke("StartStage", 0.1f);
+
+            Managers._uiGameScene.FillGuage.transform.parent.gameObject.SetActive(false);
         }
+
+
 
     }
 
@@ -225,6 +310,18 @@ public class GameManager : SerializedMonoBehaviour
             AddPin(0, false);
 
         }
+
+        if (Current_Stage_Level == 0)
+        {
+            isTutorial = true;
+            TutorialState = Tutorial.MovePin;
+            Managers._uiGameScene.Tutorial_Panel.SetActive(true);
+        }
+        else if (Managers._uiGameScene.Tutorial_Panel.activeSelf)
+        {
+            Managers._uiGameScene.Tutorial_Panel.SetActive(false);
+        }
+
     }
 
 
@@ -282,7 +379,7 @@ public class GameManager : SerializedMonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
             ES3.DeleteFile();
-            Money = 0;
+            Money = 200;
             SaveData();
             SetStage(Current_Stage_Level);
         }
@@ -354,6 +451,12 @@ public class GameManager : SerializedMonoBehaviour
                 //_rotObj.rotation = Quaternion.FromToRotation(Vector3.up, Vector3.right - _testpos);
                 _rotObj.rotation = Quaternion.FromToRotation(Vector3.down, _testpos);
 
+
+                if (TutorialState == Tutorial.RotatePin && (_rotObj.rotation.eulerAngles.z >= 50 || _rotObj.rotation.eulerAngles.z <= -50))
+                {
+                    isTutorial_Rot = true;
+                }
+
             }
 
             Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -365,6 +468,12 @@ public class GameManager : SerializedMonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            if (TutorialState == Tutorial.RotatePin && isTutorial_Rot)
+            {
+                TutorialState = Tutorial.Button_1;
+                Managers._uiGameScene.Rotate_Pin.SetActive(false);
+                Managers._uiGameScene.Click_Button.SetActive(true);
+            }
             _rotObj = null;
             if (isPick)
             {
@@ -388,6 +497,12 @@ public class GameManager : SerializedMonoBehaviour
 
                         Temp_Prev_Point.GetComponent<Point>().Reset_Pin();
 
+                        if (TutorialState == Tutorial.RemovePin)
+                        {
+                            TutorialState = Tutorial.End;
+                            Managers._uiGameScene.Tutorial_Panel.SetActive(false);
+                            isTutorial = false;
+                        }
 
                     }
 
@@ -400,6 +515,16 @@ public class GameManager : SerializedMonoBehaviour
                         Temp_Prev_Point.GetComponent<Point>().Reset_Pin();
                         Temp_Next_Point.GetComponent<Point>().Set_Pin(Pick_Obj);
                         Pick_Obj.transform.position = Temp_Next_Point.position;
+
+
+                        // tutorial
+                        if (Temp_Next_Point == _gridManager.Point_Group.GetChild(12))
+                        {
+                            TutorialState = Tutorial.RotatePin;
+                            Managers._uiGameScene.Move_Pin.SetActive(false);
+                            Managers._uiGameScene.Rotate_Pin.SetActive(true);
+                        }
+
                     }
                     else
                     {
@@ -527,7 +652,7 @@ public class GameManager : SerializedMonoBehaviour
         {
             if (Money >= tempAddBall_Price)
             {
-                if (NoAds == false)
+                if (NoAds == false && isBonusStage == false && isTutorial==false)
                 {
                     AdsManager.ShowInterstitial();
                 }
@@ -535,6 +660,13 @@ public class GameManager : SerializedMonoBehaviour
                 Money -= tempAddBall_Price;
                 addBall_Level++;
                 addBallFunc();
+
+                if (TutorialState == Tutorial.Button_1)
+                {
+                    TutorialState = Tutorial.Button_2;
+                    Managers._uiGameScene.Click_Button.transform.GetChild(1).gameObject.SetActive(false);
+                    Managers._uiGameScene.Click_Button.transform.GetChild(2).gameObject.SetActive(true);
+                }
             }
             else
             {
@@ -568,7 +700,7 @@ public class GameManager : SerializedMonoBehaviour
 
         if (Money >= tempMergeBalls_Price)
         {
-            if (NoAds == false)
+            if (NoAds == false && isBonusStage == false && isTutorial == false)
             {
                 AdsManager.ShowInterstitial();
             }
@@ -576,6 +708,14 @@ public class GameManager : SerializedMonoBehaviour
             Money -= tempMergeBalls_Price;
             mergeBalls_Level++;
             mergeBallsFunc();
+
+            if (TutorialState == Tutorial.Button_2)
+            {
+                TutorialState = Tutorial.Button_3;
+                Managers._uiGameScene.Click_Button.transform.GetChild(2).gameObject.SetActive(false);
+                Managers._uiGameScene.Click_Button.transform.GetChild(3).gameObject.SetActive(true);
+            }
+
         }
         else
         {
@@ -663,7 +803,15 @@ public class GameManager : SerializedMonoBehaviour
         if (isPay == false)
         {
             Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref, transform).GetComponent<Pin>();
-            Point _point = _gridManager.Point_Group.GetChild(2).GetComponent<Point>();
+            Point _point;
+            if (Current_Stage_Level == 0)
+            {
+                _point = _gridManager.Point_Group.GetChild(13).GetComponent<Point>();
+            }
+            else
+            {
+                _point = _gridManager.Point_Group.GetChild(2).GetComponent<Point>();
+            }
 
             _point.Fix_Pin = _pin.transform;
             _pin.transform.position = _point.transform.position;
@@ -682,19 +830,28 @@ public class GameManager : SerializedMonoBehaviour
             pinList.Add(_pin);
             MoneyUpdate();
             Managers.Sound.Play(Resources.Load<AudioClip>("Sound/Spawn"));
-                        
+
         }
         else
         {
             if (Money >= tempAddPin_Price)
             {
-                if (NoAds == false)
+                if (NoAds == false && isBonusStage == false && isTutorial == false)
                 {
                     AdsManager.ShowInterstitial();
                 }
                 Money -= tempAddPin_Price;
                 addPin_Level++;
                 addPinFunc();
+
+                if (TutorialState == Tutorial.Button_3)
+                {
+                    TutorialState = Tutorial.RemovePin;
+                    Managers._uiGameScene.Click_Button.SetActive(false);
+                    Managers._uiGameScene.Remove_Pin.SetActive(true);
+                }
+
+
             }
             else
             {
@@ -835,7 +992,6 @@ public class GameManager : SerializedMonoBehaviour
         }
         else
         {
-
             Button_OnOff(Managers._uiGameScene.AddBall_Button, true,
                (Money >= tempAddBall_Price));
             Button_OnOff(Managers._uiGameScene.MergeBalls_Button, true && (tempMergeBalls.Count >= 3) && !isMerging,
@@ -884,23 +1040,29 @@ public class GameManager : SerializedMonoBehaviour
         }
     }
 
-    public void StageClear()
+    public void StageClear(bool isBonus = false)
     {
-
-        MondayOFF.EventTracker.ClearStage(Current_Stage_Level);
-
         isRunning = false;
-        Current_Stage_Level++;
+        if (!isBonus) // normal stage
+        {
+            MondayOFF.EventTracker.ClearStage(Current_Stage_Level);
+            Current_Stage_Level++;
+        }
+        else // Bonus Stage
+        {
 
+        }
+        isBonusStage = false;
         Managers.Sound.Play(Resources.Load<AudioClip>("Sound/Clear"));
 
-        Debug.Log("Stage Clear!");
         Managers._uiGameScene.Upgrade_Panel.SetActive(false);
         Managers._uiGameScene.Clear_Panel.SetActive(true);
 
         SaveData();
 
     }
+
+
 
     public void NextStage_Button()
     {
@@ -920,7 +1082,7 @@ public class GameManager : SerializedMonoBehaviour
 
     public void LoadData()
     {
-        Money = ES3.Load<double>("Money", 0);
+        Money = ES3.Load<double>("Money", 200);
         Current_Stage_Level = ES3.Load<int>("StageLevel", 0);
     }
 
@@ -948,7 +1110,7 @@ public class GameManager : SerializedMonoBehaviour
     }
 
 
-    public void FloatingTextFunc(double _price, Transform _trans)
+    public void FloatingTextFunc(double _price, Transform _trans, bool isBonus = false)
     {
         double _PriceValue = isDoubleMoney ? _price * 2d : _price;
 
@@ -1087,7 +1249,12 @@ public class GameManager : SerializedMonoBehaviour
     }
 
 
-    /// 4.10
-    //void 
+    /// 4.11
+    /// Bonus Stage
+
+    public void BonusStage()
+    {
+        SetStage((Current_Stage_Level + 1) / 4, true);
+    }
 
 }

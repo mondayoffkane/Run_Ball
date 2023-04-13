@@ -27,7 +27,9 @@ public class UI_GameScene : UI_Scene
         Haptic,
         Restore,
         RV_Merge_Reward,
-        Close_Merge_Reward
+        Close_Merge_Reward,
+        Bonus_Stage,
+        Close_Bonus
 
     }
 
@@ -47,7 +49,14 @@ public class UI_GameScene : UI_Scene
         Clear_Panel,
         Store_Panel,
         Setting_Panel,
-        Merge_RV_Panel
+        Merge_RV_Panel,
+        Tutorial_Panel,
+        Move_Pin,
+        Rotate_Pin,
+        Click_Button,
+        Remove_Pin,
+        Bonus_Stage_Panel
+
     }
 
     public Text MoneyText;
@@ -56,9 +65,10 @@ public class UI_GameScene : UI_Scene
     public Button AddBall_Button, MergeBalls_Button, AddPin_Button, NextStage_Button
         , RV_AddMoney_Button, RV_AddBalls_Button, RV_DoubleMoney_Button, BallReset_Button
         , Setting_Button, Setting_Close_Button, Sound_Button, Haptic_Button, Restore_Button
-        , RV_Merge_Reward, Close_Merge_Reward;
+        , RV_Merge_Reward, Close_Merge_Reward, Bonus_Stage_Button, Close_Bonus_Button;
 
-    public GameObject Base_Panel, Upgrade_Panel, Clear_Panel, Store_Panel, Setting_Panel, Merge_RV_Panel;
+    public GameObject Base_Panel, Upgrade_Panel, Clear_Panel, Store_Panel, Setting_Panel, Merge_RV_Panel
+        , Tutorial_Panel, Move_Pin, Rotate_Pin, Click_Button, Remove_Pin, Bonus_Stage_Panel;
     public Image FillGuage;
 
     public RawImage[] Ball_Render_Imgs;
@@ -165,6 +175,26 @@ public class UI_GameScene : UI_Scene
         RV_Merge_Reward.AddButtonEvent(() => AdsManager.ShowRewarded(() => Managers.Game.RV_Merge_Reward()));
         Close_Merge_Reward.AddButtonEvent(() => Merge_RV_Panel.SetActive(false));
 
+
+        /// /////// Add Tutorial///////////////
+
+        Tutorial_Panel = GetObject(GameObjects.Tutorial_Panel);
+        Move_Pin = GetObject(GameObjects.Move_Pin);
+        Rotate_Pin = GetObject(GameObjects.Rotate_Pin);
+        Click_Button = GetObject(GameObjects.Click_Button);
+        Remove_Pin = GetObject(GameObjects.Remove_Pin);
+
+        // Bonus Stage
+        Bonus_Stage_Panel = GetObject(GameObjects.Bonus_Stage_Panel);
+        Bonus_Stage_Button = GetButton(Buttons.Bonus_Stage);
+        Close_Bonus_Button = GetButton(Buttons.Close_Bonus);
+
+        Bonus_Stage_Button.AddButtonEvent(() =>
+        {
+            Managers.Game.BonusStage();
+            Bonus_Stage_Panel.SetActive(false);
+        });
+        Close_Bonus_Button.AddButtonEvent(() => Bonus_Stage_Panel.SetActive(false));
 
     }
     public void TestFunc()
