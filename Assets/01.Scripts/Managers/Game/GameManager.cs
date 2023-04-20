@@ -114,6 +114,7 @@ public class GameManager : SerializedMonoBehaviour
     bool isTutorial = false;
     bool isTutorial_Rot = false;
     public bool isBonusStage = false;
+    int _odeeoCnt = 0;
     // ===================================
     public void Init()
     {
@@ -144,6 +145,23 @@ public class GameManager : SerializedMonoBehaviour
             _moneytime.text = $"{doubleMoney_Time:0}s";
         }
     }
+
+    //private void Start()
+    //{
+    //    MaxSdkCallbacks.Interstitial.OnAdHiddenEvent += (a, aa) =>
+    //    {
+    //        _odeeoCnt++;
+    //        if (_odeeoCnt % 2 == 0)
+    //        {
+    //            AdsManager.ShowPlayOn();
+    //        }
+    //    };
+
+    //    MaxSdkCallbacks.Interstitial.OnAdDisplayedEvent += (a, aa) =>
+    //    {
+    //        AdsManager.HidePlayOn();
+    //    };
+    //}
 
 
     void CheckMaxStage()
@@ -317,9 +335,13 @@ public class GameManager : SerializedMonoBehaviour
             TutorialState = Tutorial.MovePin;
             Managers._uiGameScene.Tutorial_Panel.SetActive(true);
         }
-        else if (Managers._uiGameScene.Tutorial_Panel.activeSelf)
+        else
         {
-            Managers._uiGameScene.Tutorial_Panel.SetActive(false);
+            isTutorial = false;
+            if (Managers._uiGameScene.Tutorial_Panel.activeSelf)
+            {
+                Managers._uiGameScene.Tutorial_Panel.SetActive(false);
+            }
         }
 
     }
@@ -652,7 +674,7 @@ public class GameManager : SerializedMonoBehaviour
         {
             if (Money >= tempAddBall_Price)
             {
-                if (NoAds == false && isBonusStage == false && isTutorial==false)
+                if (NoAds == false && isBonusStage == false && isTutorial == false)
                 {
                     AdsManager.ShowInterstitial();
                 }

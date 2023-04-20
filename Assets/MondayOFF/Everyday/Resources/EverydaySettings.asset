@@ -27,15 +27,15 @@ MonoBehaviour:
     AOS_IS_AdUnitID: c58aeed5ae3c209d
     AOS_RV_AdUnitID: df7e799fd84abdc0
     AOS_BN_AdUnitID: fd4865a87d297ebe
-    playOnAPIKey_Android: 
-    playOnAPIKey_iOS: 
-    storeID: 
+    playOnAPIKey_Android: 3bfc9acd-1a18-4d75-91c8-b77b666c2df6
+    playOnAPIKey_iOS: 4795582d-a012-4a9b-a74b-67cb3000beea
+    storeID: 6446715757
     playPlayonEveryNthInterstitial: 2
     playOnPosition:
-      useScreenPositioning: 0
-      playOnLogoAnchor: 0
+      useScreenPositioning: 1
+      playOnLogoAnchor: 3
       playOnLogoOffset: {x: 0, y: 150}
       playOnLogoSize: 64
-    initializeAdvertyOnAwake: 0
-    advertyApiKey_Android: 
-    advertyApiKey_iOS: 
+    initializeAdvertyOnAwake: 1
+    advertyApiKey_Android: NWVlNTA2ZTMtZWUxOS00NTNhLWFkNGQtYWFmNzdkNTI2ZTA4JGh0dHBzOi8vYWRzZXJ2ZXIuYWR2ZXJ0eS5jb20=
+    advertyApiKey_iOS: YTU5YmE4NWQtODA1YS00M2U2LTg5NGYtNTE0NWVmMTZhNmJlJGh0dHBzOi8vYWRzZXJ2ZXIuYWR2ZXJ0eS5jb20=
