@@ -42,6 +42,7 @@ MonoBehaviour:
     - Everyday.Ads.Editor
     - Everyday.Editor
     - Everyday.IAP
+    - Everyday.IAP.Editor
     - Google.Android.AppBundle.Editor
     - Google.Play.Common
     - Google.Play.Core
@@ -56,6 +57,7 @@ MonoBehaviour:
     - Nementic.SelectionUtility.Editor
     - Nementic.SelectionUtility.Runtime
     - PlayOn
+    - Purchasing.Common
     - SingularSDK
     - Sirenix.OdinInspector.CompatibilityLayer
     - Sirenix.OdinInspector.CompatibilityLayer.Editor

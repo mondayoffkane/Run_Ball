@@ -38,7 +38,11 @@ namespace MondayOFF {
         }
 
         public void OnInitializeFailed(InitializationFailureReason error) {
-            Debug.Log("[EVERYDAY] Failed to initialize Store Listener");
+            Debug.Log($"[EVERYDAY] Failed to initialize Store Listener: {error.ToString()}");
+        }
+
+        public void OnInitializeFailed(InitializationFailureReason error, string message) {
+            Debug.Log($"[EVERYDAY] Failed to initialize Store Listener: {error.ToString()}\nMessage: {message}");
         }
 
         public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason) {

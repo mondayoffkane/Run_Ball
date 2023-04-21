@@ -66,12 +66,18 @@ namespace MondayOFF {
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         private static void AfterAssembliesLoaded() {
-            Initialze();
+            System.Threading.Tasks.Task.Run(() => {
+                while (EveryDay.settings == null) {
+                    System.Threading.Thread.Sleep(100);
+                }
+                EveryDay.settings.adSettings.IsNoAds = () => NoAds.IsNoAds;
+            });
+            Initialize();
         }
 
-        private async static void Initialze() {
+        private async static void Initialize() {
             if(!EveryDay.isInitialized){
-                EveryDay.onEverydayInitialized += Initialze;
+                EveryDay.onEverydayInitialized += Initialize;
                 return;
             }
 
@@ -85,8 +91,6 @@ namespace MondayOFF {
 
             Debug.Log("[EVERYDAY] UNITY_PURCHASING is defined.");
             Debug.Log("[EVERYDAY] Initializing IAP Manager");
-
-            EveryDay.settings.adSettings.IsNoAds = () => NoAds.IsNoAds;
 
             EverydayProducts everydayProducts = default;
             var assets = Resources.LoadAll<EverydayProducts>("EverydayProducts");

@@ -29,7 +29,9 @@ public class UI_GameScene : UI_Scene
         RV_Merge_Reward,
         Close_Merge_Reward,
         Bonus_Stage,
-        Close_Bonus
+        Close_Bonus,
+        NoAds_On,
+        Purchase_NoAds
 
     }
 
@@ -55,7 +57,8 @@ public class UI_GameScene : UI_Scene
         Rotate_Pin,
         Click_Button,
         Remove_Pin,
-        Bonus_Stage_Panel
+        Bonus_Stage_Panel,
+        NoAds_Panel
 
     }
 
@@ -65,10 +68,13 @@ public class UI_GameScene : UI_Scene
     public Button AddBall_Button, MergeBalls_Button, AddPin_Button, NextStage_Button
         , RV_AddMoney_Button, RV_AddBalls_Button, RV_DoubleMoney_Button, BallReset_Button
         , Setting_Button, Setting_Close_Button, Sound_Button, Haptic_Button, Restore_Button
-        , RV_Merge_Reward, Close_Merge_Reward, Bonus_Stage_Button, Close_Bonus_Button;
+        , RV_Merge_Reward, Close_Merge_Reward, Bonus_Stage_Button, Close_Bonus_Button
+        , NoAds_On, Purchase_NoAds;
 
     public GameObject Base_Panel, Upgrade_Panel, Clear_Panel, Store_Panel, Setting_Panel, Merge_RV_Panel
-        , Tutorial_Panel, Move_Pin, Rotate_Pin, Click_Button, Remove_Pin, Bonus_Stage_Panel;
+        , Tutorial_Panel, Move_Pin, Rotate_Pin, Click_Button, Remove_Pin, Bonus_Stage_Panel
+        , NoAds_Panel;
+
     public Image FillGuage;
 
     public RawImage[] Ball_Render_Imgs;
@@ -196,6 +202,24 @@ public class UI_GameScene : UI_Scene
         });
         Close_Bonus_Button.AddButtonEvent(() => Bonus_Stage_Panel.SetActive(false));
 
+        Purchase_NoAds = GetButton(Buttons.Purchase_NoAds);
+        Purchase_NoAds.AddButtonEvent(() =>
+        {
+            MondayOFF.NoAds.Purchase();
+        });
+        MondayOFF.NoAds.OnNoAds += () =>
+        {
+            PlayerPrefs.SetInt("isNoAds", 1);
+            Managers.Game.isNoAds = 1;
+            NoAds_Panel.SetActive(false);
+            NoAds_On.gameObject.SetActive(false);
+
+            Debug.Log("구매 완료!");
+
+        };
+
+        NoAds_On = GetButton(Buttons.NoAds_On);
+        NoAds_Panel = GetObject(GameObjects.NoAds_Panel);
     }
     public void TestFunc()
     {

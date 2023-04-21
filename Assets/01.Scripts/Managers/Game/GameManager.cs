@@ -96,7 +96,7 @@ public class GameManager : SerializedMonoBehaviour
 
     [SerializeField] int RV_Max_MergeLevel = 1;
 
-    [SerializeField] bool NoAds = false;
+
     public bool isBonusReady = true;
 
     public enum Tutorial
@@ -115,9 +115,15 @@ public class GameManager : SerializedMonoBehaviour
     bool isTutorial_Rot = false;
     public bool isBonusStage = false;
     int _odeeoCnt = 0;
+    public int isNoAds = 0;
     // ===================================
     public void Init()
     {
+        MondayOFF.IAPManager.RestorePurchase();
+        isNoAds = PlayerPrefs.GetInt("isNoAds", 0);
+
+        Invoke("CheckNoAds", 5f);
+
         CheckMaxStage();
 
 
@@ -144,6 +150,13 @@ public class GameManager : SerializedMonoBehaviour
             Managers._uiGameScene.MPSText.text = $"${ToCurrencyString(Mps)} / Sec";
             _moneytime.text = $"{doubleMoney_Time:0}s";
         }
+    }
+
+    void CheckNoAds()
+    {
+        bool isOn = isNoAds == 0 ? true : false;
+        Managers._uiGameScene.NoAds_On.gameObject.SetActive(isOn);
+
     }
 
     //private void Start()
@@ -243,7 +256,7 @@ public class GameManager : SerializedMonoBehaviour
 
 
 
-            if ((Current_Stage_Level + 1) % 4 == 0 && isBonusReady)
+            if ((Current_Stage_Level + 1) % 3 == 0 && isBonusReady)
             {
                 Managers._uiGameScene.Bonus_Stage_Panel.SetActive(true);
             }
@@ -674,7 +687,7 @@ public class GameManager : SerializedMonoBehaviour
         {
             if (Money >= tempAddBall_Price)
             {
-                if (NoAds == false && isBonusStage == false && isTutorial == false)
+                if (isNoAds == 0 && isBonusStage == false && isTutorial == false)
                 {
                     AdsManager.ShowInterstitial();
                 }
@@ -692,9 +705,9 @@ public class GameManager : SerializedMonoBehaviour
             }
             else
             {
-                if (NoAds == false)
+                if (isNoAds == 0)
                 {
-                    addBall_Level++;
+
                     AdsManager.ShowRewarded(() => addBallFunc());
                 }
             }
@@ -703,6 +716,7 @@ public class GameManager : SerializedMonoBehaviour
         /////////////////
         void addBallFunc()
         {
+            addBall_Level++;
             Ball _newBall = _currentShooter.AddBall();
             _newBall.gameObject.SetActive(false);
             _currentShooter.Ball_Wait_List.Add(_newBall.GetComponent<Rigidbody>());
@@ -722,7 +736,7 @@ public class GameManager : SerializedMonoBehaviour
 
         if (Money >= tempMergeBalls_Price)
         {
-            if (NoAds == false && isBonusStage == false && isTutorial == false)
+            if (isNoAds == 0 && isBonusStage == false && isTutorial == false)
             {
                 AdsManager.ShowInterstitial();
             }
@@ -741,9 +755,9 @@ public class GameManager : SerializedMonoBehaviour
         }
         else
         {
-            if (NoAds == false)
+            if (isNoAds == 0)
             {
-                addBall_Level++;
+
                 AdsManager.ShowRewarded(() => mergeBallsFunc());
             }
         }
@@ -752,6 +766,7 @@ public class GameManager : SerializedMonoBehaviour
 
         void mergeBallsFunc()
         {
+            mergeBalls_Level++;
             int tempLevel = 0;
 
             Button_OnOff(Managers._uiGameScene.MergeBalls_Button, false);
@@ -858,7 +873,7 @@ public class GameManager : SerializedMonoBehaviour
         {
             if (Money >= tempAddPin_Price)
             {
-                if (NoAds == false && isBonusStage == false && isTutorial == false)
+                if (isNoAds == 0 && isBonusStage == false && isTutorial == false)
                 {
                     AdsManager.ShowInterstitial();
                 }
@@ -877,9 +892,9 @@ public class GameManager : SerializedMonoBehaviour
             }
             else
             {
-                if (NoAds == false)
+                if (isNoAds == 0)
                 {
-                    addPin_Level++;
+
                     AdsManager.ShowRewarded(() => addPinFunc());
                 }
             }
@@ -887,6 +902,7 @@ public class GameManager : SerializedMonoBehaviour
 
         void addPinFunc()
         {
+            addPin_Level++;
             Pin _pin = Managers.Pool.Pop(_gridManager.Pin_Pref, transform).GetComponent<Pin>();
 
             Point _point = _gridManager.FindEmptyPoint(GridManager.FindState.Random);
@@ -1003,44 +1019,63 @@ public class GameManager : SerializedMonoBehaviour
 
 
         // 금액 비교후 버튼 활성화 결정
-        if (NoAds == true)
-        {
-            Button_OnOff(Managers._uiGameScene.AddBall_Button,
-               (Money >= tempAddBall_Price));
-            Button_OnOff(Managers._uiGameScene.MergeBalls_Button,
-               (Money >= tempMergeBalls_Price && (tempMergeBalls.Count >= 3) && !isMerging));
-            Button_OnOff(Managers._uiGameScene.AddPin_Button,
-                (Money >= tempAddPin_Price && (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null)));
-        }
-        else
-        {
-            Button_OnOff(Managers._uiGameScene.AddBall_Button, true,
-               (Money >= tempAddBall_Price));
-            Button_OnOff(Managers._uiGameScene.MergeBalls_Button, true && (tempMergeBalls.Count >= 3) && !isMerging,
-               (Money >= tempMergeBalls_Price));
-            Button_OnOff(Managers._uiGameScene.AddPin_Button, true && (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null),
-                (Money >= tempAddPin_Price));
-        }
+        //if (isNoAds == 0)
+        //{
+        Button_OnOff(Managers._uiGameScene.AddBall_Button,
+           (Money >= tempAddBall_Price));
+        Button_OnOff(Managers._uiGameScene.MergeBalls_Button,
+           (Money >= tempMergeBalls_Price), (tempMergeBalls.Count >= 3) && !isMerging);
+        Button_OnOff(Managers._uiGameScene.AddPin_Button,
+            (Money >= tempAddPin_Price), (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null));
+        //}
+        //else
+        //{
+        //    Button_OnOff(Managers._uiGameScene.AddBall_Button, true,
+        //       (Money >= tempAddBall_Price));
+        //    Button_OnOff(Managers._uiGameScene.MergeBalls_Button, true && (tempMergeBalls.Count >= 3) && !isMerging,
+        //       (Money >= tempMergeBalls_Price));
+        //    Button_OnOff(Managers._uiGameScene.AddPin_Button, true && (_gridManager.FindEmptyPoint(GridManager.FindState.Random) != null),
+        //        (Money >= tempAddPin_Price));
+        //}
 
 
 
     }
 
-    public void Button_OnOff(Button _button, bool isTrue, bool enoughMoney = true)
+    public void Button_OnOff(Button _button, bool enoughMoney = true, bool isReady = true)
     {
-
-        _button.interactable = isTrue;
-        _button.transform.GetChild(0).GetComponent<Text>().color = isTrue ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
-        _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().enabled = enoughMoney;
-        _button.transform.GetChild(0).GetChild(1).GetComponent<Image>().enabled = !enoughMoney;
-        _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = isTrue ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
-        _button.transform.GetChild(0).GetChild(1).GetComponent<Image>().color = isTrue ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
-        _button.transform.GetChild(1).GetComponent<Outline>().enabled = isTrue;
-
-        if (!enoughMoney)
+        if (isNoAds == 0)
         {
-            _button.transform.GetChild(0).GetComponent<Text>().text = $"Free";
+            _button.interactable = isReady;
+            _button.transform.GetChild(0).GetComponent<Text>().color = isReady ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
+            _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().enabled = enoughMoney;
+            _button.transform.GetChild(0).GetChild(1).GetComponent<Image>().enabled = !enoughMoney;
+            _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = true ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
+            _button.transform.GetChild(0).GetChild(1).GetComponent<Image>().color = true ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
+            _button.transform.GetChild(1).GetComponent<Outline>().enabled = isReady;
+
+            if (!enoughMoney)
+            {
+                _button.transform.GetChild(0).GetComponent<Text>().text = $"Free";
+            }
         }
+        else
+        {
+
+            _button.interactable = enoughMoney && isReady;
+            _button.transform.GetChild(0).GetComponent<Text>().color = enoughMoney && isReady ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
+            _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().enabled = true;
+            _button.transform.GetChild(0).GetChild(1).GetComponent<Image>().enabled = false;
+            _button.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = enoughMoney && isReady ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
+            _button.transform.GetChild(0).GetChild(1).GetComponent<Image>().color = enoughMoney && isReady ? new Color32(255, 255, 255, 255) : new Color32(175, 175, 175, 255);
+            _button.transform.GetChild(1).GetComponent<Outline>().enabled = enoughMoney && isReady;
+        }
+        if (isReady == false)
+        {
+            _button.interactable = false;
+        }
+
+
 
     }
 
@@ -1276,7 +1311,7 @@ public class GameManager : SerializedMonoBehaviour
 
     public void BonusStage()
     {
-        SetStage((Current_Stage_Level + 1) / 4, true);
+        SetStage((Current_Stage_Level + 1) / 3, true);
     }
 
 }

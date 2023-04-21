@@ -12,8 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd63d146545254068a1f00d3dcd90cdf, type: 3}
   m_Name: EverydayProducts
   m_EditorClassIdentifier: MondayOFF.IAP:MondayOFF:MondayOFFProducts
-  products:
-  - productID: Consumable
-    productType: 0
-  - productID: Non Consumable
-    productType: 1
+  products: []

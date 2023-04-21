@@ -34,7 +34,7 @@ MonoBehaviour:
     playOnPosition:
       useScreenPositioning: 1
       playOnLogoAnchor: 3
-      playOnLogoOffset: {x: 0, y: 150}
+      playOnLogoOffset: {x: 0, y: 0}
       playOnLogoSize: 64
     initializeAdvertyOnAwake: 1
     advertyApiKey_Android: NWVlNTA2ZTMtZWUxOS00NTNhLWFkNGQtYWFmNzdkNTI2ZTA4JGh0dHBzOi8vYWRzZXJ2ZXIuYWR2ZXJ0eS5jb20=
