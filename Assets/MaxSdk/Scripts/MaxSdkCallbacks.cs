@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
+using AppLovinMax.Internal.API;
 using AppLovinMax.ThirdParty.MiniJson;
 
 public class MaxSdkCallbacks : MonoBehaviour
@@ -49,6 +50,7 @@ public class MaxSdkCallbacks : MonoBehaviour
 
     // Fire when the MaxVariableService has finished loading the latest set of variables.
     private static Action _onVariablesUpdatedEvent;
+    [System.Obsolete("This API has been deprecated. Please use our SDK's initialization callback to retrieve variables instead.")]
     public static event Action OnVariablesUpdatedEvent
     {
         add
@@ -180,7 +182,7 @@ public class MaxSdkCallbacks : MonoBehaviour
                 _onInterstitialAdRevenuePaidEvent -= value;
             }
         }
-        
+
         /// <summary>
         /// Fired when an Ad Review Creative ID has been generated.
         /// The parameters returned are the adUnitIdentifier, adReviewCreativeId, and adInfo in that respective order.
@@ -198,7 +200,7 @@ public class MaxSdkCallbacks : MonoBehaviour
                 _onInterstitialAdReviewCreativeIdGeneratedEvent -= value;
             }
         }
-        
+
         public static event Action<string, MaxSdkBase.AdInfo> OnAdHiddenEvent
         {
             add
@@ -432,7 +434,7 @@ public class MaxSdkCallbacks : MonoBehaviour
                 _onRewardedAdRevenuePaidEvent -= value;
             }
         }
-        
+
         /// <summary>
         /// Fired when an Ad Review Creative ID has been generated.
         /// The parameters returned are the adUnitIdentifier, adReviewCreativeId, and adInfo in that respective order.
@@ -583,7 +585,7 @@ public class MaxSdkCallbacks : MonoBehaviour
                 _onRewardedInterstitialAdRevenuePaidEvent -= value;
             }
         }
-        
+
         /// <summary>
         /// Fired when an Ad Review Creative ID has been generated.
         /// The parameters returned are the adUnitIdentifier, adReviewCreativeId, and adInfo in that respective order.
@@ -696,7 +698,7 @@ public class MaxSdkCallbacks : MonoBehaviour
                 _onBannerAdRevenuePaidEvent -= value;
             }
         }
-        
+
         /// <summary>
         /// Fired when an Ad Review Creative ID has been generated.
         /// The parameters returned are the adUnitIdentifier, adReviewCreativeId, and adInfo in that respective order.
@@ -809,7 +811,7 @@ public class MaxSdkCallbacks : MonoBehaviour
                 _onMRecAdRevenuePaidEvent -= value;
             }
         }
-        
+
         /// <summary>
         /// Fired when an Ad Review Creative ID has been generated.
         /// The parameters returned are the adUnitIdentifier, adReviewCreativeId, and adInfo in that respective order.
@@ -856,7 +858,7 @@ public class MaxSdkCallbacks : MonoBehaviour
             }
         }
     }
-    
+
     private static Action<string, MaxSdkBase.AdInfo> _onCrossPromoAdLoadedEvent;
     private static Action<string, MaxSdkBase.ErrorInfo> _onCrossPromoAdLoadFailedEvent;
     private static Action<string, MaxSdkBase.AdInfo> _onCrossPromoAdClickedEvent;
@@ -1359,6 +1361,10 @@ public class MaxSdkCallbacks : MonoBehaviour
         {
             InvokeEvent(_onSdkConsentDialogDismissedEvent, eventName);
         }
+        else if (eventName == "OnSdkConsentFlowCompletedEvent")
+        {
+            CFService.NotifyConsentFlowCompletedIfNeeded(eventProps);
+        }
         // Ad Events
         else
         {
@@ -1654,16 +1660,7 @@ public class MaxSdkCallbacks : MonoBehaviour
     {
         if (_onSdkInitializedEvent == null) return;
 
-        var sdkConfiguration = new MaxSdkBase.SdkConfiguration();
-        sdkConfiguration.IsSuccessfullyInitialized = true;
-#pragma warning disable 0618
-        sdkConfiguration.ConsentDialogState = MaxSdkBase.ConsentDialogState.Unknown;
-#pragma warning restore 0618
-        sdkConfiguration.AppTrackingStatus = MaxSdkBase.AppTrackingStatus.Authorized;
-        var currentRegion = RegionInfo.CurrentRegion;
-        sdkConfiguration.CountryCode = currentRegion != null ? currentRegion.TwoLetterISORegionName : "US";
-
-        _onSdkInitializedEvent(sdkConfiguration);
+        _onSdkInitializedEvent(MaxSdkBase.SdkConfiguration.CreateEmpty());
     }
 #endif
 

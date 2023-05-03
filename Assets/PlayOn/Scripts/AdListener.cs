@@ -14,6 +14,7 @@ public class AdListener
     public PlayOnSDK.PlayOnNoArgsDelegate OnClick = () => { };
     public PlayOnSDK.PlayOnFloatDelegate OnReward = (amount) => { };
     public PlayOnSDK.PlayOnImpressionDelegate OnImpression = (data) => { };
+    public PlayOnSDK.PlayOnNoArgsDelegate OnAdBlocked = () => { };
     public bool adBlocked = false;
 
 #if UNITY_ANDROID && !UNITY_EDITOR

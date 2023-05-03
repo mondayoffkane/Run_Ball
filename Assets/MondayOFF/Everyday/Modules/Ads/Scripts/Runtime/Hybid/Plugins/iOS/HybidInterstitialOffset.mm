@@ -7,6 +7,6 @@
 extern "C" {
   void SetHyBidOffsets(int skipOffset){
       [[HyBidRenderingConfig sharedConfig] setVideoSkipOffset:[[HyBidSkipOffset alloc] initWithOffset:@(skipOffset) isCustom:true]];
-      [[HyBidRenderingConfig sharedConfig] setHtmlSkipOffset:[[HyBidSkipOffset alloc] initWithOffset:@(skipOffset) isCustom:true]];
+      [[HyBidRenderingConfig sharedConfig] setInterstitialHtmlSkipOffset:[[HyBidSkipOffset alloc] initWithOffset:@(skipOffset) isCustom:true]];
   }
 }

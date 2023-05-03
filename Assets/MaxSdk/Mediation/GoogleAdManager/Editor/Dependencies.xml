@@ -2,9 +2,9 @@
 <dependencies>
     <androidPackages>
         <!-- Ensure that Resolver doesn't inadvertently pull the latest Play Services Ads' SDK that we haven't certified against. -->
-        <androidPackage spec="com.applovin.mediation:google-ad-manager-adapter:[21.5.0.0]" />
+        <androidPackage spec="com.applovin.mediation:google-ad-manager-adapter:[22.0.0.2]" />
     </androidPackages>
     <iosPods>
-        <iosPod name="AppLovinMediationGoogleAdManagerAdapter" version="9.14.0.2" />
+        <iosPod name="AppLovinMediationGoogleAdManagerAdapter" version="10.3.0.1" />
     </iosPods>
 </dependencies>

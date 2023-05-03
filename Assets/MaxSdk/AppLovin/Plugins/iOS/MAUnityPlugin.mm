@@ -292,7 +292,7 @@ extern "C"
         
         [_sdk showCreativeDebugger];
     }
-
+    
     void _MaxShowConsentDialog()
     {
         NSLog(@"[%@] Failed to show consent dialog - Unavailable on iOS, please use the consent flow: https://dash.applovin.com/documentation/mediation/unity/getting-started/consent-flow", TAG);
@@ -416,7 +416,13 @@ extern "C"
     {
         if ( !_sdk )
         {
-            logUninitializedAccessError("_MaxClearAllTargetingData");
+            _targetingYearOfBirth = nil;
+            _targetingGender = nil;
+            _targetingMaximumAdContentRating = nil;
+            _targetingEmail = nil;
+            _targetingPhoneNumber = nil;
+            _targetingKeywords = nil;
+            _targetingInterests = nil;
             return;
         }
         
@@ -437,7 +443,8 @@ extern "C"
         return cStringCopy([MAUnityAdManager serializeParameters: @{@"consentDialogState" : consentDialogStateStr,
                                                                     @"countryCode" : _sdk.configuration.countryCode,
                                                                     @"appTrackingStatus" : appTrackingStatus,
-                                                                    @"isSuccessfullyInitialized" : ([_sdk isInitialized] ? @"true" : @"false")}]);
+                                                                    @"isSuccessfullyInitialized" : @([_sdk isInitialized]),
+                                                                    @"isTestModeEnabled" : @([_sdk.configuration isTestModeEnabled])}]);
     }
     
     void _MaxSetHasUserConsent(bool hasUserConsent)
@@ -1045,6 +1052,28 @@ extern "C"
                 _extraParametersToSet[stringKey] = NSSTRING(value);
             }
         }
+    }
+
+    const char * _MaxGetCFType()
+    {
+        if ( !_sdk )
+        {
+            NSLog(@"[%@] Failed to get available mediated networks - please ensure the AppLovin MAX Unity Plugin has been initialized by calling 'MaxSdk.InitializeSdk();'!", TAG);
+            return cStringCopy(@(ALCFTypeUnknown).stringValue);
+        }
+        
+        return cStringCopy(@(_sdk.cfService.cfType).stringValue);
+    }
+
+    void _MaxStartConsentFlow()
+    {
+        if (!isPluginInitialized())
+        {
+            logUninitializedAccessError("_MaxStartConsentFlow");
+            return;
+        }
+        
+        [_adManager startConsentFlow];
     }
 
     float _MaxGetAdaptiveBannerHeight(const float width)

@@ -33,6 +33,8 @@ MonoBehaviour:
     - ACTk.Editor
     - ACTk.Runtime
     - AdvertyPlatformSpecific
+    - Amazon.Editor
+    - Amazon.Scripts
     - Assembly-CSharp
     - Assembly-CSharp-firstpass
     - Cinemachine

@@ -11,11 +11,6 @@ namespace MondayOFF {
         public int callbackOrder => 0;
 
         public void OnPreprocessBuild(BuildReport report) {
-            // Facebook settings
-            // Facebook.Unity.Settings.FacebookSettings.AppLabels = new System.Collections.Generic.List<string> { "" };
-            // Facebook.Unity.Settings.FacebookSettings.AppIds = new System.Collections.Generic.List<string> { "" };
-            // Facebook.Unity.Settings.FacebookSettings.ClientTokens = new System.Collections.Generic.List<string> { "" };
-
             var settingAssets = AssetDatabase.FindAssets("t:EverydaySettings");
 
             if (settingAssets.Length != 1) {
@@ -26,14 +21,7 @@ namespace MondayOFF {
             AddSettingsToPreload(settings);
 
             if (string.IsNullOrEmpty(Facebook.Unity.Settings.FacebookSettings.ClientToken)) {
-                var fbSettings = AssetDatabase.FindAssets(filter: "t:FacebookSettings");
-
-                if (fbSettings.Length != 1) {
-                    Debug.LogError("[EVERYDAY] There are zero or more than two Objects! " + fbSettings.Length);
-                    return;
-                }
-
-                UnityEditor.Selection.activeObject = AssetDatabase.LoadAssetAtPath<FacebookSettings>(AssetDatabase.GUIDToAssetPath(fbSettings[0]));
+                UnityEditor.Selection.activeObject = FacebookSettings.Instance;
                 throw new UnityEditor.Build.BuildFailedException("[EVERYDAY] Facebook Client Token is empty!");
             }
 

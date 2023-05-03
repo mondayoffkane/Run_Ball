@@ -48,7 +48,26 @@ namespace MondayOFF {
             MaxSdkCallbacks.Rewarded.OnAdHiddenEvent += OnAdHiddenEvent;
             MaxSdkCallbacks.Rewarded.OnAdReceivedRewardEvent += OnAdReceivedRewardEvent;
 
-            LoadRewardedAd();
+            if (_settings.HasAPSKey(AdType.Rewarded)) {
+                LoadAPSRewarded();
+            } else {
+                LoadRewardedAd();
+            }
+        }
+
+        private void LoadAPSRewarded() {
+            Debug.Log("[EVERYDAY] Loading APS Rewarded Ad");
+            var rewardedVideoAd = new AmazonAds.APSVideoAdRequest(320, 480, _settings.apsRewardedSlotId);
+            rewardedVideoAd.onSuccess += (adResponse) => {
+                MaxSdk.SetRewardedAdLocalExtraParameter(_settings.rewardedAdUnitId, "amazon_ad_response", adResponse.GetResponse());
+                LoadRewardedAd();
+            };
+            rewardedVideoAd.onFailedWithError += (adError) => {
+                MaxSdk.SetRewardedAdLocalExtraParameter(_settings.rewardedAdUnitId, "amazon_ad_error", adError.GetAdError());
+                LoadRewardedAd();
+            };
+
+            rewardedVideoAd.LoadAd();
         }
 
         private void LoadRewardedAd() {

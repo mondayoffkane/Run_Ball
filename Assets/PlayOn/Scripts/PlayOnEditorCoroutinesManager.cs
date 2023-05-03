@@ -8,7 +8,7 @@ public class PlayOnEditorCoroutinesManager
 {
     readonly IEnumerator mRoutine;
 
-    public static PlayOnEditorCoroutinesManager StartEditorCoroutine( IEnumerator routine)
+    public static PlayOnEditorCoroutinesManager StartEditorCoroutine(IEnumerator routine)
     {
         PlayOnEditorCoroutinesManager coroutine = new PlayOnEditorCoroutinesManager(routine);
         coroutine.start();
@@ -27,7 +27,7 @@ public class PlayOnEditorCoroutinesManager
 
     void update()
     {
-        if(!mRoutine.MoveNext())
+        if (!mRoutine.MoveNext())
         {
             StopEditorCoroutine();
         }

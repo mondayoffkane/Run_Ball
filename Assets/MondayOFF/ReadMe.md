@@ -9,10 +9,6 @@ This package consists of these third party SDKs
 - Firebase Analytics
 ---
 
-## Migrating to v3.0.0
-- **Don't**. 
--  It has no-backward compatibility so clean up Everyday before integrating version 3 if you have older version installed.
-
 ## Requirements
 - Unity 2021.3+
 
@@ -30,7 +26,7 @@ This package consists of these third party SDKs
     - **Enable Verbose Logging**
         - Enable it to use default Unity Debug logger. Disabling it will hide **ALL** Unity log messages. It is recommended to disable verbose logging on release products.
     - **Initialize On Load**
-        - Enable it to initialze AdsManager upon initialization. 
+        - Enable it to initialize AdsManager upon initialization. 
         > Call `MondayOFF.AdsManager.Initialize()` if you want to manually initialize AdsManager.
     - **Show Banner On Load**
         - Enable it to show banner when AdsManager is initialized.
@@ -46,6 +42,8 @@ This package consists of these third party SDKs
         - Set banner position. Banners are automatically sized to 320x50 on phones and 728x90 on tablets.
     - **Ad Unit ID**
         - Ad Unit IDs for each platform and ad format. Empty Ad Unit IDs will be considered inactive.
+    - **APS App ID/Slot ID**
+        - Empty IDs will be considered inactive.
     - **PlayOn Api Key**
         - Enter Api Keys for Android and iOS
     - **AppStore ID**
@@ -201,7 +199,7 @@ public class SampleScript: MonoBehaviour {
 ## Adverty
 > See [Documentation](https://adverty.com/4.1/documentation) for more details
 - Check `initializeAdvertyOnAwake` if your game have main camera at the start of game scene and is the only camera throughout the gameplay.
-- Call `InitializeAdverty(Camera)` if you want to manually initialze Adverty.
+- Call `InitializeAdverty(Camera)` if you want to manually initialize Adverty.
 - Call `ChangeAdvertyCamera(Camera)` if your main camera changes during gameplay.
 
 ## Events

@@ -8,7 +8,7 @@ namespace MondayOFF {
         [SerializeField] internal bool initializeOnLoad = true;
 
         [Header("Show Banner upon initialization")]
-        [SerializeField] internal bool showBannerOnLoad = false;
+        [SerializeField] internal bool showBannerOnLoad = true;
 
         [Header("Ad initialization order")]
         [SerializeField] internal AdInitializationOrder adInitializationOrder = AdInitializationOrder.Banner_Inter_Reward;
@@ -23,24 +23,27 @@ namespace MondayOFF {
 
 #pragma warning disable CS0414
         [Header("====== iOS Ad Unit IDs ======")]
-        // [SerializeField][LabelOverride("Interstitial (IS)")] bool iOS_has_IS = false;
         [SerializeField][LabelOverride("Interstitial")] string iOS_IS_AdUnitID = "";
-        // [SerializeField][LabelOverride("Rewarded (RV)")] bool iOS_has_RV = false;
         [SerializeField][LabelOverride("Rewarded")] string iOS_RV_AdUnitID = "";
-        // [SerializeField][LabelOverride("Banner (BN)")] bool iOS_has_BN = false;
         [SerializeField][LabelOverride("Banner")] string iOS_BN_AdUnitID = "";
+        [Space(10)]
+        [SerializeField][LabelOverride("APS App ID")] string iOS_APS_AppID = "";
+        [SerializeField][LabelOverride("APS Interstitial Slot ID")] string iOS_APS_IS_SlotID = "";
+        [SerializeField][LabelOverride("APS Rewarded Slot ID")] string iOS_APS_RV_SlotID = "";
+        [SerializeField][LabelOverride("APS Banner Slot ID")] string iOS_APS_BN_SlotID = "";
 
         [Header("====== Android Ad Unit IDs ======")]
-        // [SerializeField][LabelOverride("Interstitial (IS)")] bool AOS_has_IS = false;
         [SerializeField][LabelOverride("Interstitial")] string AOS_IS_AdUnitID = "";
-        // [SerializeField][LabelOverride("Rewarded (RV)")] bool AOS_has_RV = false;
         [SerializeField][LabelOverride("Rewarded")] string AOS_RV_AdUnitID = "";
-        // [SerializeField][LabelOverride("Banner (BN)")] bool AOS_has_BN = false;
         [SerializeField][LabelOverride("Banner")] string AOS_BN_AdUnitID = "";
+        [Space(10)]
+        [SerializeField][LabelOverride("APS App ID")] string AOS_APS_AppID = "";
+        [SerializeField][LabelOverride("APS Interstitial Slot ID")] string AOS_APS_IS_SlotID = "";
+        [SerializeField][LabelOverride("APS Rewarded Slot ID")] string AOS_APS_RV_SlotID = "";
+        [SerializeField][LabelOverride("APS Banner Slot ID")] string AOS_APS_BN_SlotID = "";
 
         [Space(20)]
         [Header("====== PlayOn ======")]
-        // [SerializeField][LabelOverride("PlayOn")] internal bool hasPlayOn = false;
         [SerializeField][LabelOverride("Android Api Key")] private string playOnAPIKey_Android = "";
         [SerializeField][LabelOverride("iOS Api Key")] private string playOnAPIKey_iOS = "";
         [SerializeField][LabelOverride("Apple AppStore ID")] internal string storeID = "";
@@ -67,32 +70,51 @@ namespace MondayOFF {
         internal string playOnAPIKey => playOnAPIKey_iOS;
 
         internal string advertyApiKey => advertyApiKey_iOS;
+
+        internal string apsAppId => iOS_APS_AppID;
+        internal string apsInterstitialSlotId => iOS_APS_IS_SlotID;
+        internal string apsRewardedSlotId => iOS_APS_RV_SlotID;
+        internal string apsBannerSlotId => iOS_APS_BN_SlotID;
 #else
         internal string interstitialAdUnitId => AOS_IS_AdUnitID;
         internal string rewardedAdUnitId => AOS_RV_AdUnitID;
         internal string bannerAdUnitId => AOS_BN_AdUnitID;
 
-        
+
         internal bool hasInterstitial => !string.IsNullOrEmpty(AOS_IS_AdUnitID);
         internal bool hasRewarded => !string.IsNullOrEmpty(AOS_RV_AdUnitID);
         internal bool hasBanner => !string.IsNullOrEmpty(AOS_BN_AdUnitID);
 
         internal string playOnAPIKey => playOnAPIKey_Android;
         internal string advertyApiKey => advertyApiKey_Android;
+
+        internal string apsAppId => AOS_APS_AppID;
+        internal string apsInterstitialSlotId => AOS_APS_IS_SlotID;
+        internal string apsRewardedSlotId => AOS_APS_RV_SlotID;
+        internal string apsBannerSlotId => AOS_APS_BN_SlotID;
 #endif
 
         internal System.Func<bool> IsNoAds = () => false;
 
-        internal bool HasInterstitialAdUnitID() {
-            return hasInterstitial && !string.IsNullOrEmpty(interstitialAdUnitId);
+        internal bool HasAPSKey() {
+            return !string.IsNullOrEmpty(apsAppId);
         }
 
-        internal bool HadRewardedAdUnitID() {
-            return hasRewarded && !string.IsNullOrEmpty(rewardedAdUnitId);
-        }
+        internal bool HasAPSKey(AdType adType) {
+            if (!HasAPSKey()) {
+                return false;
+            }
 
-        internal bool HasBannerAdUnitID() {
-            return hasBanner && !string.IsNullOrEmpty(bannerAdUnitId);
+            switch (adType) {
+                case AdType.Interstitial:
+                    return !string.IsNullOrEmpty(apsInterstitialSlotId);
+                case AdType.Rewarded:
+                    return !string.IsNullOrEmpty(apsRewardedSlotId);
+                case AdType.Banner:
+                    return !string.IsNullOrEmpty(apsBannerSlotId);
+            }
+
+            return false;
         }
     }
 

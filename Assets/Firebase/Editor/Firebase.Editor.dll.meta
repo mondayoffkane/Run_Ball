@@ -3,7 +3,7 @@ guid: 9f2edbf81053418f879076c05f816dc2
 labels:
 - gvh
 - gvh_targets-editor
-- gvh_version-9.6.0
+- gvh_version-10.6.0
 - gvhp_exportpath-Firebase/Editor/Firebase.Editor.dll
 PluginImporter:
   externalObjects: {}
@@ -101,6 +101,13 @@ PluginImporter:
         CPU: AnyCPU
   - first:
       iPhone: iOS
+    second:
+      enabled: 0
+      settings:
+        CompileFlags: 
+        FrameworkDependencies: 
+  - first:
+      tvOS: tvOS
     second:
       enabled: 0
       settings:

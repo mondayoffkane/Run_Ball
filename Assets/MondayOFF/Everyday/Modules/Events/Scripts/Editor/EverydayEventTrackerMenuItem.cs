@@ -15,7 +15,7 @@ namespace MondayOFF {
                 "Assets/Editor Default Resources",
                 "Assets/Firebase",
                 "Assets/Parse",
-                "Assets/Plugins/iOS/Firebase",
+                "Assets/MondayOFF/ThirdParties/Firebase",
                 "Assets/GeneratedLocalRepo"
             };
 

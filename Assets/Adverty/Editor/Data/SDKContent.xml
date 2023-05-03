@@ -127,5 +127,5 @@
     <file action="Delete">Scripts/PlatformSpecific/IosNativeDebug.cs</file>
     <file action="Delete">Scripts/PlatformSpecific/IosNativeLogger.cs</file>
   </Files>
-  <Version>4.1.4</Version>
+  <Version>4.1.5</Version>
 </SDKContent>

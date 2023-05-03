@@ -1,6 +1,7 @@
 #if UNITY_IOS
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
@@ -70,9 +71,42 @@ namespace MondayOFF {
             // Get root
             PlistElementDict rootDict = plist.root;
 
-            // Max.. should go to Ads but this should not hurt i guess
-            // var appLovinKey = "AppLovinSdkKey";
-            // rootDict.SetString(appLovinKey, "-uBAP4IJbzlOMFq-KJUwdvW8bwGdhtGgmRr9V8T65CUSSIQocwhFqCNP7e2pVITFkJPERuLW5q-X7PJlJ_-7CM");
+            // ! Temporal solution for APS
+
+            var skAdNetworkIds = new[]{
+                "bvpn9ufa9b.skadnetwork",
+                "hjevpa356n.skadnetwork"
+            };
+            PlistElement skAdNetworkItems;
+            plist.root.values.TryGetValue("SKAdNetworkItems", out skAdNetworkItems);
+            var existingSkAdNetworkIds = new HashSet<string>();
+            // Check if SKAdNetworkItems array is already in the Plist document and collect all the IDs that are already present.
+            if (skAdNetworkItems != null && skAdNetworkItems.GetType() == typeof(PlistElementArray)) {
+                var plistElementDictionaries = skAdNetworkItems.AsArray().values.Where(plistElement => plistElement.GetType() == typeof(PlistElementDict));
+                foreach (var plistElement in plistElementDictionaries) {
+                    PlistElement existingId;
+                    plistElement.AsDict().values.TryGetValue("SKAdNetworkIdentifier", out existingId);
+                    if (existingId == null || existingId.GetType() != typeof(PlistElementString) || string.IsNullOrEmpty(existingId.AsString())) continue;
+
+                    existingSkAdNetworkIds.Add(existingId.AsString());
+                }
+            }
+            // Else, create an array of SKAdNetworkItems into which we will add our IDs.
+            else {
+                skAdNetworkItems = plist.root.CreateArray("SKAdNetworkItems");
+            }
+
+            foreach (var skAdNetworkId in skAdNetworkIds) {
+                // Skip adding IDs that are already in the array.
+                if (existingSkAdNetworkIds.Contains(skAdNetworkId)) continue;
+
+                var skAdNetworkItemDict = skAdNetworkItems.AsArray().AddDict();
+                skAdNetworkItemDict.SetString("SKAdNetworkIdentifier", skAdNetworkId);
+            }
+
+            // ! End of temporal solution for APS
+
+            // Location permission
             var NSLocationWhenInUseUsageDescription = "NSLocationWhenInUseUsageDescription";
             rootDict.SetString(NSLocationWhenInUseUsageDescription, "Permission to improve advertisement experience");
 

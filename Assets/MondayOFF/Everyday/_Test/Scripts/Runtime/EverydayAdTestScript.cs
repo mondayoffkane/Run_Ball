@@ -108,7 +108,7 @@ public class EverydayAdTestScript : MonoBehaviour {
     }
 
     public void IAP_InitializeIAPManager() {
-        // IAPManager.Initialze();
+        // IAPManager.Initialize();
     }
 
     public void IAP_RegisterCallbackConsumable() {
@@ -161,5 +161,9 @@ public class EverydayAdTestScript : MonoBehaviour {
 
     public void Events_ClearStage(int stageNum) {
         EventTracker.ClearStage(stageNum);
+    }
+
+    public void Show_MediationDebugger(){
+        MaxSdk.ShowMediationDebugger();
     }
 }

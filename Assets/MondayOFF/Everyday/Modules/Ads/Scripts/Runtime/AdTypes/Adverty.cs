@@ -13,7 +13,7 @@ namespace MondayOFF {
             UserData userData = new UserData(AgeSegment.Unknown, Gender.Unknown);
             AdvertySDK.Init(_settings.advertyApiKey, AdvertySettings.Mode.Mobile, !AdsManager.HAS_USER_CONSENT, userData);
             AdvertySettings.SetMainCamera(mainCamera);
-            //AdvertySettings.SandboxMode = false;
+            // AdvertySettings.SandboxMode = false;
         }
 
         public void Dispose() {

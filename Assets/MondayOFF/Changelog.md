@@ -1,3 +1,35 @@
+# v3.0.21
+- [Singular] Update to 4.0.15
+- [Ads] Added HyprMX, MobileFuse
+
+# v3.0.20
+- [Ads] Added new ad network adapter Amazon Publisher Service. 
+- [Adverty] Updated to 4.1.5
+
+# v3.0.19
+- [Firebase] Updated to 10.6.0
+
+# v3.0.18
+- [IAP] Implemented `OnInitializeFailed(InitializationFailureReason error, string message)` for In-App Purchasing 4.6.0+
+- [IAP] Fixed NoAds not hiding ads when restarting
+
+# v3.0.17
+- [Odeeo] Update to 2.2.2
+- [Ads] When `Initialize` is called before the manager is prepared, it waits for the settings and continue initialization.
+- [iOS] Max 11.8 no longer supports ATT dialogue. `EverydayAppTracking` has been added for ATT.
+
+# v3.0.16
+- [Odeeo] Update to 2.1.0
+- [Singular] Plugins are relocated to `Assets/MondayOFF/Everyday/Plugins`
+- [Singular] App crashes when Singular fails to initialize.
+- [Ads] Fixed a bug where Rewarded was not resetting Interstitial interval correctly.
+- [iOS] Target version requirement is now 12.0 or higher
+
+# v3.0.15
+- [Singular] Updated to 4.0.13
+- [Adverty] Updated to 4.1.4
+- [Odeeo] Added user level impression
+
 # v3.0.14
 - [Ads] `Strip AdMob` now deletes `Google Ad Manager` adapter as well. Don't forget to install `Google Ad Manager` when installing `Google AdMob`.
 - [Singular] Fixed exception on Unity Editor when targeting iOS.

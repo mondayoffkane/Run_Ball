@@ -8,6 +8,33 @@ import Foundation
 import Swift
 import UIKit
 import _Concurrency
+@objc @_inheritsConvenienceInitializers @objcMembers public class OverlayService : ObjectiveC.NSObject {
+  @objc public static var shared: PlayOnSDK.OverlayService {
+    get
+  }
+  @objc public var overlaidCompletionHandler: (() -> Swift.Void)?
+  @objc public var notOverlaidCompletionHandler: (() -> Swift.Void)?
+  @objc public var intersectionIntPercCompletionHandler: ((Swift.Float) -> Swift.Void)?
+  @objc public func startObserveFor(view: UIKit.UIView)
+  @objc public func endObserve()
+  @objc public func forceCheck()
+  @objc override dynamic public init()
+  @objc deinit
+}
+@_inheritsConvenienceInitializers @objc public class FrequencyService : ObjectiveC.NSObject {
+  @objc public static var shared: PlayOnSDK.FrequencyService {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+extension PlayOnSDK.FrequencyService {
+  @objc dynamic public func set(pacing: Swift.Float)
+  @objc dynamic public func updateLastShowingDate()
+  @objc dynamic public func loadAd(completion: @escaping () -> Swift.Void)
+  @objc dynamic public func showAd(succesCompletion: @escaping () -> Swift.Void, errorCompletion: @escaping () -> Swift.Void)
+  @objc dynamic public func onAvailabilityChanged(completion: @escaping () -> Swift.Void)
+}
 @_inheritsConvenienceInitializers @objc public class ConsentService : ObjectiveC.NSObject {
   @objc public static var shared: PlayOnSDK.ConsentService {
     get
@@ -27,7 +54,6 @@ extension PlayOnSDK.ConsentService {
   @objc dynamic public func gdprConsent(status: Swift.Bool, consentString: Swift.String? = nil)
   @objc dynamic public func doNotSell(status: Swift.Bool, consentString: Swift.String? = nil)
   @objc dynamic public func getConsentString() -> Swift.String
-  @objc dynamic public func getGeneralConsent() -> Swift.Bool
   @objc dynamic public func clearConsentString()
   @objc dynamic public func forceRegulationType(_ type: PlayOnSDK.ConsentRegulationType)
   @objc dynamic public func clearForceRegulationType()
@@ -37,8 +63,12 @@ extension PlayOnSDK.ConsentService {
   @objc dynamic public var idfaString: Swift.String {
     @objc get
   }
+  @objc dynamic public var idfvString: Swift.String? {
+    @objc get
+  }
   @objc dynamic public func clearConsentServiceCache()
   @objc dynamic public func set(consentString: Swift.String)
+  @objc dynamic public func getGeneralConsentStatusString() -> Swift.String
 }
 @objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objcMembers public class SilentModeService : ObjectiveC.NSObject {
   @objc public static let shared: PlayOnSDK.SilentModeService
@@ -61,5 +91,5 @@ extension PlayOnSDK.ConsentService {
   }
   @objc deinit
   @objc public func check(forceCheck: Swift.Bool)
-  @objc public func getSilentStatus() -> Swift.String
+  @objc public func getSilentStatus() -> Swift.Bool
 }

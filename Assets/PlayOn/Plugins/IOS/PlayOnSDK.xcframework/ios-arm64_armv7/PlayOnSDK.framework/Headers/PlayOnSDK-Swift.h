@@ -233,14 +233,47 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) ConsentServi
 - (void)gdprConsentWithStatus:(BOOL)status consentString:(NSString * _Nullable)consentString;
 - (void)doNotSellWithStatus:(BOOL)status consentString:(NSString * _Nullable)consentString;
 - (NSString * _Nonnull)getConsentString SWIFT_WARN_UNUSED_RESULT;
-- (BOOL)getGeneralConsent SWIFT_WARN_UNUSED_RESULT;
 - (void)clearConsentString;
 - (void)forceRegulationType:(ConsentRegulationType)type;
 - (void)clearForceRegulationType;
 @property (nonatomic, readonly) ConsentRegulationType regulationType;
 @property (nonatomic, readonly, copy) NSString * _Nonnull idfaString;
+@property (nonatomic, readonly, copy) NSString * _Nullable idfvString;
 - (void)clearConsentServiceCache;
 - (void)setWithConsentString:(NSString * _Nonnull)consentString;
+- (NSString * _Nonnull)getGeneralConsentStatusString SWIFT_WARN_UNUSED_RESULT;
+@end
+
+
+SWIFT_CLASS("_TtC9PlayOnSDK16FrequencyService")
+@interface FrequencyService : NSObject
+SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) FrequencyService * _Nonnull shared;)
++ (FrequencyService * _Nonnull)shared SWIFT_WARN_UNUSED_RESULT;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+@interface FrequencyService (SWIFT_EXTENSION(PlayOnSDK))
+- (void)setWithPacing:(float)pacing;
+- (void)updateLastShowingDate;
+- (void)loadAdWithCompletion:(void (^ _Nonnull)(void))completion;
+- (void)showAdWithSuccesCompletion:(void (^ _Nonnull)(void))succesCompletion errorCompletion:(void (^ _Nonnull)(void))errorCompletion;
+- (void)onAvailabilityChangedWithCompletion:(void (^ _Nonnull)(void))completion;
+@end
+
+@class UIView;
+
+SWIFT_CLASS("_TtC9PlayOnSDK14OverlayService")
+@interface OverlayService : NSObject
+SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) OverlayService * _Nonnull shared;)
++ (OverlayService * _Nonnull)shared SWIFT_WARN_UNUSED_RESULT;
+@property (nonatomic, copy) void (^ _Nullable overlaidCompletionHandler)(void);
+@property (nonatomic, copy) void (^ _Nullable notOverlaidCompletionHandler)(void);
+@property (nonatomic, copy) void (^ _Nullable intersectionIntPercCompletionHandler)(float);
+- (void)startObserveForView:(UIView * _Nonnull)view;
+- (void)endObserve;
+- (void)forceCheck;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -269,7 +302,7 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) SilentModeSe
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 /// Starts a mute check outside the <code>checkInterval</code>
 - (void)checkWithForceCheck:(BOOL)forceCheck;
-- (NSString * _Nonnull)getSilentStatus SWIFT_WARN_UNUSED_RESULT;
+- (BOOL)getSilentStatus SWIFT_WARN_UNUSED_RESULT;
 @end
 
 #if __has_attribute(external_source_symbol)
@@ -512,14 +545,47 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) ConsentServi
 - (void)gdprConsentWithStatus:(BOOL)status consentString:(NSString * _Nullable)consentString;
 - (void)doNotSellWithStatus:(BOOL)status consentString:(NSString * _Nullable)consentString;
 - (NSString * _Nonnull)getConsentString SWIFT_WARN_UNUSED_RESULT;
-- (BOOL)getGeneralConsent SWIFT_WARN_UNUSED_RESULT;
 - (void)clearConsentString;
 - (void)forceRegulationType:(ConsentRegulationType)type;
 - (void)clearForceRegulationType;
 @property (nonatomic, readonly) ConsentRegulationType regulationType;
 @property (nonatomic, readonly, copy) NSString * _Nonnull idfaString;
+@property (nonatomic, readonly, copy) NSString * _Nullable idfvString;
 - (void)clearConsentServiceCache;
 - (void)setWithConsentString:(NSString * _Nonnull)consentString;
+- (NSString * _Nonnull)getGeneralConsentStatusString SWIFT_WARN_UNUSED_RESULT;
+@end
+
+
+SWIFT_CLASS("_TtC9PlayOnSDK16FrequencyService")
+@interface FrequencyService : NSObject
+SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) FrequencyService * _Nonnull shared;)
++ (FrequencyService * _Nonnull)shared SWIFT_WARN_UNUSED_RESULT;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+@interface FrequencyService (SWIFT_EXTENSION(PlayOnSDK))
+- (void)setWithPacing:(float)pacing;
+- (void)updateLastShowingDate;
+- (void)loadAdWithCompletion:(void (^ _Nonnull)(void))completion;
+- (void)showAdWithSuccesCompletion:(void (^ _Nonnull)(void))succesCompletion errorCompletion:(void (^ _Nonnull)(void))errorCompletion;
+- (void)onAvailabilityChangedWithCompletion:(void (^ _Nonnull)(void))completion;
+@end
+
+@class UIView;
+
+SWIFT_CLASS("_TtC9PlayOnSDK14OverlayService")
+@interface OverlayService : NSObject
+SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) OverlayService * _Nonnull shared;)
++ (OverlayService * _Nonnull)shared SWIFT_WARN_UNUSED_RESULT;
+@property (nonatomic, copy) void (^ _Nullable overlaidCompletionHandler)(void);
+@property (nonatomic, copy) void (^ _Nullable notOverlaidCompletionHandler)(void);
+@property (nonatomic, copy) void (^ _Nullable intersectionIntPercCompletionHandler)(float);
+- (void)startObserveForView:(UIView * _Nonnull)view;
+- (void)endObserve;
+- (void)forceCheck;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -548,7 +614,7 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) SilentModeSe
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 /// Starts a mute check outside the <code>checkInterval</code>
 - (void)checkWithForceCheck:(BOOL)forceCheck;
-- (NSString * _Nonnull)getSilentStatus SWIFT_WARN_UNUSED_RESULT;
+- (BOOL)getSilentStatus SWIFT_WARN_UNUSED_RESULT;
 @end
 
 #if __has_attribute(external_source_symbol)

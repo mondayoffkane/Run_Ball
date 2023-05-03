@@ -73,8 +73,8 @@ void _playOnDestroyBridgeReference(CFTypeRef adUnit){
     CFRelease( adUnit );
 }
 
-PlayOnManagerListener* _playOnSetOnInitializationListener(POTypeCallbackClientRef * listener, PlayOnVoidDelegateNative onInitialization){
-    PlayOnManagerListener* newDelegate = [[PlayOnManagerListener alloc] initWithListenersOnInitialization:listener with:onInitialization];
+PlayOnManagerListener* _playOnSetOnInitializationListener(POTypeCallbackClientRef * listener, PlayOnVoidDelegateNative onInitializationFinished, PlayOnNoArgsDelegateNative onInitializationFail){
+    PlayOnManagerListener* newDelegate = [[PlayOnManagerListener alloc] initWithListenersOnInitialization:listener with:onInitializationFinished and:onInitializationFail];
     CFBridgingRetain(newDelegate);
     [[PlayOnManager sharedManager] setDelegate:newDelegate];
     return newDelegate;
@@ -254,4 +254,12 @@ void _playOnAddAdUnitToRootView(POAdUnit* ad){
 
 void _playOnRemoveAdUnitFromSuperView(POAdUnit* ad){
     [ad removeFromSuperview];
+}
+
+const char* _playOnGetPlayerID(){
+    return plsyOnStringCopy([PlayOnManager.sharedManager getPlayerID]);
+}
+
+void _playOnSetPlayerID(const char*  id){
+    [PlayOnManager.sharedManager setPlayerID:GetStringParam(id)];
 }

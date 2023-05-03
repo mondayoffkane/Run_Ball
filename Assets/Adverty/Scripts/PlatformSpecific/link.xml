@@ -3,4 +3,9 @@
     <assembly fullname="AdvertyPlatformSpecific">
         <type fullname="Adverty.*" preserve="all" />
     </assembly>
+	
+	<assembly fullname="System" preserve="all" />
+	<assembly fullname="System.Configuration">
+        <type fullname="System.Configuration.*" preserve="all" />
+    </assembly>
 </linker>

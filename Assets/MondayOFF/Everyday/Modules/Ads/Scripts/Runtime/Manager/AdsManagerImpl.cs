@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Threading;
 using System.Threading.Tasks;
+using AmazonAds;
 
 namespace MondayOFF {
     public static partial class AdsManager {
-        private static bool _isInitialized = false;
+        private static bool _isInitializeRequested = false;
         private static AdSettings _settings = default;
         private static AdType _activeAdTypes = AdType.All;
 
@@ -21,6 +22,10 @@ namespace MondayOFF {
         internal static void PrepareManager(AdSettings settings) {
             Debug.Log($"[EVERYDAY] Preparing Ads Manager");
             _settings = settings;
+
+            if (_isInitializeRequested) {
+                InitializeAdTypes();
+            }
 
 #if UNITY_EDITOR
             Application.quitting -= OnEditorStop;
@@ -55,6 +60,15 @@ namespace MondayOFF {
             if (_settings == null) {
                 Debug.Log($"[EVERYDAY] Ads Manager is not prepared. It will continue initialization after settings are loaded.");
                 return;
+            }
+
+            if (_settings.HasAPSKey()) {
+                Debug.Log($"[EVERYDAY] Initializing APS");
+                Amazon.Initialize(_settings.apsAppId);
+                Amazon.SetAdNetworkInfo(new AdNetworkInfo(DTBAdNetwork.MAX));
+                Amazon.UseGeoLocation(true);
+                // Amazon.EnableTesting(true);
+                // Amazon.EnableLogging(true);
             }
 
             // Is this right place??
@@ -151,7 +165,7 @@ namespace MondayOFF {
                 return false;
             }
 
-            if (!_activeAdTypes.HasFlag(AdType.Banner) || !_settings.HasBannerAdUnitID()) {
+            if (!_activeAdTypes.HasFlag(AdType.Banner) || !_settings.hasBanner) {
                 Debug.Log("[EVERYDAY] Skipping banner initialization");
                 return false;
             }
@@ -166,7 +180,7 @@ namespace MondayOFF {
                 return false;
             }
 
-            if (!_activeAdTypes.HasFlag(AdType.Interstitial) || !_settings.HasInterstitialAdUnitID()) {
+            if (!_activeAdTypes.HasFlag(AdType.Interstitial) || !_settings.hasInterstitial) {
                 Debug.Log("[EVERYDAY] Skipping intersitial initialization");
                 return false;
             }
@@ -181,7 +195,7 @@ namespace MondayOFF {
                 return false;
             }
 
-            if (!_activeAdTypes.HasFlag(AdType.Rewarded) || !_settings.HadRewardedAdUnitID()) {
+            if (!_activeAdTypes.HasFlag(AdType.Rewarded) || !_settings.hasRewarded) {
                 Debug.Log("[EVERYDAY] Skipping rewarded initialization");
                 return false;
             }

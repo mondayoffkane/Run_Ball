@@ -1,179 +1,300 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
-using System.Collections;
-using System.Diagnostics;
 #endif
+using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Debug = UnityEngine.Debug;
 
 #if UNITY_EDITOR
 [ExecuteInEditMode]
 #endif
 public class AdUnitAnchor : UIBehaviour
 {
-    private RectTransform _transform;
+    private RectTransform _rect;
     private Canvas _canvas;
+    private RectTransform _canvasRect;
 #if UNITY_EDITOR
-    private Dictionary<PlayOnSDK.Position, Vector3> positions = new Dictionary<PlayOnSDK.Position, Vector3>();
-    private float maxPXSize;
-    private float minPXSize;
+    private Dictionary<PlayOnSDK.Position, Vector3> _positions = new Dictionary<PlayOnSDK.Position, Vector3>();
+    private float _maxPXSize;
+    private float _minPXSize;
+    
+    private Vector3 _savedPosition;
+    private Vector2 _savedAnchorMin;
+    private Vector2 _savedAnchorMax;
+    private Vector2 _savedSizeDelta;
+    private Vector2 _savedCanvasDelta;
 
+    private bool _isInitialized = false;
+    private Coroutine _initCoroutine;
+    
+    private bool _isUnitFixed = false;
+    private bool _isHierarchyDirty = true;
+    private bool _isDimensionsDirty = true;
 
-    private Vector3 savedPosition;
-    private Vector2 savedWindowSizeDelta = Vector2.zero;
-    private Vector2 savedAnchorMin;
-    private Vector2 savedAnchorMax;
-    private float savedSize;
+    private bool _isErrorMessageShown = false;
+#endif
 
-    private float delayBeforeSave = 1.5f;
-
-    private bool inited = false;
-    private bool saved = false;
-
-    protected override void Awake() {
-        _transform = (RectTransform) transform;
-    }
-
-    protected override void OnEnable() {
-        inited = false;
-        _transform = (RectTransform) transform;
-        OnTransformParentChanged();
-        ChangeHierarchy();
-        if (_canvas != null)
-            PlayOnEditorCoroutinesManager.StartEditorCoroutine(SetOptimalDPI());
-        EditorApplication.hierarchyChanged += ChangeHierarchy;
-        base.OnEnable();
-    }
-
-    protected override void OnDisable() {
-        StopAllCoroutines();
-        inited = false;
-        saved = false;
-        EditorApplication.hierarchyChanged -= ChangeHierarchy;
-        base.OnDisable();
-    }
-
-    protected override void OnValidate() {
-        base.OnValidate();
-    }
-
-    private void ChangeHierarchy() {
-        if (_canvas == null)
+    protected override void Awake()
+    {
+        if (Application.isPlaying)
         {
-            ShowErrorInConsole("Hierarchy changed");
+            GetComponent<Image>().enabled = false;
+            foreach (Transform child in transform)
+                child.gameObject.SetActive(false);
+        }
+    }
+
+#if UNITY_EDITOR
+    protected override void OnEnable()
+    {
+        _isInitialized = false;
+
+        if(_initCoroutine == null)
+            _initCoroutine = StartCoroutine(Initialize());
+        
+        EditorApplication.hierarchyChanged += OnHierarchyChanged;
+    }
+
+    protected override void OnDisable()
+    {
+        EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+    }
+
+    private void OnHierarchyChanged()
+    {
+        if(!IsActive() || !_isInitialized || _isHierarchyDirty)
             return;
-        }
-
-        if (_canvas.transform.childCount - 1 != _transform.GetSiblingIndex())
-        {
-            _transform.SetAsLastSibling();
-        }
+        
+        _isHierarchyDirty = true;
     }
 
-    protected override void OnTransformParentChanged() {
-        if (this.transform.parent != null)
-        {
-            _canvas = this.transform.parent.GetComponent<Canvas>();
-            if (_canvas == null)
-            {
-                ShowErrorInConsole("Parent changed");
-            }
-        }
-        else
-        {
-            _canvas = null;
-            ShowErrorInConsole("Parent changed");
-        }
-
-        base.OnTransformParentChanged();
-    }
-
-    protected override void OnRectTransformDimensionsChange() {
-        if (!this.IsActive() || !inited || !saved)
+    protected override void OnBeforeTransformParentChanged()
+    {
+        if(!IsActive() || !_isInitialized || _isHierarchyDirty)
             return;
-
-        if (isAnchoredChangedFromCode())
-        {
-            SetSavedSize(savedSize);
-            return;
-        }
-
-        if (!WindowSizeChanged())
-        {
-            _transform.position = savedPosition;
-        }
-        else
-        {
-            return;
-        }
-        if ((savedAnchorMax != _transform.anchorMax) || savedAnchorMin != _transform.anchorMin)
-        {
-            FixAnchors();
-        }
-  
-        FixSize();
-        savedSize = GetSizeInDP(_transform.sizeDelta.x);
-        base.OnRectTransformDimensionsChange();
+        
+        if(IsProperHierarchy())
+            _savedPosition = _rect.position;
     }
     
-    private void Update() {
-        if (!inited)
+    protected override void OnRectTransformDimensionsChange()
+    {
+        if(!IsActive() || !_isInitialized || _isDimensionsDirty)
             return;
-        Freeze();
-        if (!WindowSizeChanged())
-        {
-            if (savedPosition != _transform.position)
-            {
-                if (saved)
-                {
-                    savedPosition = _transform.position;
-                }
 
+        _isDimensionsDirty = true;
+    }
+    
+    private void Update()
+    {
+        if (!_isInitialized)
+        {
+            if(_initCoroutine == null)
+                _initCoroutine = StartCoroutine(Initialize());
+            return;
+        }
+
+        _isUnitFixed = false;
+
+        CheckDimensions();
+        CheckHierarchy();
+
+        ResetRotationAndScale();
+        StayInLines();
+
+        if (!_isUnitFixed && IsProperHierarchy())
+            _savedPosition = _rect.position;
+    }
+
+    private IEnumerator Initialize()
+    {
+        yield return new WaitForEndOfFrame();
+        _initCoroutine = null;
+
+        _rect = GetComponent<RectTransform>();
+        if (!_rect || !_rect.parent)
+        {
+            if (!_isErrorMessageShown)
+            {
+                _isErrorMessageShown = true;
+                ShowErrorInConsole("Parent is NULL");
+            }
+            yield break;
+        }
+
+        _canvas = _rect.parent.GetComponent<Canvas>();
+        if (!_canvas)
+        {
+            if (!_isErrorMessageShown)
+            {
+                _isErrorMessageShown = true;
+                ShowErrorInConsole("Wrong Parent");
+            }
+            yield break;
+        }
+
+        _canvasRect = _canvas.GetComponent<RectTransform>();
+        if(!_canvasRect)
+            yield break;
+
+        _savedCanvasDelta = _canvasRect.sizeDelta;
+        _savedPosition = _rect.position;
+        _savedAnchorMin = _rect.anchorMin;
+        _savedAnchorMax = _rect.anchorMax;
+        
+        _isInitialized = true;
+        _isErrorMessageShown = false;
+
+        _isHierarchyDirty = true;
+        CheckHierarchy();
+        
+        CalculateScreenSize();
+        SetUnitSize();
+
+        _savedPosition = _rect.position;
+    }
+
+    private void CheckDimensions()
+    {
+        if(!_isDimensionsDirty)
+            return;
+
+        if (_savedCanvasDelta != _canvasRect.sizeDelta)
+        {
+            _isDimensionsDirty = false;
+            _isInitialized = false;
+            
+            if (_initCoroutine == null)
+                _initCoroutine = StartCoroutine(Initialize());
+            
+            return;
+        }
+
+        if (IsAnchorsChanged())
+        {
+            FixAnchors();
+            _isUnitFixed = true;
+        }
+
+        if (!_savedSizeDelta.Equals(_rect.sizeDelta))
+        {
+            SetUnitSize();
+            
+            _rect.position = _savedPosition;
+            _isUnitFixed = true;
+        }
+
+        if (!_rect.pivot.Equals(new Vector2(0.5f, 0.5f)))
+        {
+            _rect.pivot = new Vector2(0.5f, 0.5f);
+            _isUnitFixed = true;
+        }
+        
+        _isDimensionsDirty = false;
+    }
+    
+    private void CheckHierarchy()
+    {
+        if(!_isHierarchyDirty)
+            return;
+        
+        if (!_canvas)
+        {
+            if (!rectTransform.parent)
+            {
+                ShowErrorInConsole("Parent is NULL");
+                return;
+            }
+            
+            _canvas = rectTransform.parent.GetComponent<Canvas>();
+            if (!_canvas)
+            {
+                ShowErrorInConsole("Wrong Parent");
+                return;
             }
         }
-        else
+
+        if(!_canvasRect)
+            _canvasRect = _canvas.GetComponent<RectTransform>();
+        
+        FixHierarchy();
+        _isHierarchyDirty = false;
+    }
+    
+    private void FixHierarchy()
+    {
+        if (rectTransform.parent != _canvas.transform)
         {
-            PlayOnEditorCoroutinesManager.StartEditorCoroutine(SetOptimalDPI());
+            rectTransform.SetParent(_canvas.transform);
+            _rect.position = _savedPosition;
+            _isUnitFixed = true;
         }
-        StayInLines();
+
+        if (_canvasRect.childCount - 1 != rectTransform.GetSiblingIndex())
+        {
+            rectTransform.SetAsLastSibling();
+            _rect.position = _savedPosition;
+            _isUnitFixed = true;
+        }
     }
 
+    private bool IsProperHierarchy()
+    {
+        if (!_rect || !_rect.parent)
+            return false;
+        
+        if (!_canvas)
+            return false;
 
-    private void GetCorners() {
+        if (!_canvasRect)
+            return false;
+
+        if (_rect.parent != _canvasRect)
+            return false;
+
+        return true;
+    }
+
+    private void GetCorners()
+    {
+        if(!_canvas || !_canvasRect)
+            return;
+        
         Vector3[] v = new Vector3[4];
-        this.transform.parent.GetComponent<RectTransform>().GetLocalCorners(v);
-        positions = new Dictionary<PlayOnSDK.Position, Vector3>();
-        positions.Add(PlayOnSDK.Position.CenterLeft, new Vector3(v[0].x + _transform.sizeDelta.x / 2, 0f, 0f));
-        positions.Add(PlayOnSDK.Position.CenterRight, new Vector3(v[2].x - _transform.sizeDelta.x / 2, 0f, 0f));
-        positions.Add(PlayOnSDK.Position.BottomCenter, new Vector3(0f, v[0].y + _transform.sizeDelta.x / 2, 0f));
-        positions.Add(PlayOnSDK.Position.BottomLeft,
-            new Vector3(v[0].x + _transform.sizeDelta.x / 2, v[0].y + _transform.sizeDelta.x / 2, 0f));
-        positions.Add(PlayOnSDK.Position.BottomRight,
-            new Vector3(v[2].x - _transform.sizeDelta.x / 2, v[0].y + _transform.sizeDelta.x / 2, 0f));
-        positions.Add(PlayOnSDK.Position.TopCenter, new Vector3(0f, v[1].y - _transform.sizeDelta.x / 2, 0f));
-        positions.Add(PlayOnSDK.Position.TopLeft,
-            new Vector3(v[0].x + _transform.sizeDelta.x / 2, v[1].y - _transform.sizeDelta.x / 2, 0f));
-        positions.Add(PlayOnSDK.Position.TopRight,
-            new Vector3(v[2].x - _transform.sizeDelta.x / 2, v[1].y - _transform.sizeDelta.x / 2, 0f));
-        positions.Add(PlayOnSDK.Position.Centered, Vector3.zero);
+        _canvasRect.GetLocalCorners(v);
+        _positions = new Dictionary<PlayOnSDK.Position, Vector3>();
+        _positions.Add(PlayOnSDK.Position.CenterLeft, new Vector3(v[0].x + _rect.sizeDelta.x / 2, 0f, 0f));
+        _positions.Add(PlayOnSDK.Position.CenterRight, new Vector3(v[2].x - _rect.sizeDelta.x / 2, 0f, 0f));
+        _positions.Add(PlayOnSDK.Position.BottomCenter, new Vector3(0f, v[0].y + _rect.sizeDelta.x / 2, 0f));
+        _positions.Add(PlayOnSDK.Position.BottomLeft,
+            new Vector3(v[0].x + _rect.sizeDelta.x / 2, v[0].y + _rect.sizeDelta.x / 2, 0f));
+        _positions.Add(PlayOnSDK.Position.BottomRight,
+            new Vector3(v[2].x - _rect.sizeDelta.x / 2, v[0].y + _rect.sizeDelta.x / 2, 0f));
+        _positions.Add(PlayOnSDK.Position.TopCenter, new Vector3(0f, v[1].y - _rect.sizeDelta.x / 2, 0f));
+        _positions.Add(PlayOnSDK.Position.TopLeft,
+            new Vector3(v[0].x + _rect.sizeDelta.x / 2, v[1].y - _rect.sizeDelta.x / 2, 0f));
+        _positions.Add(PlayOnSDK.Position.TopRight,
+            new Vector3(v[2].x - _rect.sizeDelta.x / 2, v[1].y - _rect.sizeDelta.x / 2, 0f));
+        _positions.Add(PlayOnSDK.Position.Centered, Vector3.zero);
     }
-
-
+    
     private void ShowErrorInConsole(string message) {
-        var errorMessage = message + ". Put PlayonAdAnchor in Canvas";
+        var errorMessage = message + ". Put PlayOnAdAnchor in Canvas";
         PlayOnSDK.LogE(PlayOnSDK.LogLevel.Debug, errorMessage);
     }
 
-    private PlayOnSDK.Position GetClosest(Vector3 startPosition, Dictionary<PlayOnSDK.Position, Vector3> pickups) {
+    private PlayOnSDK.Position GetClosest(Vector3 startPosition, Dictionary<PlayOnSDK.Position, Vector3> pickups)
+    {
         PlayOnSDK.Position location = PlayOnSDK.Position.Centered;
         float closestDistanceSqr = Mathf.Infinity;
+        
         foreach (var potentialTarget in pickups)
         {
             Vector3 directionToTarget = potentialTarget.Value - startPosition;
             float dSqrToTarget = directionToTarget.sqrMagnitude;
+            
             if (dSqrToTarget < closestDistanceSqr)
             {
                 closestDistanceSqr = dSqrToTarget;
@@ -184,281 +305,161 @@ public class AdUnitAnchor : UIBehaviour
         return location;
     }
 
-    private void StayInLines() {
+    private void StayInLines()
+    {
         if (_canvas == null)
             return;
-        _transform.pivot = new Vector2(0.5f, 0.5f);
+
         GetCorners();
-        var location = GetClosest(_transform.localPosition, positions);
-        var loc = positions[location];
-        var xoffset = _transform.localPosition.x - loc.x;
-        var yoffset = _transform.localPosition.y - loc.y;
+        
+        var location = GetClosest(_rect.localPosition, _positions);
+        var loc = _positions[location];
+        var xoffset = _rect.localPosition.x - loc.x;
+        var yoffset = _rect.localPosition.y - loc.y;
+        
         switch (location)
         {
             case PlayOnSDK.Position.Centered:
                 break;
             case PlayOnSDK.Position.CenterRight:
                 if (xoffset > 0)
-                {
-                    xoffset = 0;
-                    this.transform.localPosition = new Vector3(positions[PlayOnSDK.Position.CenterRight].x,
-                        this.transform.localPosition.y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_positions[PlayOnSDK.Position.CenterRight].x,
+                        _rect.localPosition.y, 0);
                 break;
             case PlayOnSDK.Position.CenterLeft:
                 if (xoffset < 0)
-                {
-                    xoffset = 0;
-                    this.transform.localPosition = new Vector3(positions[PlayOnSDK.Position.CenterLeft].x,
-                        this.transform.localPosition.y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_positions[PlayOnSDK.Position.CenterLeft].x,
+                        _rect.localPosition.y, 0);
                 break;
             case PlayOnSDK.Position.TopCenter:
                 if (yoffset > 0)
-                {
-                    yoffset = 0;
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x,
-                        positions[PlayOnSDK.Position.TopCenter].y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_rect.localPosition.x,
+                        _positions[PlayOnSDK.Position.TopCenter].y, 0);
                 break;
             case PlayOnSDK.Position.TopRight:
                 if (yoffset > 0)
-                {
-                    yoffset = 0;
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x,
-                        positions[PlayOnSDK.Position.TopCenter].y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_rect.localPosition.x,
+                        _positions[PlayOnSDK.Position.TopCenter].y, 0);
                 if (xoffset > 0)
-                {
-                    xoffset = 0;
-                    this.transform.localPosition = new Vector3(positions[PlayOnSDK.Position.TopRight].x,
-                        this.transform.localPosition.y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_positions[PlayOnSDK.Position.TopRight].x,
+                        _rect.localPosition.y, 0);
                 break;
             case PlayOnSDK.Position.TopLeft:
                 if (yoffset > 0)
-                {
-                    yoffset = 0;
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x,
-                        positions[PlayOnSDK.Position.TopCenter].y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_rect.localPosition.x,
+                        _positions[PlayOnSDK.Position.TopCenter].y, 0);
                 if (xoffset < 0)
-                {
-                    xoffset = 0;
-                    this.transform.localPosition = new Vector3(positions[PlayOnSDK.Position.TopLeft].x,
-                        this.transform.localPosition.y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_positions[PlayOnSDK.Position.TopLeft].x,
+                        _rect.localPosition.y, 0);
                 break;
             case PlayOnSDK.Position.BottomCenter:
                 if (yoffset < 0)
-                {
-                    yoffset = 0;
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x,
-                        positions[PlayOnSDK.Position.BottomCenter].y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_rect.localPosition.x,
+                        _positions[PlayOnSDK.Position.BottomCenter].y, 0);
                 break;
             case PlayOnSDK.Position.BottomRight:
                 if (yoffset < 0)
-                {
-                    yoffset = 0;
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x,
-                        positions[PlayOnSDK.Position.BottomRight].y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_rect.localPosition.x,
+                        _positions[PlayOnSDK.Position.BottomRight].y, 0);
                 if (xoffset > 0)
-                {
-                    xoffset = 0;
-                    this.transform.localPosition = new Vector3(positions[PlayOnSDK.Position.BottomRight].x,
-                        this.transform.localPosition.y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_positions[PlayOnSDK.Position.BottomRight].x,
+                        _rect.localPosition.y, 0);
                 break;
             case PlayOnSDK.Position.BottomLeft:
                 if (yoffset < 0)
-                {
-                    yoffset = 0;
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x,
-                        positions[PlayOnSDK.Position.BottomLeft].y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_rect.localPosition.x,
+                        _positions[PlayOnSDK.Position.BottomLeft].y, 0);
                 if (xoffset < 0)
-                {
-                    xoffset = 0;
-                    this.transform.localPosition = new Vector3(positions[PlayOnSDK.Position.BottomLeft].x,
-                        this.transform.localPosition.y, 0);
-                }
-
+                    _rect.localPosition = new Vector3(_positions[PlayOnSDK.Position.BottomLeft].x,
+                        _rect.localPosition.y, 0);
                 break;
         }
     }
 
+    private void CalculateScreenSize()
+    {
+        if(!_canvas)
+            return;
 
-    private bool WindowSizeChanged() {
-        if (_canvas == null)
-            return false;
-        if (_canvas.pixelRect.width != savedWindowSizeDelta.x || _canvas.pixelRect.height != savedWindowSizeDelta.y)
-        {
+        PlayOnSDK.SetOptimalDPI();
+
+        float minScreenSize = 70f * (PlayOnSDK.GetUnityEditorDPI() / 160f);
+        float maxScreenSize = 120f * (PlayOnSDK.GetUnityEditorDPI() / 160f);
+
+        Vector2 sizeDelta = _canvasRect.sizeDelta;
+                
+        _minPXSize = minScreenSize / Screen.width * sizeDelta.x;
+        _maxPXSize = maxScreenSize / Screen.width * sizeDelta.x;
+    }
+
+    private void SetUnitSize()
+    {
+        float unitSize = Mathf.Clamp(_rect.sizeDelta.x, _minPXSize, _maxPXSize);
+
+        _rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, unitSize);
+        _rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, unitSize);
+        _rect.ForceUpdateRectTransforms();
+
+        _savedSizeDelta = _rect.sizeDelta;
+    }
+
+    private bool IsAnchorsChanged()
+    {
+        if (_savedAnchorMax != _rect.anchorMax)
             return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
 
-
-    public IEnumerator SetOptimalDPI() {
-        inited = false;
-        yield return new WaitForSeconds(delayBeforeSave);
-        PlayOnSDK.SetUnityEditorDPI(96);
-        if(this!=null){
-            if(_canvas==null){
-                if(this.transform.parent != null) _canvas = this.transform.parent.GetComponent<Canvas>();
-            }
-            if(_canvas!=null){
-                if (_canvas.pixelRect.width >= 1440)
-                {
-                    PlayOnSDK.SetUnityEditorDPI(440);
-                }
-                else if (_canvas.pixelRect.width >= 1080)
-                {
-                    PlayOnSDK.SetUnityEditorDPI(323);
-                }
-                else if (_canvas.pixelRect.width >= 720)
-                {
-                    PlayOnSDK.SetUnityEditorDPI(252);
-                }
-                else if (_canvas.pixelRect.width >= 480)
-                {
-                    PlayOnSDK.SetUnityEditorDPI(170);
-                }
-
-                minPXSize = (((70 + 0.5f) * ((float) PlayOnSDK.GetUnityEditorDPI() / 160f)) / _canvas.scaleFactor);
-                maxPXSize = (((120 + 0.5f) * ((float) PlayOnSDK.GetUnityEditorDPI() / 160f)) / _canvas.scaleFactor);
-                if (saved)
-                    SetSavedSize(savedSize);
-                if (_canvas.pixelRect.width != savedWindowSizeDelta.x || _canvas.pixelRect.height != savedWindowSizeDelta.y)
-                {
-                    savedWindowSizeDelta = new Vector2(_canvas.pixelRect.width, _canvas.pixelRect.height);
-                    FixSize();
-                }
-
-                if (!saved)
-                    SaveSizeAndPosition();
-             
-                inited = true;  
-            }
-        }
-        yield return null;
-    }
-
-
-    private float GetSizeInDP(float vectorSize) {
-        var size = savedSize;
-        if(_canvas.scaleFactor != 1 && inited)
-            size = vectorSize/ (((float) PlayOnSDK.GetUnityEditorDPI() / 160f)/_canvas.scaleFactor) - 0.5f;
-        return size;
-    }
-    private void FixSize() {
-        _transform.localScale = Vector3.one;
-        if (_transform.sizeDelta.x > maxPXSize)
-        {
-            _transform.sizeDelta = new Vector2(maxPXSize, maxPXSize);
-        }
-
-        if (_transform.sizeDelta.x < minPXSize)
-        {
-            _transform.sizeDelta = new Vector2(minPXSize, minPXSize);
-        }
-
-        _transform.sizeDelta = new Vector2(_transform.sizeDelta.x, _transform.sizeDelta.x);
-    }
-
-
-    public void FixAnchors() {
-        if (savedAnchorMax != _transform.anchorMax)
-        {
-            SetAnchorMin(_transform.anchorMax);
-            savedAnchorMin = _transform.anchorMin;
-            savedAnchorMax = _transform.anchorMax;
-        }
-        else if (savedAnchorMin != _transform.anchorMin)
-        {
-            SetAnchorMax(_transform.anchorMin);
-            savedAnchorMin = _transform.anchorMin;
-            savedAnchorMax = _transform.anchorMax;
-        }
-    }
-
-    private bool anchoredChangedFromCode = false;
-
-    private void SetAnchorMin(Vector2 anch) {
-        _transform.anchorMin = anch;
-        anchoredChangedFromCode = true;
-    }
-
-    private void SetAnchorMax(Vector2 anch) {
-        _transform.anchorMax = anch;
-        anchoredChangedFromCode = true;
-    }
-
-    private void SetSavedSize(float pos) {
-        var size = (((pos + 0.5f) * ((float) PlayOnSDK.GetUnityEditorDPI() / 160f)) / _canvas.scaleFactor);
-        _transform.sizeDelta = new Vector2(size, size);
-    }
-
-    private void SaveSizeAndPosition() {
-        savedPosition = _transform.position;
-        savedSize = GetSizeInDP(_transform.sizeDelta.x);
-        saved = true;
-    }
-
-    private bool isAnchoredChangedFromCode() {
-        if (anchoredChangedFromCode == true)
-        {
-            anchoredChangedFromCode = false;
+        if (_savedAnchorMin != _rect.anchorMin)
             return true;
-        }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
-    private void Freeze() {
-        _transform.rotation = Quaternion.identity;
-        _transform.localScale = Vector3.one;
+    private void FixAnchors()
+    {
+        bool isNeedToRestorePosition = false;
+        if (_rect.anchorMax != _rect.anchorMin)
+        {
+            _savedPosition = _rect.position;
+            isNeedToRestorePosition = true;
+        }
+
+        if (_savedAnchorMax != _rect.anchorMax) 
+            _rect.anchorMin = _rect.anchorMax;
+        else if (_savedAnchorMin != _rect.anchorMin) 
+            _rect.anchorMax = _rect.anchorMin;
+
+        _savedAnchorMin = _rect.anchorMin;
+        _savedAnchorMax = _rect.anchorMax;
+
+        _rect.sizeDelta = _savedSizeDelta;
+
+        if (isNeedToRestorePosition)
+            _rect.position = _savedPosition;
+    }
+
+    private void ResetRotationAndScale()
+    {
+        _rect.rotation = Quaternion.identity;
+        _rect.localScale = Vector3.one;
     }
 
 #endif
 
-    public RectTransform GetRectTransform() {
-        if(_transform == null) _transform = (RectTransform) transform;
-        return _transform;
-    }
-
-    public Canvas GetCanvas() {
-        if (_canvas == null)
+    public RectTransform rectTransform
+    {
+        get
         {
-            _canvas = this.transform.parent.GetComponent<Canvas>();
-            return _canvas;
-        }
-        else
-        {
-            return _canvas;
+            if (!_rect) _rect = (RectTransform)transform;
+            return _rect;
         }
     }
 
-    protected override void Start() {
-        if (Application.isPlaying)
-            this.gameObject.SetActive(false);
+    public Canvas canvas
+    {
+        get
+        {
+            if (!_canvas) _canvas = transform.parent.GetComponent<Canvas>();
+            return _canvas;
+        }
     }
 }

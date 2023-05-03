@@ -15,6 +15,7 @@ namespace MondayOFF {
             MaxSdkCallbacks.Interstitial.OnAdHiddenEvent -= ResetTimer;
 
             MaxSdkCallbacks.Rewarded.OnAdHiddenEvent -= ResetTimer;
+            MaxSdkCallbacks.Rewarded.OnAdReceivedRewardEvent -= ResetTimerForRewarded;
         }
 
         internal override bool IsReady() {
@@ -51,9 +52,30 @@ namespace MondayOFF {
 
             if (_settings.resetTimerOnRewarded) {
                 MaxSdkCallbacks.Rewarded.OnAdHiddenEvent += ResetTimer;
+                // Temporal fix for rewarded ad not resetting interstitial timer
+                MaxSdkCallbacks.Rewarded.OnAdReceivedRewardEvent += ResetTimerForRewarded;
             }
 
-            LoadInterstitialAd();
+            if (_settings.HasAPSKey(AdType.Interstitial)) {
+                LoadAPSInterstitial();
+            } else {
+                LoadInterstitialAd();
+            }
+        }
+
+        private void LoadAPSInterstitial() {
+            Debug.Log("[EVERYDAY] Loading APS Interstitial");
+            var interstitialVideoAd = new AmazonAds.APSVideoAdRequest(320, 480, _settings.apsInterstitialSlotId);
+            interstitialVideoAd.onSuccess += (adResponse) => {
+                MaxSdk.SetInterstitialLocalExtraParameter(_settings.interstitialAdUnitId, "amazon_ad_response", adResponse.GetResponse());
+                LoadInterstitialAd();
+            };
+            interstitialVideoAd.onFailedWithError += (adError) => {
+                MaxSdk.SetInterstitialLocalExtraParameter(_settings.interstitialAdUnitId, "amazon_ad_error", adError.GetAdError());
+                LoadInterstitialAd();
+            };
+
+            interstitialVideoAd.LoadAd();
         }
 
         private void LoadInterstitialAd() {
@@ -92,6 +114,10 @@ namespace MondayOFF {
         }
 
         private void ResetTimer(string adUnitId, MaxSdkBase.AdInfo adInfo) {
+            _lastInterstitialTimestamp = Time.realtimeSinceStartup;
+        }
+
+        private void ResetTimerForRewarded(string adUnitId, MaxSdkBase.Reward reward, MaxSdkBase.AdInfo adInfo) {
             _lastInterstitialTimestamp = Time.realtimeSinceStartup;
         }
     }

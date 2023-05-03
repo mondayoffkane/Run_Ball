@@ -10,15 +10,42 @@ using System.Xml.Linq;
 
 namespace MondayOFF {
     public class EverydayPreprocessBuildAndroid : IPreprocessBuildWithReport {
+        const string DEFAULT_PLUGIN_PATH = "Assets/Plugins/Android";
+        const string MONDAYOFF_PLUGIN_PATH = "Assets/MondayOFF/ThirdParties/Singular/Plugins/Android";
+        const string SINGULAR_SDK_FILENAME = "singular_sdk.aar";
+        const string SINGULAR_UNITYBRIDGE_FILENAME = "SingularUnityBridge.jar";
+
         public int callbackOrder => 0;
 
         public void OnPreprocessBuild(BuildReport report) {
+            VerifySingularSDK(SINGULAR_SDK_FILENAME);
+            VerifySingularSDK(SINGULAR_UNITYBRIDGE_FILENAME);
+
             ConfigProguard();
             ConfigAndroidManifest();
         }
+        // Check if file exists in the DEFAULT_PLUGIN_PATH. If there is, move it to MONDAYOFF_PLUGIN_PATH and delete the file in DEFAULT_PLUGIN_PATH.
+        // if non of them exist, throw an error.
+        private static void VerifySingularSDK(in string filename) {
+            string defaultFilePath = Path.Combine(DEFAULT_PLUGIN_PATH, filename);
+            string mondayoffFilePath = Path.Combine(MONDAYOFF_PLUGIN_PATH, filename);
+
+            if (File.Exists(defaultFilePath)) {
+                if (File.Exists(mondayoffFilePath)) {
+                    File.Delete(defaultFilePath);
+                } else {
+                    if (!Directory.Exists(MONDAYOFF_PLUGIN_PATH)) {
+                        Directory.CreateDirectory(MONDAYOFF_PLUGIN_PATH);
+                    }
+                    File.Move(defaultFilePath, mondayoffFilePath);
+                }
+            } else if (!File.Exists(mondayoffFilePath)) {
+                throw new UnityEditor.Build.BuildFailedException($"[EVERYDAY] {filename} is missing!");
+            }
+        }
 
         private static void ConfigProguard() {
-            List<string> PROGUARD_LIST = new List<string>(){
+            List<string> proguardList = new List<string>(){
                 "# Singular",
                 "-keep class com.singular.sdk.** { *; }",
                 "-keep public class com.android.installreferrer.** { *; }",
@@ -42,9 +69,14 @@ namespace MondayOFF {
 
             List<string> lines;
             if (File.Exists(proguardPath)) {
-                lines = File.ReadAllLines(proguardPath).Union(PROGUARD_LIST).ToList();
+                lines = File.ReadAllLines(proguardPath).Union(proguardList).ToList();
             } else {
-                lines = PROGUARD_LIST;
+                string proguardDirectory = Path.GetDirectoryName(proguardPath);
+                if (!Directory.Exists(proguardDirectory)) {
+                    Directory.CreateDirectory(proguardDirectory);
+                }
+                File.Create(proguardPath).Dispose();
+                lines = proguardList;
             }
 
             File.WriteAllLines(proguardPath, lines);
@@ -52,6 +84,23 @@ namespace MondayOFF {
 
         private static void ConfigAndroidManifest() {
             const string manifestPath = "Assets/Plugins/Android/AndroidManifest.xml";
+            string manifestDirectory = Path.GetDirectoryName(manifestPath);
+            if (!Directory.Exists(manifestDirectory)) {
+                Directory.CreateDirectory(manifestDirectory);
+            }
+
+            // Check for FB 
+            if (Facebook.Unity.Settings.FacebookSettings.AppIds == null || Facebook.Unity.Settings.FacebookSettings.AppIds.Count == 0) {
+                UnityEditor.Selection.activeObject = Facebook.Unity.Settings.FacebookSettings.Instance;
+                throw new UnityEditor.Build.BuildFailedException("[EVERYDAY] Facebook App ID is empty!.");
+            }
+            if (string.IsNullOrEmpty(Facebook.Unity.Settings.FacebookSettings.ClientToken)) {
+                UnityEditor.Selection.activeObject = Facebook.Unity.Settings.FacebookSettings.Instance;
+                throw new UnityEditor.Build.BuildFailedException("[EVERYDAY] Facebook Client Token is empty!.");
+            }
+
+            Facebook.Unity.Editor.ManifestMod.GenerateManifest();
+
             var androidManifestDocument = XDocument.Load(manifestPath);
 
             XNamespace androidNamespace = androidManifestDocument.Root.Attribute(XNamespace.Xmlns + "android").Value;
@@ -65,21 +114,27 @@ namespace MondayOFF {
                 return;
             }
 
-            // Check for FB 
-            var clientTokenElement = androidManifestDocument.Root.Descendants().FirstOrDefault(element => element.Name == "meta-data" && element.Attribute(androidNamespace + "name").Value == "com.facebook.sdk.ClientToken");
-            if (clientTokenElement == null) {
-                var fbSettings = AssetDatabase.FindAssets(filter: "t:FacebookSettings");
+            bool isModified = false;
 
-                if (fbSettings.Length != 1) {
-                    Debug.LogError("[EVERYDAY] There are zero or more than two Objects! " + fbSettings.Length);
-                    return;
-                }
-
-                UnityEditor.Selection.activeObject = AssetDatabase.LoadAssetAtPath<Facebook.Unity.Settings.FacebookSettings>(AssetDatabase.GUIDToAssetPath(fbSettings[0]));
-                throw new UnityEditor.Build.BuildFailedException("[EVERYDAY] Facebook Client Token is empty or AndroidManifest is not regenerated after setting Facebook App info!.");
+            if (applicationNode.Attribute(androidNamespace + "debuggable")?.Value == "true") {
+                applicationNode.SetAttributeValue(androidNamespace + "debuggable", "false");
+                isModified = true;
             }
 
-            bool isModified = false;
+            // Check if child node with name "activity" and attribute "android:name" with value "com.amazon.device.ads.DTBInterstitialActivity" exists and add if it doesn't
+            var apsActivities = new[] { "com.amazon.device.ads.DTBInterstitialActivity", "com.amazon.device.ads.DTBAdActivity" };
+            foreach (var activity in apsActivities) {
+                var activityNode = applicationNode
+                                    .Descendants("activity")
+                                    .FirstOrDefault(element => element.Attribute(androidNamespace + "name")?.Value == activity);
+
+                if (activityNode == null) {
+                    activityNode = new XElement("activity");
+                    activityNode.SetAttributeValue(androidNamespace + "name", activity);
+                    applicationNode.Add(activityNode);
+                    isModified = true;
+                }
+            }
 
             // Add NetworkSecurityConfig
             var networkSecurityName = androidNamespace + "networkSecurityConfig";
@@ -93,15 +148,18 @@ namespace MondayOFF {
             // Add required permissions
             string[] permissions = new string[]{
                 "android.permission.ACCESS_NETWORK_STATE",
+                "android.permission.ACCESS_WIFI_STATE",
                 "android.permission.INTERNET",
-                "com.google.android.gms.permission.AD_ID"
+                "com.google.android.gms.permission.AD_ID",
+                "android.permission.ACCESS_COARSE_LOCATION",
+                "android.permission.ACCESS_FINE_LOCATION",
             };
 
             foreach (var permission in permissions) {
                 var existingPermission
                         = androidManifestDocument.Root
                             .Descendants()
-                            .FirstOrDefault(element => element.Name == "uses-permission" && element.Attribute(androidNamespace + "name").Value == permission);
+                            .FirstOrDefault(element => element.Name == "uses-permission" && element.Attribute(androidNamespace + "name")?.Value == permission);
 
                 if (existingPermission == null) {
                     var element = new XElement("uses-permission");

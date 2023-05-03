@@ -5,7 +5,7 @@
 
 #import "MAUnityAdManager.h"
 
-#define VERSION @"5.6.6"
+#define VERSION @"5.9.0"
 
 #define KEY_WINDOW [UIApplication sharedApplication].keyWindow
 #define DEVICE_SPECIFIC_ADVIEW_AD_FORMAT ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? MAAdFormat.leader : MAAdFormat.banner
@@ -176,7 +176,15 @@ static ALUnityBackgroundCallback backgroundCallback;
     backgroundCallback = unityBackgroundCallback;
     NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
     NSString *sdkKey = infoDict[@"AppLovinSdkKey"];
-    self.sdk = [ALSdk sharedWithKey: sdkKey settings: [self generateSDKSettingsForAdUnitIdentifiers: serializedAdUnitIdentifiers metaData: serializedMetaData]];
+    if ( [sdkKey al_isValidString] )
+    {
+        self.sdk = [ALSdk sharedWithKey: sdkKey settings: [self generateSDKSettingsForAdUnitIdentifiers: serializedAdUnitIdentifiers metaData: serializedMetaData]];
+    }
+    else
+    {
+        self.sdk = [ALSdk sharedWithSettings:[self generateSDKSettingsForAdUnitIdentifiers:serializedAdUnitIdentifiers metaData:serializedMetaData]];
+    }
+    
     self.sdk.variableService.delegate = self;
     [self.sdk setPluginVersion: [@"Max-Unity-" stringByAppendingString: VERSION]];
     self.sdk.mediationProvider = @"max";
@@ -191,7 +199,8 @@ static ALUnityBackgroundCallback backgroundCallback;
                                                        @"consentDialogState" : consentDialogStateStr,
                                                        @"countryCode" : configuration.countryCode,
                                                        @"appTrackingStatus" : appTrackingStatus,
-                                                       @"isSuccessfullyInitialized" : ([self.sdk isInitialized] ? @"true" : @"false")}];
+                                                       @"isSuccessfullyInitialized" : @([self.sdk isInitialized]),
+                                                       @"isTestModeEnabled" : @([configuration isTestModeEnabled])}];
     }];
     
     return self.sdk;
@@ -614,6 +623,7 @@ static ALUnityBackgroundCallback backgroundCallback;
     }
     
     networkResponseDict[@"credentials"] = response.credentials;
+    networkResponseDict[@"isBidding"] = @([response isBidding]);
     
     MAError *error = response.error;
     if ( error )
@@ -1093,6 +1103,11 @@ static ALUnityBackgroundCallback backgroundCallback;
 {
     max_unity_dispatch_on_main_thread(^{
         [self log: @"Creating %@ with ad unit identifier \"%@\" and position: \"%@\"", adFormat, adUnitIdentifier, adViewPosition];
+        
+        if ( self.adViews[adUnitIdentifier] )
+        {
+            [self log: @"Trying to create a %@ that was already created. This will cause the current ad to be hidden.", adFormat.label];
+        }
         
         // Retrieve ad view from the map
         MAAdView *adView = [self retrieveAdViewForAdUnitIdentifier: adUnitIdentifier adFormat: adFormat atPosition: adViewPosition withOffset: offset];
@@ -1998,6 +2013,25 @@ static ALUnityBackgroundCallback backgroundCallback;
 - (void)didDismissUserConsentDialog
 {
     [MAUnityAdManager forwardUnityEventWithArgs: @{@"name" : @"OnSdkConsentDialogDismissedEvent"}];
+}
+
+#pragma mark - Consent Flow
+
+- (void)startConsentFlow
+{
+    [self.sdk.cfService scfWithCompletionHander:^(ALCFError * _Nullable error) {
+        
+        NSMutableDictionary<NSString *, id> *args = [NSMutableDictionary dictionaryWithCapacity: 3];
+        args[@"name"] = @"OnSdkConsentFlowCompletedEvent";
+        
+        if ( error )
+        {
+            args[@"code"] = @(error.code);
+            args[@"message"] = error.message;
+        }
+        
+        [MAUnityAdManager forwardUnityEventWithArgs: args];
+    }];
 }
 
 #pragma mark - Variable Service (Deprecated)

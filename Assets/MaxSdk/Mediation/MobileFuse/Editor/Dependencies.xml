@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dependencies>
+    <androidPackages>
+        <androidPackage spec="com.applovin.mediation:mobilefuse-adapter:1.4.4.0" />
+    </androidPackages>
+    <iosPods>
+        <iosPod name="AppLovinMediationMobileFuseAdapter" version="1.4.0.2" />
+    </iosPods>
+</dependencies>

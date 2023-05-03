@@ -12,6 +12,17 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+
+namespace AppLovinMax.Scripts.IntegrationManager.Editor
+{
+    public enum Platform
+    {
+        All,
+        Android,
+        iOS
+    }
+}
+
 /// <summary>
 /// A <see cref="ScriptableObject"/> representing the AppLovin Settings that can be set in the Integration Manager Window.
 ///
@@ -26,6 +37,7 @@ public class AppLovinSettings : ScriptableObject
     public const string DefaultUserTrackingDescriptionEnV0 = "Pressing \\\"Allow\\\" uses device info for more relevant ad content";
     public const string DefaultUserTrackingDescriptionEnV1 = "This only uses device info for less annoying, more relevant ads";
     public const string DefaultUserTrackingDescriptionEnV2 = "This only uses device info for more interesting and relevant ads";
+    public const string DefaultUserTrackingDescriptionEnV3 = "This uses device info for more personalized ads and content";
 
     public const string DefaultUserTrackingDescriptionDe = "\\\"Erlauben\\\" drücken benutzt Gerätinformationen für relevantere Werbeinhalte";
     public const string DefaultUserTrackingDescriptionEs = "Presionando \\\"Permitir\\\", se usa la información del dispositivo para obtener contenido publicitario más relevante";
@@ -48,6 +60,7 @@ public class AppLovinSettings : ScriptableObject
     [SerializeField] private bool setAttributionReportEndpoint;
 
     [SerializeField] private bool consentFlowEnabled;
+    [SerializeField] private Platform consentFlowPlatform;
     [SerializeField] private string consentFlowPrivacyPolicyUrl = string.Empty;
     [SerializeField] private string consentFlowTermsOfServiceUrl = string.Empty;
     [FormerlySerializedAs("userTrackingUsageDescription")] [SerializeField] private string userTrackingUsageDescriptionEn = string.Empty;
@@ -62,6 +75,8 @@ public class AppLovinSettings : ScriptableObject
 
     [SerializeField] private string adMobAndroidAppId = string.Empty;
     [SerializeField] private string adMobIosAppId = string.Empty;
+
+    [SerializeField] private bool showInternalSettingsInIntegrationManager;
 
     /// <summary>
     /// An instance of AppLovin Setting.
@@ -144,9 +159,10 @@ public class AppLovinSettings : ScriptableObject
         {
             // Update the default EN description if an old version of the description is still being used.
             if (DefaultUserTrackingDescriptionEnV0.Equals(Instance.UserTrackingUsageDescriptionEn)
-                || DefaultUserTrackingDescriptionEnV1.Equals(Instance.UserTrackingUsageDescriptionEn))
+                || DefaultUserTrackingDescriptionEnV1.Equals(Instance.UserTrackingUsageDescriptionEn)
+                || DefaultUserTrackingDescriptionEnV2.Equals(Instance.UserTrackingUsageDescriptionEn))
             {
-                Instance.UserTrackingUsageDescriptionEn = DefaultUserTrackingDescriptionEnV2;
+                Instance.UserTrackingUsageDescriptionEn = DefaultUserTrackingDescriptionEnV3;
             }
 
             return Instance.consentFlowEnabled;
@@ -161,17 +177,24 @@ public class AppLovinSettings : ScriptableObject
                 // If the value didn't change, we don't need to update anything.
                 if (previousValue) return;
 
-                Instance.UserTrackingUsageDescriptionEn = DefaultUserTrackingDescriptionEnV2;
+                Instance.UserTrackingUsageDescriptionEn = DefaultUserTrackingDescriptionEnV3;
                 Instance.UserTrackingUsageLocalizationEnabled = true;
             }
             else
             {
+                Instance.ConsentFlowPlatform = Platform.All;
                 Instance.ConsentFlowPrivacyPolicyUrl = string.Empty;
                 Instance.ConsentFlowTermsOfServiceUrl = string.Empty;
                 Instance.UserTrackingUsageDescriptionEn = string.Empty;
                 Instance.UserTrackingUsageLocalizationEnabled = false;
             }
         }
+    }
+
+    public Platform ConsentFlowPlatform
+    {
+        get { return Instance.consentFlowEnabled ? Instance.consentFlowPlatform : Platform.All; }
+        set { Instance.consentFlowPlatform = value; }
     }
 
     /// <summary>
@@ -217,7 +240,7 @@ public class AppLovinSettings : ScriptableObject
             if (value)
             {
                 // If the value didn't change or the english localization text is not the default one, we don't need to update anything.
-                if (previousValue || !DefaultUserTrackingDescriptionEnV2.Equals(Instance.UserTrackingUsageDescriptionEn)) return;
+                if (previousValue || !DefaultUserTrackingDescriptionEnV3.Equals(Instance.UserTrackingUsageDescriptionEn)) return;
 
                 Instance.UserTrackingUsageDescriptionDe = DefaultUserTrackingDescriptionDe;
                 Instance.UserTrackingUsageDescriptionEs = DefaultUserTrackingDescriptionEs;
@@ -336,6 +359,12 @@ public class AppLovinSettings : ScriptableObject
     {
         get { return Instance.adMobIosAppId; }
         set { Instance.adMobIosAppId = value; }
+    }
+
+    public bool ShowInternalSettingsInIntegrationManager
+    {
+        get { return Instance.showInternalSettingsInIntegrationManager; }
+        set { Instance.showInternalSettingsInIntegrationManager = value; }
     }
 
     /// <summary>

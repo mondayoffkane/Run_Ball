@@ -7,15 +7,16 @@
 //
 
 #if UNITY_ANDROID && UNITY_2018_2_OR_NEWER
-
 using AppLovinMax.Scripts.IntegrationManager.Editor;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using AppLovinMax.ThirdParty.MiniJson;
 using UnityEditor;
 using UnityEditor.Android;
+using UnityEngine;
 
 namespace AppLovinMax.Scripts.Editor
 {
@@ -32,6 +33,7 @@ namespace AppLovinMax.Scripts.Editor
         private const string PropertyDexingArtifactTransform = "android.enableDexingArtifactTransform";
         private const string DisableProperty = "=false";
 
+        private const string KeyMetaDataAppLovinSdkKey = "applovin.sdk.key";
         private const string KeyMetaDataAppLovinVerboseLoggingOn = "applovin.sdk.verbose_logging";
         private const string KeyMetaDataGoogleApplicationId = "com.google.android.gms.ads.APPLICATION_ID";
         private const string KeyMetaDataGoogleAdManagerApp = "com.google.android.gms.ads.AD_MANAGER_APP";
@@ -71,7 +73,7 @@ namespace AppLovinMax.Scripts.Editor
             }
 
 #if UNITY_2019_3_OR_NEWER
-            // Enable AndroidX and Jetifier properties 
+            // Enable AndroidX and Jetifier properties
             gradlePropertiesUpdated.Add(PropertyAndroidX + EnableProperty);
             gradlePropertiesUpdated.Add(PropertyJetifier + EnableProperty);
 #endif
@@ -89,6 +91,17 @@ namespace AppLovinMax.Scripts.Editor
             }
 
             ProcessAndroidManifest(path);
+
+            var rawResourceDirectory = Path.Combine(path, "src/main/res/raw");
+            if (AppLovinSettings.Instance.ShowInternalSettingsInIntegrationManager)
+            {
+                // For Unity 2018.1 or older, the consent flow is enabled in AppLovinPreProcessAndroid.
+                AppLovinPreProcessAndroid.EnableConsentFlowIfNeeded(rawResourceDirectory);
+            }
+            else
+            {
+                AppLovinPreProcessAndroid.EnableTermsFlowIfNeeded(rawResourceDirectory);
+            }
         }
 
         public int callbackOrder
@@ -129,12 +142,37 @@ namespace AppLovinMax.Scripts.Editor
 
             var metaDataElements = elementApplication.Descendants().Where(element => element.Name.LocalName.Equals("meta-data"));
 
+            AddSdkKeyIfNeeded(elementApplication);
             EnableVerboseLoggingIfNeeded(elementApplication);
             AddGoogleApplicationIdIfNeeded(elementApplication, metaDataElements);
-            AddGoogleAdManagerAppMetaDataIfNeeded(elementApplication, metaDataElements);
 
             // Save the updated manifest file.
             manifest.Save(manifestPath);
+        }
+
+        private static void AddSdkKeyIfNeeded(XElement elementApplication)
+        {
+            var sdkKey = AppLovinSettings.Instance.SdkKey;
+            if (string.IsNullOrEmpty(sdkKey)) return;
+
+            var descendants = elementApplication.Descendants();
+            var sdkKeyMetaData = descendants.FirstOrDefault(descendant => descendant.FirstAttribute != null &&
+                                                                          descendant.FirstAttribute.Name.LocalName.Equals("name") &&
+                                                                          descendant.FirstAttribute.Value.Equals(KeyMetaDataAppLovinSdkKey) &&
+                                                                          descendant.LastAttribute != null &&
+                                                                          descendant.LastAttribute.Name.LocalName.Equals("value"));
+
+            // check if applovin.sdk.key meta data exists.
+            if (sdkKeyMetaData != null)
+            {
+                sdkKeyMetaData.LastAttribute.Value = sdkKey;
+            }
+            else
+            {
+                // add applovin.sdk.key meta data if it does not exist.
+                var metaData = CreateMetaDataElement(KeyMetaDataAppLovinSdkKey, sdkKey);
+                elementApplication.Add(metaData);
+            }
         }
 
         private static void EnableVerboseLoggingIfNeeded(XElement elementApplication)
@@ -175,18 +213,14 @@ namespace AppLovinMax.Scripts.Editor
 
         private static void AddGoogleApplicationIdIfNeeded(XElement elementApplication, IEnumerable<XElement> metaDataElements)
         {
-            var googleApplicationIdMetaData = GetMetaDataElement(metaDataElements, KeyMetaDataGoogleApplicationId);
-            if (!AppLovinIntegrationManager.IsAdapterInstalled("Google"))
-            {
-                if (googleApplicationIdMetaData != null) googleApplicationIdMetaData.Remove();
-                return;
-            }
+            if (!AppLovinIntegrationManager.IsAdapterInstalled("Google") && !AppLovinIntegrationManager.IsAdapterInstalled("GoogleAdManager")) return;
 
+            var googleApplicationIdMetaData = GetMetaDataElement(metaDataElements, KeyMetaDataGoogleApplicationId);
             var appId = AppLovinSettings.Instance.AdMobAndroidAppId;
             // Log error if the App ID is not set.
             if (string.IsNullOrEmpty(appId) || !appId.StartsWith("ca-app-pub-"))
             {
-                MaxSdkLogger.UserError("AdMob App ID is not set. Please enter a valid app ID within the AppLovin Integration Manager window.");
+                MaxSdkLogger.UserError("Google App ID is not set. Please enter a valid app ID within the AppLovin Integration Manager window.");
                 return;
             }
 
@@ -199,27 +233,6 @@ namespace AppLovinMax.Scripts.Editor
             else
             {
                 elementApplication.Add(CreateMetaDataElement(KeyMetaDataGoogleApplicationId, appId));
-            }
-        }
-
-        private static void AddGoogleAdManagerAppMetaDataIfNeeded(XElement elementApplication, IEnumerable<XElement> metaDataElements)
-        {
-            var googleAdManagerAppMetaData = GetMetaDataElement(metaDataElements, KeyMetaDataGoogleAdManagerApp);
-            if (!AppLovinIntegrationManager.IsAdapterInstalled("GoogleAdManager"))
-            {
-                if (googleAdManagerAppMetaData != null) googleAdManagerAppMetaData.Remove();
-                return;
-            }
-
-            // Check if the Google Ad Manager meta data already exists. Update if it already exists.
-            if (googleAdManagerAppMetaData != null)
-            {
-                elementApplication.SetAttributeValue(AndroidNamespace + "value", true);
-            }
-            // Meta data doesn't exist, add it.
-            else
-            {
-                elementApplication.Add(CreateMetaDataElement(KeyMetaDataGoogleAdManagerApp, true));
             }
         }
 

@@ -3,7 +3,9 @@
     "rootNamespace": "",
     "references": [
         "MaxSdk.Scripts",
-        "PlayOn"
+        "PlayOn",
+        "SingularSDK",
+        "Amazon.Scripts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MondayOFF {
     public static partial class EveryDay {
-        public const string Version = "3.0.14";
+        public const string Version = "3.0.21";
 
         internal static EverydaySettings settings = default;
         internal static System.Action onEverydayInitialized = default;
@@ -17,7 +17,9 @@ namespace MondayOFF {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AfterSceneLoad() {
             Debug.Log("[EVERYDAY] Initialize..");
-            Initialize();
+            EverydayAppTracking.RequestTrackingAuthorization(consented => {
+                Initialize();
+            });
         }
 
         private static void LoadEverydaySettings() {
@@ -36,7 +38,6 @@ namespace MondayOFF {
 
         private static void Initialize() {
             if (isInitialized) {
-
                 return;
             }
             // MaxSDK

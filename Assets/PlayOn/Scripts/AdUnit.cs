@@ -18,8 +18,17 @@ public class AdUnit
 #endif
 
 #if UNITY_EDITOR
-    protected GameObject stubLogo;
-    protected bool editorAdAvailable = false;
+    protected EditorAdUnit stubLogo;
+    public bool editorAdAvailable = false;
+    public PlayOnSDK.Position popUpPosition;
+    public int popUpOffsetX;
+    public int popUpOffsetY;
+    private PlayOnSDK.Position _location = PlayOnSDK.Position.TopLeft;
+    private PlayOnSDK.Position _bannerLocation = PlayOnSDK.Position.BottomCenter;
+    private int _xOffset = 50;
+    private int _yOffset = 50;
+    private int _size = 70;
+    private const string AD_PREFAB_FILENAME = "PlayOnAD.prefab";
 #endif
 #if UNITY_IOS && !UNITY_EDITOR
     protected IntPtr client;
@@ -67,11 +76,14 @@ public class AdUnit
 
     private float fadeValue = 0.1f;
     private float sceneVolumeValue = 1f;
-    private int _xOffset = 50;
-    private int _yOffset = 50;
-    private int _size = 70;
-    private PlayOnSDK.Position _location = PlayOnSDK.Position.TopLeft;
-    private bool adBlocked = false;
+
+    private enum LogoPositionType{
+        Prefab,
+        Rect,
+        Direct
+    }
+
+    private LogoPositionType posType = LogoPositionType.Direct;
 
     private AdListener adListener = new AdListener();
     public AdListener AdCallbacks
@@ -108,7 +120,6 @@ public class AdUnit
             client = ptr;
         }
 #endif
-        
 #if UNITY_EDITOR
         private PlayOnSDK.AdUnitType adUnitType;
         public ImpressionData(PlayOnSDK.AdUnitType type) {
@@ -127,7 +138,8 @@ public class AdUnit
 #endif
         }
 
-        public string GetSessionID(){
+        public string GetSessionID()
+        {
 #if UNITY_ANDROID && !UNITY_EDITOR
             return client.Call<string>("getSessionID");
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -139,7 +151,8 @@ public class AdUnit
 #endif
         }
 
-        public PlayOnSDK.AdUnitType GetAdType(){
+        public PlayOnSDK.AdUnitType GetAdType()
+        {
 #if UNITY_ANDROID && !UNITY_EDITOR
             AndroidJavaObject enumAdType = client.Call<AndroidJavaObject>("getAdType");
             int typeIndex = enumAdType.Call<int> ("ordinal");
@@ -155,7 +168,8 @@ public class AdUnit
 
         }
 
-        public string GetCountry(){
+        public string GetCountry()
+        {
 #if UNITY_ANDROID && !UNITY_EDITOR
             return client.Call<string>("getCountry");
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -167,7 +181,8 @@ public class AdUnit
 #endif
         }
 
-        public double GetRevenue(){
+        public double GetRevenue()
+        {
 #if UNITY_ANDROID && !UNITY_EDITOR
             return client.Call<double>("getRevenue");
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -193,17 +208,17 @@ public class AdUnit
         SetAdListener();
         UnityMainThreadDispatcher.Instance();
 #if UNITY_EDITOR
-        if (type == PlayOnSDK.AdUnitType.AudioLogoAd || type == PlayOnSDK.AdUnitType.AudioRewardedLogoAd){
-            editorAdAvailable = true;
-            PlayOnEditorCoroutinesManager.StartEditorCoroutine(OnAvailabilityChangeEditorCheck());
-        }
+        editorAdAvailable = true; 
+        PlayOnEditorCoroutinesManager.StartEditorCoroutine(OnAvailabilityChangeEditorCheck());
 #endif
     }
 
 #if UNITY_EDITOR
-    private IEnumerator OnAvailabilityChangeEditorCheck(){
+    private IEnumerator OnAvailabilityChangeEditorCheck()
+    {
         yield return new WaitForSeconds(3f);
-        if(!adBlocked){
+        if (!adListener.adBlocked)
+        {
             AdCallbacks.OnAvailabilityChanged(true);
         } else
         {
@@ -222,10 +237,32 @@ public class AdUnit
         adListener.OnClose += onClose;
         adListener.OnShow += onShow;
     }
-
+    
     public void ShowAd()
     {
-        if(adBlocked) return;
+        switch(posType){
+            case LogoPositionType.Direct:
+                //Do not re-calculating
+            break;
+            case LogoPositionType.Prefab:
+                //re-calculate only if anchor still exists.
+                if(this.adUnitAnchor!=null){
+                    LinkLogoToPrefab(this.adUnitAnchor);
+                }
+                break;
+            case LogoPositionType.Rect:
+                //re-calculate only if RectTransform and Canvas still exists.
+                if(this.linkedRect!=null && this.linkedCanvas!=null){
+                    LinkLogoToRectTransform(this.linkedPosition, this.linkedRect, this.linkedCanvas, this.sizingMethod);
+                }
+                break;
+        }
+
+        if (adListener.adBlocked)
+        {
+            AdCallbacks.OnAdBlocked.Invoke();
+            return;
+        }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         client.Call ("showAd");
@@ -234,19 +271,42 @@ public class AdUnit
 #if UNITY_IOS && !UNITY_EDITOR
         _playOnShow(client);
 #endif
-        
+
 #if UNITY_EDITOR
-        if (type == PlayOnSDK.AdUnitType.AudioLogoAd || type == PlayOnSDK.AdUnitType.AudioRewardedLogoAd)
+        if (editorAdAvailable)
         {
-            if (stubLogo == null)
+            AdCallbacks.OnAvailabilityChanged.Invoke(false);
+
+            string adPrefabPath = EditorHelper.GetAssetBasedPath(AD_PREFAB_FILENAME);
+            if (string.IsNullOrEmpty(adPrefabPath))
             {
-                AdCallbacks.OnAvailabilityChanged.Invoke(false);
-                var logoPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/PlayOn/Editor/Prefabs/PlayOnAD.prefab");
-                stubLogo = Object.Instantiate(logoPrefab, Vector3.zero, Quaternion.identity);
-                stubLogo.GetComponent<EditorAdUnit>().Init(this, _location, _xOffset, _yOffset, _size);
-                Object.DontDestroyOnLoad(stubLogo);
-                editorAdAvailable = false;
+                PlayOnSDK.LogE(PlayOnSDK.LogLevel.Debug, "Can't find " + AD_PREFAB_FILENAME + " asset");
+                return;
             }
+
+            EditorAdUnit logoPrefab = AssetDatabase.LoadAssetAtPath<EditorAdUnit>(adPrefabPath);
+
+            var unitSize = new Vector2(_size, _size);
+            var prefLocation = _location;
+            var prefabXOffset = _xOffset;
+            var prefabYOffset = _yOffset;
+            if (type == PlayOnSDK.AdUnitType.AudioBannerAd || type == PlayOnSDK.AdUnitType.AudioRewardedBannerAd)
+            {
+                unitSize.x = 320;
+                unitSize.y = 50;
+                prefLocation = _bannerLocation;
+                prefabXOffset = 0;
+                prefabYOffset = 0;
+            }
+            
+            stubLogo = Object.Instantiate(logoPrefab, Vector3.zero, Quaternion.identity);
+            stubLogo.Init(this, prefLocation, prefabXOffset, prefabYOffset, unitSize);
+            Object.DontDestroyOnLoad(stubLogo);
+            editorAdAvailable = false;
+        }
+        else
+        {
+            PlayOnSDK.LogE(PlayOnSDK.LogLevel.Debug, "Advertising is not available. Wait for it to be available");
         }
 #endif
     }
@@ -258,9 +318,9 @@ public class AdUnit
 #elif UNITY_IOS && !UNITY_EDITOR
         _playOnClose(client);
 #elif UNITY_EDITOR
+
     if(stubLogo != null){
-        stubLogo.GetComponent<EditorAdUnit>().DestroyAd();
-        editorAdAvailable = true;
+        stubLogo.DestroyAd();
     }
 #endif
     }
@@ -275,12 +335,16 @@ public class AdUnit
 #elif UNITY_IOS && !UNITY_EDITOR
         _playOnSetBanner(client, (int)location);
 #endif
+     
+#if UNITY_EDITOR
+        this._bannerLocation = location;
+#endif
     }
 
     public bool IsAdAvailable()
     {
-        if(adBlocked) return false;
-         
+        if (adListener.adBlocked) return false;
+
 #if UNITY_ANDROID && !UNITY_EDITOR
         return client.Call<bool>("isAdAvailable");
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -292,7 +356,8 @@ public class AdUnit
 #endif
     }
 
-    public void SetReward(PlayOnSDK.AdUnitRewardType rewardType, float value){
+    public void SetReward(PlayOnSDK.AdUnitRewardType rewardType, float value)
+    {
         this.rewardValue = value;
         this.rewardType = rewardType;
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -312,10 +377,15 @@ public class AdUnit
         client.Call ("setPopup", curValue, xOffset, yOffset);
 #elif UNITY_IOS && !UNITY_EDITOR
        _playOnSetPopup(client, (int)position, xOffset, yOffset);
+#elif UNITY_EDITOR
+        popUpPosition = position;
+        popUpOffsetX = xOffset;
+        popUpOffsetY = yOffset;
 #endif
     }
 
-    public void SetProgressBar(Color progressBarColor){
+    public void SetProgressBar(Color progressBarColor)
+    {
 #if UNITY_ANDROID && !UNITY_EDITOR
         string hexProgressBarColor = ColorUtility.ToHtmlStringRGBA(progressBarColor);
         hexProgressBarColor = "#" + hexProgressBarColor.Substring(6) + hexProgressBarColor.Remove(6);
@@ -326,7 +396,8 @@ public class AdUnit
 #endif
     }
 
-    public void SetActionButton(PlayOnSDK.AdUnitActionButtonType actionType, float delayTime){
+    public void SetActionButton(PlayOnSDK.AdUnitActionButtonType actionType, float delayTime)
+    {
 #if UNITY_ANDROID && !UNITY_EDITOR
         AndroidJavaClass en = new AndroidJavaClass ("com.playon.bridge.AdUnit$ActionButtonType");
         AndroidJavaObject cur = en.CallStatic<AndroidJavaObject> ("valueOf", actionType.ToString ());
@@ -336,35 +407,66 @@ public class AdUnit
         _playOnSetActionButton(client, (int)actionType, delayTime);
 #endif
     }
-    
-    public void LinkLogoToRectTransform(PlayOnSDK.Position position, RectTransform rectTransform, Canvas canvas)
+
+
+    private RectTransform linkedRect = null;
+    private Canvas linkedCanvas = null;
+    private PlayOnSDK.Position linkedPosition;
+    private PlayOnSDK.AdSizingMethod sizingMethod = PlayOnSDK.AdSizingMethod.Flexible;
+
+    public void LinkLogoToRectTransform(PlayOnSDK.Position position, RectTransform rectTransform, Canvas canvas, PlayOnSDK.AdSizingMethod sizingMethod = PlayOnSDK.AdSizingMethod.Flexible)
     {
         if (rectTransform == null || canvas == null)
         {
             PlayOnSDK.LogE(PlayOnSDK.LogLevel.Debug, "LinkLogoToRectTransform function error. RectTransform || Canvas variable is null");
             return;
         }
+        
+#if UNITY_EDITOR
+        PlayOnSDK.SetOptimalDPI();
+#endif
+
+        this.posType = LogoPositionType.Rect;
+        this.linkedRect = rectTransform;
+        this.linkedCanvas = canvas;
+        this.linkedPosition = position;
+        this.sizingMethod = sizingMethod;
 
         Rect rect = RectTransformExtension.GetScreenRect(rectTransform, canvas);
-        adBlocked = true;
+
         adListener.adBlocked = true;
+
         float bestSize = AD_SIZE_LIMIT_DP_MAX;
         Vector2 positinPX = Vector2.zero;
-        for(int i = AD_SIZE_LIMIT_DP_MAX; i >= AD_SIZE_LIMIT_DP_MIN; i-=5){
+        int step = 5;
+        for (int i = AD_SIZE_LIMIT_DP_MAX; i >= AD_SIZE_LIMIT_DP_MIN; i -= step)
+        {
             bestSize = i;
             int sizeInPX = (int)(i * PlayOnSDK.GetDeviceScale());
             positinPX = RectTransformExtension.ConvertRectToPosition(rect, position, sizeInPX);
             Rect adRect = new Rect(positinPX, new Vector2(sizeInPX, sizeInPX));
-            if(RectTransformExtension.IsRectContainsRect(adRect, rect)){
-                adBlocked = false;
+            if (RectTransformExtension.IsRectContainsRect(adRect, rect))
+            {
+                adListener.adBlocked = false;
                 break;
             }
         }
 
+        switch(sizingMethod){
+            case PlayOnSDK.AdSizingMethod.Flexible:
+                adListener.adBlocked = false; //using smallest icon, unblocking show
+            break;
+            case PlayOnSDK.AdSizingMethod.Strict:
+            break;
+        }
+        
+        if (adListener.adBlocked)
+            AdCallbacks.OnAdBlocked.Invoke();
         Vector2 positionDP = RectTransformExtension.PixelPositionToDP(positinPX);
-        SetLogo(PlayOnSDK.Position.BottomLeft, (int)positionDP.x, (int)positionDP.y, (int)bestSize);
+        UpdateLogoPosition(PlayOnSDK.Position.BottomLeft, (int)positionDP.x, (int)positionDP.y, (int)bestSize);
     }
-    
+
+    private AdUnitAnchor adUnitAnchor;
     public void LinkLogoToPrefab(AdUnitAnchor adUnitAnchor)
     {
         if (adUnitAnchor == null)
@@ -372,22 +474,38 @@ public class AdUnit
             PlayOnSDK.LogE(PlayOnSDK.LogLevel.Debug, "LinkLogoToPrefab function error. AdUnitAnchor variable is null");
             return;
         }
-        RectTransform rt = adUnitAnchor.GetRectTransform();
-        Canvas canvas = adUnitAnchor.GetCanvas();
+
+        this.posType = LogoPositionType.Prefab;
+        this.adUnitAnchor = adUnitAnchor;
+        
+        RectTransform rt = adUnitAnchor.rectTransform;
+        Canvas canvas = adUnitAnchor.canvas;
+        
         if (canvas == null || rt == null)
         {
             PlayOnSDK.LogE(PlayOnSDK.LogLevel.Debug, "LinkLogoToPrefab function error. AdUnitAnchor Integrated incorrectly");
             return;
         }
-        
+
         Rect rect = RectTransformExtension.GetScreenRect(rt, canvas);
         float s = rt.sizeDelta.x * canvas.scaleFactor;
         Vector2 positionPX = RectTransformExtension.ConvertRectToPosition(rect, PlayOnSDK.Position.BottomLeft, (int)s);
         Vector2 positionDP = RectTransformExtension.PixelPositionToDP(positionPX);
-        SetLogo(PlayOnSDK.Position.BottomLeft, (int)positionDP.x, (int)positionDP.y, (int)(s / PlayOnSDK.GetDeviceScale()));
+        UpdateLogoPosition(PlayOnSDK.Position.BottomLeft, (int)positionDP.x, (int)positionDP.y, (int)(s / PlayOnSDK.GetDeviceScale()));
     }
 
-    public void SetLogo(PlayOnSDK.Position position, int xOffset, int yOffset, int size) {
+    public void SetLogo(PlayOnSDK.Position position, int xOffset, int yOffset, int size)
+    {
+        if (type != PlayOnSDK.AdUnitType.AudioLogoAd || type != PlayOnSDK.AdUnitType.AudioRewardedLogoAd)
+        {
+            PlayOnSDK.LogW(PlayOnSDK.LogLevel.Debug, "PlayonSDK: To set the position of the banner, use SetBanner method");
+        }
+
+        this.posType = LogoPositionType.Direct;
+        UpdateLogoPosition(position, xOffset, yOffset, size);
+    }
+
+    private void UpdateLogoPosition(PlayOnSDK.Position position, int xOffset, int yOffset, int size){
 #if UNITY_ANDROID && !UNITY_EDITOR
         AndroidJavaClass posEnum = new AndroidJavaClass ("com.playon.bridge.AdUnit$Position");
         AndroidJavaObject curPos = posEnum.CallStatic<AndroidJavaObject> ("valueOf", position.ToString ());
@@ -404,7 +522,7 @@ public class AdUnit
         this._location = position;
 #endif
     }
-    
+
     public void SetVisualization(Color tint, Color background)
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -429,7 +547,8 @@ public class AdUnit
 
     void onShow()
     {
-        UnityMainThreadDispatcher.Instance().Enqueue(() => {
+        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+        {
             sceneVolumeValue = AudioListener.volume;
             AudioListener.volume = fadeValue;
         });
@@ -440,7 +559,8 @@ public class AdUnit
         UnityMainThreadDispatcher.Instance().Enqueue(() => AudioListener.volume = sceneVolumeValue);
     }
 
-    public void Dispose(){
+    public void Dispose()
+    {
 #if UNITY_IOS && !UNITY_EDITOR
         _playOnDestroyBridgeReference(client);
         _playOnRemoveAdUnitFromSuperView(client);

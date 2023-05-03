@@ -63,8 +63,3 @@ MonoBehaviour:
     weight: 1
     iosUrl: https://apps.apple.com/app/id1593512763
     androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.slideballs
-  - name: domino
-    videoClip: {fileID: 32900000, guid: 52b8218129d2a4b37b90375c439ff9ae, type: 3}
-    weight: 1
-    iosUrl: https://apps.apple.com/app/id1593512763
-    androidUrl: https://play.google.com/store/apps/details?id=com.mondayoff.domino

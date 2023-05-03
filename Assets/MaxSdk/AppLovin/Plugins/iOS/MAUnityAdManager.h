@@ -93,8 +93,11 @@ typedef void (*ALUnityBackgroundCallback)(const char* args);
 // User Service
 - (void)didDismissUserConsentDialog;
 
+// Consent Flow
+- (void)startConsentFlow;
+
 // Utils
-+ (NSString *)serializeParameters:(NSDictionary<NSString *, NSString *> *)dict;
++ (NSString *)serializeParameters:(NSDictionary<NSString *, id> *)dict;
 
 /**
  * Creates an instance of @c MAUnityAdManager if needed and returns the singleton instance.
