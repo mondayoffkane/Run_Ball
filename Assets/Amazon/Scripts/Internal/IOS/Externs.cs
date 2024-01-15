@@ -162,8 +162,6 @@ namespace AmazonAds.IOS
         [DllImport("__Internal")]
         public static extern int _fetchAdHeight(IntPtr resp);
         [DllImport("__Internal")]
-        public static extern string _fetchMoPubKeywords(IntPtr resp);
-        [DllImport("__Internal")]
         public static extern void _setCMPFlavor(int cFlavor);
         [DllImport("__Internal")]
         public static extern void _setConsentStatus(int consentStatus);

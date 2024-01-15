@@ -13,6 +13,7 @@ public class AdListener
     public PlayOnSDK.PlayOnNoArgsDelegate OnClose = () => { };
     public PlayOnSDK.PlayOnNoArgsDelegate OnClick = () => { };
     public PlayOnSDK.PlayOnFloatDelegate OnReward = (amount) => { };
+    public PlayOnSDK.PlayOnNoArgsDelegate OnUserClose = () => { };
     public PlayOnSDK.PlayOnImpressionDelegate OnImpression = (data) => { };
     public PlayOnSDK.PlayOnNoArgsDelegate OnAdBlocked = () => { };
     public bool adBlocked = false;
@@ -41,6 +42,10 @@ public class AdListener
 
     void onReward (float amount) {
         UnityMainThreadDispatcher.Instance().Enqueue( () => OnReward (amount) ) ;
+    }
+    
+    void onUserClose(){
+        UnityMainThreadDispatcher.Instance().Enqueue( () => OnUserClose() ) ;
     }
 
     void onImpression (AndroidJavaObject data) {
@@ -94,6 +99,12 @@ public class AdListener
     public static void OnRewardNative(IntPtr client, float amount){
         AdListener listener = IntPtrToClient(client);
         UnityMainThreadDispatcher.Instance().Enqueue( () => listener.OnReward(amount) ) ;
+    }
+    
+    [MonoPInvokeCallback(typeof(PlayOnNoArgsDelegateNative))]
+    public static void OnUserCloseNative(IntPtr client){
+        AdListener listener = IntPtrToClient(client);
+        UnityMainThreadDispatcher.Instance().Enqueue( () => listener.OnUserClose() ) ;
     }
 
     [MonoPInvokeCallback(typeof(PlayOnDataDelegateNative))]

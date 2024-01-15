@@ -36,7 +36,7 @@ namespace MondayOFF {
         }
 #else
         internal static void SendAdData(string adUnitID, MaxSdk.AdInfo adInfo) {
-            UnityEngine.Debug.Log("[EVERYDAY] Send Ad Data to Singular");
+            EverydayLogger.Info("Send Ad Data to Singular");
         }
 #endif
     }

@@ -30,11 +30,11 @@
 		</data>
 		<key>Headers/POAdUnitActivity.h</key>
 		<data>
-		QMB/3T9aU+Oez1iUN6WjrF83/KY=
+		6OknnL3t6kZr86fr/k2fruRBbOo=
 		</data>
 		<key>Headers/POAdUnitDelegate.h</key>
 		<data>
-		rXtCywwJtCEMof6gqAD/cgEzER8=
+		gvK0oteiX5VK6WT5p/BCSJX8v7g=
 		</data>
 		<key>Headers/POAdUtilities.h</key>
 		<data>
@@ -62,7 +62,7 @@
 		</data>
 		<key>Headers/POImpressionData.h</key>
 		<data>
-		jE405R7CwZq9mVJNF3Ygt4B7uiE=
+		rHDNCvTz1Kpt1psPxwC0WYFgCSM=
 		</data>
 		<key>Headers/POLogs.h</key>
 		<data>
@@ -82,7 +82,7 @@
 		</data>
 		<key>Headers/PlayOnSDK-Swift.h</key>
 		<data>
-		0+ZMwcFB5KMxQo9FmZUKa2u1Cow=
+		LOgC1IA2ObeodbKjlQoHKB+tKAE=
 		</data>
 		<key>Headers/PlayOnSDK.h</key>
 		<data>
@@ -102,11 +102,11 @@
 		</data>
 		<key>Modules/PlayOnSDK.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		V/tM3EC+DFvKHLBRY7iNNVRV69k=
+		T//IwNO6ylI65cuVM5bxmddRQtw=
 		</data>
 		<key>Modules/PlayOnSDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		QY/zJQfDDFGJ6Oasht1+QNDzUbs=
+		y1SPBvYDIuCNHqCHSLGfdnHNjdI=
 		</data>
 		<key>Modules/PlayOnSDK.swiftmodule/i386-apple-ios-simulator.swiftdoc</key>
 		<data>
@@ -114,11 +114,11 @@
 		</data>
 		<key>Modules/PlayOnSDK.swiftmodule/i386-apple-ios-simulator.swiftinterface</key>
 		<data>
-		HAtaCejpwohrZLIAmGGTlZIuzZE=
+		0YwXQIHReSj1N+TxBTj7rttrK3o=
 		</data>
 		<key>Modules/PlayOnSDK.swiftmodule/i386-apple-ios-simulator.swiftmodule</key>
 		<data>
-		zSqr1kAep01IuRrBWMYvOFLPKto=
+		i+bWuYVBOS5vkcrsMCgBLmookjo=
 		</data>
 		<key>Modules/PlayOnSDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
@@ -126,11 +126,11 @@
 		</data>
 		<key>Modules/PlayOnSDK.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		JVAlKEFkUI60NzyVuG3UqI8TCG4=
+		3zHq8B2kewZSlILthZfC5+ngIzQ=
 		</data>
 		<key>Modules/PlayOnSDK.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		XgKdbLvRW6RETapUaD91UTXY2Zc=
+		UPVtJb/Rcuk7z+EqVw0jWHwiq74=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -269,22 +269,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			QMB/3T9aU+Oez1iUN6WjrF83/KY=
+			6OknnL3t6kZr86fr/k2fruRBbOo=
 			</data>
 			<key>hash2</key>
 			<data>
-			4tDn3S4AoIrAWhSbSYhGqqlR/t1DOly7nqdLkvGNCd4=
+			TEzEBsodpxDoUAV29tkJF4p2c3XfubQTMr+bOwflExM=
 			</data>
 		</dict>
 		<key>Headers/POAdUnitDelegate.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			rXtCywwJtCEMof6gqAD/cgEzER8=
+			gvK0oteiX5VK6WT5p/BCSJX8v7g=
 			</data>
 			<key>hash2</key>
 			<data>
-			CwgrNTv0na4BM9uPHQeOwJB2xpg9DMAe3inu/xmIL7M=
+			GL+rz9tmYNuNUlFGou3v9OGFBfzcPGYmfEeNBYFVLwo=
 			</data>
 		</dict>
 		<key>Headers/POAdUtilities.h</key>
@@ -357,11 +357,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			jE405R7CwZq9mVJNF3Ygt4B7uiE=
+			rHDNCvTz1Kpt1psPxwC0WYFgCSM=
 			</data>
 			<key>hash2</key>
 			<data>
-			frwux7tS6t7exb3TYIKuEinFHllEn0csZlphqwFqx2A=
+			tC41eeeiBWX3asfKrIXPr1r1ztg4VcV1Kc/LAd/kzLk=
 			</data>
 		</dict>
 		<key>Headers/POLogs.h</key>
@@ -412,11 +412,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			0+ZMwcFB5KMxQo9FmZUKa2u1Cow=
+			LOgC1IA2ObeodbKjlQoHKB+tKAE=
 			</data>
 			<key>hash2</key>
 			<data>
-			dR2lJeWKlXaodjrsNA95N94hqeVUMjzSGP/HrW6hy70=
+			2dmF/57HSNiBKu9PAwEeEDu7nBkdShXFH/APQEEQSrY=
 			</data>
 		</dict>
 		<key>Headers/PlayOnSDK.h</key>
@@ -456,22 +456,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			V/tM3EC+DFvKHLBRY7iNNVRV69k=
+			T//IwNO6ylI65cuVM5bxmddRQtw=
 			</data>
 			<key>hash2</key>
 			<data>
-			TjljW2mYwk3a79MiLdc/OEDjNXZXMBwQvY5F49ZpMBI=
+			r/ISgTNV1QuLiQzt5bMIE0v++yiQjtzlHBe8H0o2g08=
 			</data>
 		</dict>
 		<key>Modules/PlayOnSDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			QY/zJQfDDFGJ6Oasht1+QNDzUbs=
+			y1SPBvYDIuCNHqCHSLGfdnHNjdI=
 			</data>
 			<key>hash2</key>
 			<data>
-			47dvwzZq383wKJM8+4pxrILVJqEPtkZru78Tr31XxnY=
+			IzIcbg/kv94Rt3NblQa6H3fHkmJXcflTP9V5DhS6O/Q=
 			</data>
 		</dict>
 		<key>Modules/PlayOnSDK.swiftmodule/i386-apple-ios-simulator.swiftdoc</key>
@@ -489,22 +489,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			HAtaCejpwohrZLIAmGGTlZIuzZE=
+			0YwXQIHReSj1N+TxBTj7rttrK3o=
 			</data>
 			<key>hash2</key>
 			<data>
-			8cQiqRGtPpZlLwIo3Fpa+lMuFcEGXcsTy8HtnlZU8Ls=
+			1baEx9nZLinnIi3DNTB/lCsTzVjEqV4g7evdFN/8kKY=
 			</data>
 		</dict>
 		<key>Modules/PlayOnSDK.swiftmodule/i386-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			zSqr1kAep01IuRrBWMYvOFLPKto=
+			i+bWuYVBOS5vkcrsMCgBLmookjo=
 			</data>
 			<key>hash2</key>
 			<data>
-			XuSKYhOBajknOJQ4T/vaoqNVyKKynEypQaaRk8rT8l4=
+			DChk39N59UyZ4VxrsovsBrfBsGwtjELiHcxvPVgyLsE=
 			</data>
 		</dict>
 		<key>Modules/PlayOnSDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
@@ -522,22 +522,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			JVAlKEFkUI60NzyVuG3UqI8TCG4=
+			3zHq8B2kewZSlILthZfC5+ngIzQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			RpgyOlBTk54yOEM4KbmnslEa4JH841QzywGVzxEb6xE=
+			bx+81i96wDPnc8eLJ9W+RFo1MFtgo5p4LuK+x7uzEgw=
 			</data>
 		</dict>
 		<key>Modules/PlayOnSDK.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			XgKdbLvRW6RETapUaD91UTXY2Zc=
+			UPVtJb/Rcuk7z+EqVw0jWHwiq74=
 			</data>
 			<key>hash2</key>
 			<data>
-			WWsranggnwx9QKCi3oq/JxdmOAGVNyxCsBb9W3fE4V0=
+			EkZofP22SYgrXtDcrbz/zpPC+f+xTJzPOO8iA6bPn28=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

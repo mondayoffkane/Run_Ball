@@ -6,68 +6,52 @@ using System.Runtime.InteropServices;
 
 namespace Adverty.PlatformSpecific
 {
-    public class AndroidRenderingPlugin : IAndroidRenderingPlugin
+    public class AndroidRenderingPlugin : IAndroidRenderingBridge
     {
 #if !UNITY_EDITOR && UNITY_ANDROID
-        [DllImport("glbridge")]
-        private static extern void SetGlIssuePluginEventMethod(IntPtr glIssuePluginMethod, int renderMode);
-
-        [DllImport("glbridge")]
-        private static extern void IssuePluginEvent(int eventId);
-
-        [DllImport("glbridge")]
-        private static extern void CustomRenderEvent(int eventId);
-
-        [DllImport("glbridge")]
+        [DllImport("AdvertyAndroidPlugin")]
         private static extern void SetNativeTexture(IntPtr handler, int width, int height, int id, int scale);
 
-        [DllImport("glbridge")]
+        [DllImport("AdvertyAndroidPlugin")]
         private static extern void DestroyNativeTexture(int textureId);
 
-        public void NativeSetGlIssuePluginEventMethod(IntPtr glIssuePluginMethod, int renderMode)
-        {
-            SetGlIssuePluginEventMethod(glIssuePluginMethod, renderMode);
-        }
+        [DllImport("AdvertyAndroidPlugin")]
+        private static extern IntPtr GetWebViewRenderEventFunc();
 
-        public void NativeIssuePluginEvent(int eventId)
-        {
-            IssuePluginEvent(eventId);
-        }
-
-        public void Render(int eventId)
-        {
-            CustomRenderEvent(eventId);
-        }
-
-        public void SendTexture(IntPtr handler, int width, int height, int id, int scale)
-        {
-            SetNativeTexture(handler, width, height, id, scale);
-        }
-
-        public void DestroyTexture(int id)
-        {
-            DestroyNativeTexture(id);
-        }
-#else
-        public void NativeSetGlIssuePluginEventMethod(IntPtr glIssuePluginMethod, int renderMode)
-        {
-        }
-
-        public void NativeIssuePluginEvent(int eventId)
-        {
-        }
-
-        public void Render(int eventId)
-        {
-        }
-
-        public void SendTexture(IntPtr handler, int width, int height, int id, int scale)
-        {
-        }
-
-        public void DestroyTexture(int id)
-        {
-        }
+        [DllImport("AdvertyAndroidPlugin")]
+        private static extern int GetWebViewGraphicsEventID();
 #endif
+
+        public void SendTexture(IntPtr handler, int width, int height, int id, int scale)
+        {
+#if !UNITY_EDITOR && UNITY_ANDROID
+            SetNativeTexture(handler, width, height, id, scale);
+#endif
+        }
+
+        public void DestroyTexture(int id)
+        {
+#if !UNITY_EDITOR && UNITY_ANDROID
+            DestroyNativeTexture(id);
+#endif
+        }
+
+        public IntPtr GetRenderEventFunction()
+        {
+#if !UNITY_EDITOR && UNITY_ANDROID
+            return GetWebViewRenderEventFunc();
+#else
+            return IntPtr.Zero;
+#endif
+        }
+
+        public int GetRenderEventID()
+        {
+#if !UNITY_EDITOR && UNITY_ANDROID
+            return GetWebViewGraphicsEventID();
+#else
+            return -1;
+#endif
+        }
     }
 }

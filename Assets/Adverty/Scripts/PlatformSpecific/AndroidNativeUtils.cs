@@ -10,17 +10,8 @@ namespace Adverty.PlatformSpecific
     {
 #if !UNITY_EDITOR && UNITY_ANDROID
         [DllImport(LIBRARY_NAME)]
-        private static extern void AdvertyRequestAdIdData(IntPtr callback);
-
-        [DllImport(LIBRARY_NAME)]
         private static extern NativeIABData AdvertyRequestIABData();
 #endif
-        public void RequestAdIdData(IntPtr callback)
-        {
-#if !UNITY_EDITOR && UNITY_ANDROID
-            AdvertyRequestAdIdData(callback);
-#endif
-        }
 
         public NativeIABData RequestIABData()
         {

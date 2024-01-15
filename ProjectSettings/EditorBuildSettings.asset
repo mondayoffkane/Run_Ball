@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MondayOFF/Everyday/Modules/SplashView/Scenes/SplashScene.unity
-    guid: e1a776ef4bedc4b22ae52396b9af61ae
+    path: Assets/MondayOFF/Everyday/Modules/SplashScreen/Scenes/MondayOFFSplashScene.unity
+    guid: ec50c059956d441d29d9c6e996d6ee7a
   - enabled: 1
     path: Assets/00.Scenes/Game 2.unity
     guid: a712dd01a0a35494e9acf89370927d4c

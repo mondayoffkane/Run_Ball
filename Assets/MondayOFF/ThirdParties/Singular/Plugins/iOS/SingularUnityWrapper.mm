@@ -41,10 +41,12 @@ uint8_t *hexStringToBytes(const char *inhex)
 }
 
 static NSDictionary* singularLinkParamsToDictionary(SingularLinkParams* params){
-    return [NSDictionary dictionaryWithObjectsAndKeys:
-            [params getDeepLink],@"deeplink",
-            [params getPassthrough], @"passthrough",
-            [params isDeferred] ? @YES : @NO, @"is_deferred", nil];
+    return @{
+      @"deeplink" : [params getDeepLink] ? [params getDeepLink] : @"",
+      @"passthrough" : [params getPassthrough] ? [params getPassthrough] : @"",
+      @"is_deferred" : [params isDeferred] ? @YES : @NO,
+      @"url_parameters" : [params getUrlParameters] ? [params getUrlParameters] : @{ }
+    };
 }
 
 static NSString* dictionaryToJson(NSDictionary* dictionary){

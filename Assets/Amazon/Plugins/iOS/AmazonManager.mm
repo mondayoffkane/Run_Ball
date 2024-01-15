@@ -182,9 +182,6 @@
     [DTBAds.sharedInstance addSlotGroup:group];
 }
 
--(NSString*)fetchMoPubKeywords:(DTBAdResponse*)response {
-    return [response keywordsForMopub];
-}
 
 -(NSString*)fetchAmznSlots:(DTBAdResponse *)response {
     return [response amznSlots];

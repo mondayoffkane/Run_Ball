@@ -61,10 +61,9 @@ fixed4 GetAdvertyColor(float2 uv, fixed useMainTex)
 {
     float2 mainUv = uv;
     float2 fadeUV = uv;
-#if SHADER_API_VULKAN || SHADER_API_METAL
+
     fadeUV.y = lerp(fadeUV.y, 1.0f - fadeUV.y, _FadeTexUVFactor);
     mainUv.y = lerp(mainUv.y, 1.0f - mainUv.y, _MainTexUVFactor);
-#endif
 
     fixed4 mainColor = GetMainColor(mainUv, useMainTex);
     fixed4 color = lerp(mainColor, tex2D(_FadeTexture, fadeUV), _TransitionProgress);

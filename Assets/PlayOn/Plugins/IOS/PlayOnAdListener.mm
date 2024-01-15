@@ -2,7 +2,14 @@
 
 @implementation PlayOnAdListener 
 
--(instancetype) initWithListeners:(POTypeCallbackClientRef* )client onShow:(PlayOnNoArgsDelegateNative)onShowRef onClose:(PlayOnNoArgsDelegateNative)onCloseRef onClick:(PlayOnNoArgsDelegateNative)onClickRef onAvailabilityChange:(PlayOnStateDelegateNative)onAvailabilityChangeRef onReward:(PlayOnFloatDelegateNative)onRewardRef onImpression:(PlayOnDataDelegateNative)onImpressionRef
+-(instancetype) initWithListeners:(POTypeCallbackClientRef* )client 
+    onShow:(PlayOnNoArgsDelegateNative)onShowRef
+    onClose:(PlayOnNoArgsDelegateNative)onCloseRef
+    onClick:(PlayOnNoArgsDelegateNative)onClickRef
+    onAvailabilityChange:(PlayOnStateDelegateNative)onAvailabilityChangeRef
+    onReward:(PlayOnFloatDelegateNative)onRewardRef
+    onUserClose:(PlayOnNoArgsDelegateNative)onUserCloseRef
+    onImpression:(PlayOnDataDelegateNative)onImpressionRef
 {
     self = [super init];
     
@@ -12,6 +19,7 @@
     _onClickCallback = onClickRef;
     _onAvailabilityChangedCallback = onAvailabilityChangeRef;
     _onRewardCallback = onRewardRef;
+    _onUserCloseCallback = onUserCloseRef;
     _onImpressionCallback = onImpressionRef;
     return self;
 }
@@ -31,6 +39,11 @@
 -(void) onClose {
     NSLog(@"onClose");
     _onCloseCallback(_clientRef);
+}
+
+-(void) onUserClose {
+    NSLog(@"onUserClose");
+    _onUserCloseCallback(_clientRef);
 }
 
 -(void) onClick {

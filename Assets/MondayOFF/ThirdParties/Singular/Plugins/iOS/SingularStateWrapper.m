@@ -22,7 +22,7 @@ static int shortlinkResolveTimeout;
 }
 
 +(NSString*)getApiSecret{
-    return apiKey;
+    return apiSecret;
 }
 
 +(void (^)(SingularLinkParams*))getSingularLinkHandler{

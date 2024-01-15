@@ -105,13 +105,7 @@ namespace AmazonAds.IOS {
         }
 
         public override void SetAutoRefreshAdMob (bool flag, bool isSmartBanner = false) {
-            isAutoRefreshAdMob = flag;
-            if(flag){
-                CreateFetchManager(isSmartBanner);
-                StartFetchManager();
-            } else {
-                StopFetchManager();
-            }
+            Debug.LogError("The API has been deprecated");
         }
 
         public override void SetRefreshFlag (bool flag) {

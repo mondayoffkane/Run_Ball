@@ -90,6 +90,8 @@
     <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Portrait/Static_Frame_Portrait_Dark.prefab">Example/Prefabs/UnitPresets/Static_Frame_Portrait_Dark.prefab</file>
     <file action="Move" optional="true" dst="Example/Prefabs/UnitPresets/Portrait/Static_Frame_Portrait_Light.prefab">Example/Prefabs/UnitPresets/Static_Frame_Portrait_Light.prefab</file>
     <!-- Files to delete -->
+    <file action="Delete">Plugins/Android/play-services-ads-identifier-17.0.1.aar</file>
+    <file action="Delete">Plugins/Android/play-services-basement-17.6.0.aar</file>
     <!-- 4.0.3 -> 4.1.0 -->
     <file action="Delete">Scripts/PlatformSpecific/IOSWebView.cs</file>
     <file action="Delete">Scripts/PlatformSpecific/AndroidWebViewPlugin.cs</file>
@@ -126,6 +128,12 @@
     <file action="Delete">Scripts/PlatformSpecific/IosMessageSystem.cs</file>
     <file action="Delete">Scripts/PlatformSpecific/IosNativeDebug.cs</file>
     <file action="Delete">Scripts/PlatformSpecific/IosNativeLogger.cs</file>
+    <!-- 3.1.0 -> 4.2.0 -->
+    <file action="Delete">Plugins/Android/AdvertyVideoPlayer.aar</file>
+    <file action="Delete">Plugins/Android/play-services-ads-identifier-18.0.1.aar</file>
+    <file action="Delete">Plugins/Android/play-services-ads-identifier-18.0.1.aar.meta</file>
+    <file action="Delete">Plugins/Android/play-services-basement-18.2.0.aar</file>
+    <file action="Delete">Plugins/Android/play-services-basement-18.2.0.aar.meta</file>
   </Files>
-  <Version>4.1.5</Version>
+  <Version>4.2.2</Version>
 </SDKContent>

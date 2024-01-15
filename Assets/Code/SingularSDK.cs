@@ -9,6 +9,7 @@ using System.Threading;
 
 using Newtonsoft.Json;
 using System;
+using System.Text.RegularExpressions;
 
 #if UNITY_5_3_OR_NEWER && UNITY_PURCHASING
 using UnityEngine.Purchasing;
@@ -17,11 +18,11 @@ using UnityEngine.Purchasing;
 
 public delegate void ShortLinkCallback(string data, string error);
 
-public class SingularSDK : MonoBehaviour {
+public class SingularSDK : MonoBehaviour
+{
     // public properties
-    public string SingularAPIKey = "mondayoff_5ecf047a";
-    public string SingularAPISecret = "a369925935347aecb6556aef481dacbd";
-    public bool InitializeOnAwake = true;
+    private string SingularAPIKey = "mondayoff_5ecf047a";
+    private string SingularAPISecret = "a369925935347aecb6556aef481dacbd";
 
     public bool autoIAPComplete = false;
     private Dictionary<string, SingularGlobalProperty> globalProperties = new Dictionary<string, SingularGlobalProperty>();
@@ -35,26 +36,24 @@ public class SingularSDK : MonoBehaviour {
     public bool enableLogging = false;
     public int logLevel = 0;
     public static string fcmDeviceToken = null;
-    public static string facebookAppId;
+    public string facebookAppId;
     public bool clipboardAttribution = false;
     public static string openUri;
     public bool collectOAID = false;
 
-#if UNITY_ANDROID
+    public bool limitedIdentifiersEnabled = false;
+
     private static string imei;
     // This are only for android because it does not support setting the custom user id before init
     private static string customUserId;
-#endif
 
     public long ddlTimeoutSec = 0; // default - 0 - use default timeout (60s)
     public long sessionTimeoutSec = 0; // default - 0 - use default timeout (60s)
     public long shortlinkResolveTimeout = 0; // default - 0 - use default timeout (10s)
 
-#if UNITY_IOS
     public bool SKANEnabled = true;
     public bool manualSKANConversionManagement = false;
-    public int waitForTrackingAuthorizationWithTimeoutInterval = 60;
-#endif
+    public int waitForTrackingAuthorizationWithTimeoutInterval = 0;
 
     private const long DEFAULT_SHORT_LINKS_TIMEOUT = 10;
     private const long DEFAULT_DDL_TIMEOUT = 60;
@@ -67,7 +66,7 @@ public class SingularSDK : MonoBehaviour {
     private static bool Initialized = false;
 
     private const string UNITY_WRAPPER_NAME = "Unity";
-    private const string UNITY_VERSION = "4.0.15";
+    private const string UNITY_VERSION = "4.2.0";
 
 
 #if UNITY_ANDROID
@@ -75,7 +74,7 @@ public class SingularSDK : MonoBehaviour {
     static AndroidJavaClass jclass;
     static AndroidJavaObject activity;
     static AndroidJavaClass jniSingularUnityBridge;
-
+    
 
     static bool status = false;
 #endif
@@ -94,12 +93,13 @@ public class SingularSDK : MonoBehaviour {
 
 
     // The Singular SDK is initialized here
-    void Awake() {
-        Debug.Log(string.Format("SingularSDK Awake, InitializeOnAwake={0}", InitializeOnAwake));
+    void Awake()
+    {
+        // Debug.Log(string.Format("SingularSDK Awake, InitializeOnAwake={0}", InitializeOnAwake));
 
-        if (Application.isEditor) {
-            return;
-        }
+        // if (Application.isEditor) {
+        //     return;
+        // }
 
         if (instance)
             return;
@@ -110,46 +110,48 @@ public class SingularSDK : MonoBehaviour {
         // Keep this script running when another scene loads
         DontDestroyOnLoad(gameObject);
 
-        if (InitializeOnAwake) {
-            Debug.Log("Awake : calling Singular Init");
-            InitializeSingularSDK();
-        }
+        // if (InitializeOnAwake) {
+        //     Debug.Log("Awake : calling Singular Init");
+        //     InitializeSingularSDK();
+        // }
     }
 
     // Only call this if you have disabled InitializeOnAwake
-    public static void InitializeSingularSDK() {
+    public static void InitializeSingularSDK(string apiKey, string apiSecret)
+    {
         if (Initialized)
             return;
 
-        if (!instance) {
+        if (!instance)
+        {
             Debug.LogError("SingularSDK InitializeSingularSDK, no instance available - cannot initialize");
             return;
         }
 
+        instance.SingularAPIKey = apiKey;
+        instance.SingularAPISecret = apiSecret;
+
         Debug.Log(string.Format("SingularSDK InitializeSingularSDK, APIKey={0}", instance.SingularAPIKey));
 
-        if (Application.isEditor) {
+        if (Application.isEditor)
+        {
             return;
         }
 
         SingularConfig config = BuildSingularConfig();
 
-        try {
 #if UNITY_IOS
         StartSingularSession(config);
         SetAllowAutoIAPComplete_(instance.autoIAPComplete);
 #elif UNITY_ANDROID
-            initSDK(config);
+        initSDK(config);
 #endif
-        } catch (Exception e) {
-            Debug.LogException(e);
-            UnityEngine.Diagnostics.Utils.ForceCrash(UnityEngine.Diagnostics.ForcedCrashCategory.Abort);
-        }
         Initialized = true;
     }
 
 
-    public static void createReferrerShortLink(string baseLink, string referrerName, string referrerId, Dictionary<string, string> passthroughParams, ShortLinkCallback completionHandler) {
+    public static void createReferrerShortLink(string baseLink, string referrerName, string referrerId, Dictionary<string, string> passthroughParams, ShortLinkCallback completionHandler)
+    {
         shortLinkCallback = completionHandler;
 #if UNITY_IOS
         createReferrerShortLink_( baseLink,  referrerName,  referrerId, JsonConvert.SerializeObject(passthroughParams));
@@ -162,7 +164,8 @@ public class SingularSDK : MonoBehaviour {
     }
 
 
-    private static SingularConfig BuildSingularConfig() {
+    private static SingularConfig BuildSingularConfig()
+    {
         SingularConfig config = new SingularConfig();
         config.SetValue("apiKey", instance.SingularAPIKey);
         config.SetValue("secret", instance.SingularAPISecret);
@@ -170,9 +173,8 @@ public class SingularSDK : MonoBehaviour {
             DEFAULT_SHORT_LINKS_TIMEOUT : instance.shortlinkResolveTimeout);
         config.SetValue("globalProperties", instance.globalProperties);
         config.SetValue("sessionTimeoutSec", instance.sessionTimeoutSec);
-
 #if UNITY_ANDROID
-        config.SetValue("facebookAppId", facebookAppId);
+        config.SetValue("facebookAppId", instance.facebookAppId);
         config.SetValue("customUserId", customUserId);
         config.SetValue("imei", imei);
         config.SetValue("openUri", openUri);
@@ -180,10 +182,11 @@ public class SingularSDK : MonoBehaviour {
         config.SetValue("enableDeferredDeepLinks", enableDeferredDeepLinks);
         config.SetValue("enableLogging", instance.enableLogging);
         config.SetValue("logLevel", instance.logLevel);
-        if (SingularSDK.fcmDeviceToken != null) {
+        if (SingularSDK.fcmDeviceToken != null){
             config.SetValue("fcmDeviceToken", SingularSDK.fcmDeviceToken);
         }
         config.SetValue("collectOAID", instance.collectOAID);
+        config.SetValue("limitedIdentifiersEnabled", instance.limitedIdentifiersEnabled);
 #elif UNITY_IOS
         config.SetValue("clipboardAttribution", instance.clipboardAttribution);
         config.SetValue("skAdNetworkEnabled", instance.SKANEnabled);
@@ -236,7 +239,8 @@ public class SingularSDK : MonoBehaviour {
 
 #endif
 
-    private enum NSType {
+    private enum NSType
+    {
         STRING = 0,
         INT,
         LONG,
@@ -505,8 +509,10 @@ public class SingularSDK : MonoBehaviour {
 
 #endif
 
-    private static bool StartSingularSession(SingularConfig config) {
-        if (!Application.isEditor) {
+    private static bool StartSingularSession(SingularConfig config)
+    {
+        if (!Application.isEditor)
+        {
 #if UNITY_IOS
             RegisterDeferredDeepLinkHandler_();
 
@@ -519,8 +525,10 @@ public class SingularSDK : MonoBehaviour {
         return false;
     }
 
-    public static bool StartSingularSessionWithLaunchOptions(string key, string secret, Dictionary<string, object> options) {
-        if (!Application.isEditor) {
+    public static bool StartSingularSessionWithLaunchOptions(string key, string secret, Dictionary<string, object> options)
+    {
+        if (!Application.isEditor)
+        {
 #if UNITY_IOS
             Init_NSDictionary();
             Init_NSMasterArray();
@@ -570,8 +578,10 @@ public class SingularSDK : MonoBehaviour {
         return false;
     }
 
-    public static bool StartSingularSessionWithLaunchURL(string key, string secret, string url) {
-        if (!Application.isEditor) {
+    public static bool StartSingularSessionWithLaunchURL(string key, string secret, string url)
+    {
+        if (!Application.isEditor)
+        {
 #if UNITY_IOS
             return StartSingularSessionWithLaunchURL_(key, secret, url);
 #endif
@@ -580,8 +590,10 @@ public class SingularSDK : MonoBehaviour {
     }
 
 
-    public static void RestartSingularSession(string key, string secret) {
-        if (!Application.isEditor) {
+    public static void RestartSingularSession(string key, string secret)
+    {
+        if (!Application.isEditor)
+        {
 #if UNITY_IOS
 #elif UNITY_ANDROID
             if (singular != null) {
@@ -591,8 +603,10 @@ public class SingularSDK : MonoBehaviour {
         }
     }
 
-    public static void EndSingularSession() {
-        if (!Application.isEditor) {
+    public static void EndSingularSession()
+    {
+        if (!Application.isEditor)
+        {
 #if UNITY_IOS
 #elif UNITY_ANDROID
             if (singular != null) {
@@ -602,11 +616,13 @@ public class SingularSDK : MonoBehaviour {
         }
     }
 
-    public static void Event(string name) {
+    public static void Event(string name)
+    {
         if (!Initialized)
             return;
 
-        if (!Application.isEditor) {
+        if (!Application.isEditor)
+        {
 #if UNITY_IOS
             SendEvent_(name);
 #elif UNITY_ANDROID
@@ -626,13 +642,15 @@ public class SingularSDK : MonoBehaviour {
 	the elements in the ArrayList and values in the Dictionary must have one of these types:
 	  string, int, long, float, double, null, ArrayList, Dictionary<String,object>
 	*/
-    public static void Event(Dictionary<string, object> args, string name) {
+    public static void Event(Dictionary<string, object> args, string name)
+    {
         // Debug.Log(string.Format("SingularSDK Event: args JSON={0}", JsonConvert.SerializeObject(args, Formatting.None)));
 
         if (!Initialized)
             return;
 
-        if (!Application.isEditor) {
+        if (!Application.isEditor)
+        {
 #if UNITY_IOS
             Init_NSDictionary();
             Init_NSMasterArray();
@@ -707,11 +725,13 @@ public class SingularSDK : MonoBehaviour {
 	string, int, long, float, double, null, ArrayList, Dictionary<String,object>
     */
 
-    public static void Event(string name, params object[] args) {
+    public static void Event(string name, params object[] args)
+    {
         if (!Initialized)
             return;
 
-        if (!Application.isEditor) {
+        if (!Application.isEditor)
+        {
 #if UNITY_IOS || UNITY_ANDROID
             if (args.Length % 2 != 0) {
                 // Debug.LogWarning("The number of arguments is ann odd number. The arguments are key-value pairs so the number of arguments should be even.");
@@ -728,12 +748,15 @@ public class SingularSDK : MonoBehaviour {
         }
     }
 
-    public static void SetDeviceCustomUserId(string customUserId) {
-        if (Application.isEditor) {
+    public static void SetDeviceCustomUserId(string customUserId)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 
-        if (!Initialized) {
+        if (!Initialized)
+        {
             return;
         }
 
@@ -746,11 +769,13 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void SetAge(int age) {
+    public static void SetAge(int age)
+    {
         if (!Initialized)
             return;
 
-        if (Mathf.Clamp(age, 0, 100) != age) {
+        if (Mathf.Clamp(age, 0, 100) != age)
+        {
             Debug.Log("Age " + age + "is not between 0 and 100");
             return;
         }
@@ -761,11 +786,13 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void SetGender(string gender) {
+    public static void SetGender(string gender)
+    {
         if (!Initialized)
             return;
 
-        if (gender != "m" && gender != "f") {
+        if (gender != "m" && gender != "f")
+        {
             Debug.Log("gender " + gender + "is not m or f");
             return;
         }
@@ -776,7 +803,8 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void SetAllowAutoIAPComplete(bool allowed) {
+    public static void SetAllowAutoIAPComplete(bool allowed)
+    {
 #if UNITY_IOS
         if (!Application.isEditor) {
             SetAllowAutoIAPComplete_(allowed);
@@ -792,7 +820,8 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    void OnApplicationPause(bool paused) {
+    void OnApplicationPause(bool paused)
+    {
         if (!Initialized || !instance)
             return;
 
@@ -813,8 +842,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    void OnApplicationQuit() {
-        if (Application.isEditor) {
+    void OnApplicationQuit()
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 
@@ -826,13 +857,16 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void SetDeferredDeepLinkHandler(SingularDeferredDeepLinkHandler ddlHandler) {
-        if (!instance) {
+    public static void SetDeferredDeepLinkHandler(SingularDeferredDeepLinkHandler ddlHandler)
+    {
+        if (!instance)
+        {
             Debug.LogError("SingularSDK SetDeferredDeepLinkHandler, no instance available - cannot set deferred deeplink handler!");
             return;
         }
 
-        if (Application.isEditor) {
+        if (Application.isEditor)
+        {
             return;
         }
 
@@ -840,64 +874,79 @@ public class SingularSDK : MonoBehaviour {
         System.Int32 now = (System.Int32)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
 
         // call the ddl handler with the cached value if the timeout has not passed yet
-        if (now - cachedDDLMessageTime < instance.ddlTimeoutSec && cachedDDLMessage != null) {
+        if (now - cachedDDLMessageTime < instance.ddlTimeoutSec && cachedDDLMessage != null)
+        {
             registeredDDLHandler.OnDeferredDeepLink(cachedDDLMessage);
         }
     }
 
     // this is the internal handler - handling deeplinks for both iOS & Android
-    public void DeepLinkHandler(string message) {
+    public void DeepLinkHandler(string message)
+    {
         Debug.Log(string.Format("SingularSDK DeepLinkHandler called! message='{0}'", message));
 
-        if (Application.isEditor) {
+        if (Application.isEditor)
+        {
             return;
         }
 
-        if (message == "") {
+        if (message == "")
+        {
             message = null;
         }
-        if (registeredDDLHandler != null) {
+        if (registeredDDLHandler != null)
+        {
             registeredDDLHandler.OnDeferredDeepLink(message);
-        } else {
+        }
+        else
+        {
             cachedDDLMessage = message;
             cachedDDLMessageTime = CurrentTimeSec();
         }
     }
 
-    private static int CurrentTimeSec() {
+    private static int CurrentTimeSec()
+    {
         return (System.Int32)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
     }
 
-    public static void SetSingularLinkHandler(SingularLinkHandler handler) {
-        if (Application.isEditor) {
+    public static void SetSingularLinkHandler(SingularLinkHandler handler)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 
         registeredSingularLinkHandler = handler;
 
         // In case the link was resolved before the client registered
-        if (instance != null) {
+        if (instance != null)
+        {
             instance.ResolveSingularLink();
         }
     }
 
-    private void SingularLinkHandlerResolved(string handlerParamsJson) {
+    private void SingularLinkHandlerResolved(string handlerParamsJson)
+    {
         instance.resolvedSingularLinkParams = JsonConvert.DeserializeObject<SingularLinkParams>(handlerParamsJson);
         instance.resolvedSingularLinkTime = CurrentTimeSec();
 
         ResolveSingularLink();
     }
 
-    private void ShortLinkResolved(string json) {
+    private void ShortLinkResolved(string json)
+    {
         ShortLinkParams shortLinkParams;
         shortLinkParams = JsonConvert.DeserializeObject<ShortLinkParams>(json);
-        if (shortLinkCallback != null) {
+        if (shortLinkCallback != null)
+        {
             shortLinkCallback(string.IsNullOrEmpty(shortLinkParams.Data) ? null : shortLinkParams.Data, string.IsNullOrEmpty(shortLinkParams.Error) ? null : shortLinkParams.Error);
             shortLinkCallback = null;
         }
     }
 
-    public static void SetConversionValueUpdatedHandler(SingularConversionValueUpdatedHandler handler) {
+    public static void SetConversionValueUpdatedHandler(SingularConversionValueUpdatedHandler handler)
+    {
 #if UNITY_IOS
         if (Application.isEditor)
         {
@@ -908,7 +957,8 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void SetConversionValuesUpdatedHandler(SingularConversionValuesUpdatedHandler handler) {
+    public static void SetConversionValuesUpdatedHandler(SingularConversionValuesUpdatedHandler handler)
+    {
 #if UNITY_IOS
         if (Application.isEditor)
         {
@@ -919,7 +969,8 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    private void ConversionValueUpdated(string value) {
+    private void ConversionValueUpdated(string value)
+    {
 #if UNITY_IOS
         if (registeredConversionValueUpdatedHandler != null)
         {
@@ -931,7 +982,8 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    private void ConversionValuesUpdated(string json) {
+    private void ConversionValuesUpdated(string json)
+    {
 #if UNITY_IOS
         if (registeredConversionValuesUpdatedHandler != null)
         {
@@ -943,20 +995,27 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    private void ResolveSingularLink() {
-        if (instance.resolvedSingularLinkParams != null) {
-            if (registeredSingularLinkHandler != null) {
+    private void ResolveSingularLink()
+    {
+        if (instance.resolvedSingularLinkParams != null)
+        {
+            if (registeredSingularLinkHandler != null)
+            {
 
                 registeredSingularLinkHandler.OnSingularLinkResolved(instance.resolvedSingularLinkParams);
                 instance.resolvedSingularLinkParams = null;
 
-            } else if (registeredDDLHandler != null) {
+            }
+            else if (registeredDDLHandler != null)
+            {
 
-                if (ddlTimeoutSec <= 0) {
+                if (ddlTimeoutSec <= 0)
+                {
                     ddlTimeoutSec = DEFAULT_DDL_TIMEOUT;
                 }
 
-                if (CurrentTimeSec() - instance.resolvedSingularLinkTime <= ddlTimeoutSec) {
+                if (CurrentTimeSec() - instance.resolvedSingularLinkTime <= ddlTimeoutSec)
+                {
                     registeredDDLHandler.OnDeferredDeepLink(instance.resolvedSingularLinkParams.Deeplink);
                 }
 
@@ -965,7 +1024,8 @@ public class SingularSDK : MonoBehaviour {
         }
     }
 
-    public static void RegisterDeviceTokenForUninstall(string APNSToken) {
+    public static void RegisterDeviceTokenForUninstall(string APNSToken)
+    {
 #if UNITY_IOS
         if (!Application.isEditor) {
             if (APNSToken.Length % 2 != 0) {
@@ -981,7 +1041,8 @@ public class SingularSDK : MonoBehaviour {
     }
 
 
-    public static string GetAPID() {
+    public static string GetAPID()
+    {
         //only works for iOS. Will return null until Singular is initialized.
 #if UNITY_IOS
         if (!Application.isEditor) {
@@ -991,7 +1052,8 @@ public class SingularSDK : MonoBehaviour {
         return null;
     }
 
-    public static string GetIDFA() {
+    public static string GetIDFA()
+    {
         //only works for iOS. Will return null until Singular is initialized.
 #if UNITY_IOS
         if (!Application.isEditor) {
@@ -1130,8 +1192,11 @@ public class SingularSDK : MonoBehaviour {
         if (product.definition != null) {
             transactionData["pk"] = product.definition.id;
         }
-
-        transactionData["receipt"] = product.receipt;
+	
+	// this string manipulation is done in order to deal with problematic descaping on server and validating receipts.
+	// for more information: https://singularlabs.atlassian.net/browse/SDKDEV-88
+        string receipt = Regex.Replace(product.receipt, @"\\+n", "");
+        transactionData["receipt"] = receipt;
         transactionData["is_revenue_event"] = true;
 
         if (product.metadata != null) {
@@ -1144,8 +1209,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
 
 #endif
-    public static void Revenue(string currency, double amount) {
-        if (Application.isEditor) {
+    public static void Revenue(string currency, double amount)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1157,8 +1224,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void CustomRevenue(string eventName, string currency, double amount) {
-        if (Application.isEditor) {
+    public static void CustomRevenue(string eventName, string currency, double amount)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1170,8 +1239,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void Revenue(string currency, double amount, string receipt, string signature) {
-        if (Application.isEditor) {
+    public static void Revenue(string currency, double amount, string receipt, string signature)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_ANDROID
@@ -1181,8 +1252,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void CustomRevenue(string eventName, string currency, double amount, string receipt, string signature) {
-        if (Application.isEditor) {
+    public static void CustomRevenue(string eventName, string currency, double amount, string receipt, string signature)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_ANDROID
@@ -1191,8 +1264,10 @@ public class SingularSDK : MonoBehaviour {
         }
 #endif
     }
-    public static void Revenue(string currency, double amount, string productSKU, string productName, string productCategory, int productQuantity, double productPrice) {
-        if (Application.isEditor) {
+    public static void Revenue(string currency, double amount, string productSKU, string productName, string productCategory, int productQuantity, double productPrice)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 
@@ -1206,8 +1281,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void CustomRevenue(string eventName, string currency, double amount, string productSKU, string productName, string productCategory, int productQuantity, double productPrice) {
-        if (Application.isEditor) {
+    public static void CustomRevenue(string eventName, string currency, double amount, string productSKU, string productName, string productCategory, int productQuantity, double productPrice)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1220,7 +1297,8 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void RegisterTokenForUninstall(String token) {
+    public static void RegisterTokenForUninstall(String token)
+    {
 #if UNITY_IOS
         RegisterDeviceTokenForUninstall(token);
 #elif UNITY_ANDROID
@@ -1229,8 +1307,10 @@ public class SingularSDK : MonoBehaviour {
 
     }
 
-    public static void SetFCMDeviceToken(string fcmDeviceToken) {
-        if (Application.isEditor) {
+    public static void SetFCMDeviceToken(string fcmDeviceToken)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1238,14 +1318,16 @@ public class SingularSDK : MonoBehaviour {
 #elif UNITY_ANDROID
         if (singular != null) {
             singular.CallStatic("setFCMDeviceToken", fcmDeviceToken);
-        } else {
+        }else{
             SingularSDK.fcmDeviceToken = fcmDeviceToken;
         }
 #endif
     }
 
-    public static void SetGCMDeviceToken(string gcmDeviceToken) {
-        if (Application.isEditor) {
+    public static void SetGCMDeviceToken(string gcmDeviceToken)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1257,8 +1339,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void SetCustomUserId(string userId) {
-        if (Application.isEditor) {
+    public static void SetCustomUserId(string userId)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1273,8 +1357,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void UnsetCustomUserId() {
-        if (Application.isEditor) {
+    public static void UnsetCustomUserId()
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1288,8 +1374,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void TrackingOptIn() {
-        if (Application.isEditor) {
+    public static void TrackingOptIn()
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1301,8 +1389,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void TrackingUnder13() {
-        if (Application.isEditor) {
+    public static void TrackingUnder13()
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1314,8 +1404,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void StopAllTracking() {
-        if (Application.isEditor) {
+    public static void StopAllTracking()
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1327,8 +1419,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void ResumeAllTracking() {
-        if (Application.isEditor) {
+    public static void ResumeAllTracking()
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
@@ -1340,16 +1434,21 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static bool IsAllTrackingStopped() {
-        if (Application.isEditor) {
+    public static bool IsAllTrackingStopped()
+    {
+        if (Application.isEditor)
+        {
             return false;
         }
 
-        if (Application.platform == RuntimePlatform.IPhonePlayer) {
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
 #if UNITY_IOS
             return IsAllTrackingStopped_();
 #endif
-        } else if (Application.platform == RuntimePlatform.Android) {
+        }
+        else if (Application.platform == RuntimePlatform.Android)
+        {
 #if UNITY_ANDROID
             if (singular != null) {
                 return singular.CallStatic<bool>("isAllTrackingStopped");
@@ -1360,21 +1459,26 @@ public class SingularSDK : MonoBehaviour {
         return false;
     }
 
-    public static void LimitDataSharing(bool limitDataSharingValue) {
-        if (Application.isEditor) {
+    public static void LimitDataSharing(bool limitDataSharingValue)
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 #if UNITY_IOS
         LimitDataSharing_(limitDataSharingValue);
 #elif UNITY_ANDROID
-        if (singular != null) {
+        if (singular != null)
+        {
             singular.CallStatic("limitDataSharing", limitDataSharingValue);
         }
 #endif
     }
 
-    public static bool GetLimitDataSharing() {
-        if (Application.isEditor) {
+    public static bool GetLimitDataSharing()
+    {
+        if (Application.isEditor)
+        {
             return false;
         }
 
@@ -1382,7 +1486,8 @@ public class SingularSDK : MonoBehaviour {
         return GetLimitDataSharing_();
 #endif
 #if UNITY_ANDROID
-        if (singular != null) {
+        if (singular != null)
+        {
             return singular.CallStatic<bool>("getLimitDataSharing");
         }
 #endif
@@ -1390,14 +1495,18 @@ public class SingularSDK : MonoBehaviour {
         return false;
     }
 
-    public static void AdRevenue(SingularAdData adData) {
-        try {
-            if (!Initialized || adData == null || !adData.HasRequiredParams()) {
+    public static void AdRevenue(SingularAdData adData)
+    {
+        try
+        {
+            if (!Initialized || adData == null || !adData.HasRequiredParams())
+            {
                 return;
             }
 
             Event(adData, ADMON_REVENUE_EVENT_NAME);
-        } catch (Exception) { }
+        }
+        catch (Exception) { }
     }
 
 #if UNITY_ANDROID
@@ -1416,8 +1525,10 @@ public class SingularSDK : MonoBehaviour {
 
     #region Global Properties
 
-    public static Dictionary<string, string> GetGlobalProperties() {
-        if (Application.isEditor) {
+    public static Dictionary<string, string> GetGlobalProperties()
+    {
+        if (Application.isEditor)
+        {
             return null;
         }
 
@@ -1434,23 +1545,28 @@ public class SingularSDK : MonoBehaviour {
         }
 #endif
 
-        if (propertiesJsonString == null || propertiesJsonString.Trim() == "") {
+        if (propertiesJsonString == null || propertiesJsonString.Trim() == "")
+        {
             return null;
         }
 
         return JsonConvert.DeserializeObject<Dictionary<string, string>>(propertiesJsonString);
     }
 
-    public static bool SetGlobalProperty(string key, string value, bool overrideExisting) {
-        if (Application.isEditor) {
+    public static bool SetGlobalProperty(string key, string value, bool overrideExisting)
+    {
+        if (Application.isEditor)
+        {
             return false;
         }
 
-        if (key == null || key.Trim() == string.Empty) {
+        if (key == null || key.Trim() == string.Empty)
+        {
             return false;
         }
 
-        if (!Initialized) {
+        if (!Initialized)
+        {
             instance.globalProperties[key] = new SingularGlobalProperty(key, value, overrideExisting);
             return true;
         }
@@ -1465,8 +1581,10 @@ public class SingularSDK : MonoBehaviour {
         return false;
     }
 
-    public static void UnsetGlobalProperty(string key) {
-        if (Application.isEditor || !Initialized) {
+    public static void UnsetGlobalProperty(string key)
+    {
+        if (Application.isEditor || !Initialized)
+        {
             return;
         }
 
@@ -1479,8 +1597,10 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void ClearGlobalProperties() {
-        if (Application.isEditor) {
+    public static void ClearGlobalProperties()
+    {
+        if (Application.isEditor)
+        {
             return;
         }
 
@@ -1493,13 +1613,15 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void SkanRegisterAppForAdNetworkAttribution() {
+    public static void SkanRegisterAppForAdNetworkAttribution()
+    {
 #if UNITY_IOS
         SkanRegisterAppForAdNetworkAttribution_();
 #endif
     }
 
-    public static bool SkanUpdateConversionValue(int conversionValue) {
+    public static bool SkanUpdateConversionValue(int conversionValue)
+    {
 #if UNITY_IOS
         return SkanUpdateConversionValue_(conversionValue);
 #else
@@ -1507,7 +1629,8 @@ public class SingularSDK : MonoBehaviour {
 #endif
     }
 
-    public static void SkanUpdateConversionValue(int conversionValue, int coarse, bool _lock) {
+    public static void SkanUpdateConversionValue(int conversionValue, int coarse, bool _lock)
+    {
 #if UNITY_IOS
         SkanUpdateConversionValues_(conversionValue, coarse, _lock);
 #else
@@ -1515,7 +1638,8 @@ public class SingularSDK : MonoBehaviour {
     }
 
 
-    public static int? SkanGetConversionValue() {
+    public static int? SkanGetConversionValue()
+    {
 #if UNITY_IOS
         int value = SkanGetConversionValue_();
         if (value == -1) {
@@ -1530,32 +1654,39 @@ public class SingularSDK : MonoBehaviour {
 
     #endregion
 
-    private class SingularConfig {
+    private class SingularConfig
+    {
         private Dictionary<string, object> _configValues;
 
-        public SingularConfig() {
+        public SingularConfig()
+        {
             _configValues = new Dictionary<string, object>();
         }
 
-        public void SetValue(string key, object value) {
-            if (key == null || key.Trim() == "" || value == null) {
+        public void SetValue(string key, object value)
+        {
+            if (key == null || key.Trim() == "" || value == null)
+            {
                 return;
             }
 
             _configValues[key] = value;
         }
 
-        public string ToJsonString() {
+        public string ToJsonString()
+        {
             return JsonConvert.SerializeObject(_configValues);
         }
     }
 
-    private class SingularGlobalProperty {
+    private class SingularGlobalProperty
+    {
         public string Key { get; set; }
         public string Value { get; set; }
         public bool OverrideExisting { get; set; }
 
-        public SingularGlobalProperty(string key, string value, bool overrideExisting) {
+        public SingularGlobalProperty(string key, string value, bool overrideExisting)
+        {
             Key = key;
             Value = value;
             OverrideExisting = overrideExisting;

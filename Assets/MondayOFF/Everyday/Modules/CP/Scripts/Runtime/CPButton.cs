@@ -21,10 +21,10 @@ namespace MondayOFF {
             for (int i = _videoList.count - 1; i >= 0; --i) {
                 var bundleID = _videoList[i].bundleID;
                 if (bundleID != null && bundleID.Equals(Application.identifier)) {
-                    Debug.LogWarning($"[EVERYDAY] Removing {_videoList[i].name} because it is targeting this game");
+                    EverydayLogger.Warn($"Removing {_videoList[i].name} because it is targeting this game");
                     _videoList.list.RemoveAt(i);
                 } else if (string.IsNullOrEmpty(_videoList[i].url) || _videoList[i].videoClip == null) {
-                    Debug.LogWarning($"[EVERYDAY] Removing {_videoList[i].name} because it does not contain store url or video");
+                    EverydayLogger.Warn($"Removing {_videoList[i].name} because it does not contain store url or video");
                     _videoList.list.RemoveAt(i);
                 }
             }
@@ -32,7 +32,7 @@ namespace MondayOFF {
             _videoList.list.Sort((a, b) => Mathf.CeilToInt(b.weight - a.weight));
 
             if (_videoList.count <= 0) {
-                Debug.LogError("[EVERYDAY] No CP video and url found!");
+                EverydayLogger.Error("No CP video and url found!");
                 Destroy(this.gameObject);
                 return;
             }

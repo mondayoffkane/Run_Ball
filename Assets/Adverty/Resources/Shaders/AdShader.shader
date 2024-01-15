@@ -61,10 +61,8 @@
             half4 AdvertyLitPassFragment(Varyings input) : SV_Target
             {
                 float2 fadeUV = input.uv.xy;
-                #if defined(SHADER_API_METAL) || defined(SHADER_API_VULKAN)
-                    fadeUV.y = lerp(fadeUV.y, 1.0f - fadeUV.y, _FadeTexUVFactor);
-                    input.uv.y = lerp(input.uv.y, 1.0f - input.uv.y, _MainTexUVFactor);
-                #endif
+                fadeUV.y = lerp(fadeUV.y, 1.0f - fadeUV.y, _FadeTexUVFactor);
+                input.uv.y = lerp(input.uv.y, 1.0f - input.uv.y, _MainTexUVFactor);
 
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
@@ -79,9 +77,7 @@
                 half4 color = UniversalFragmentPBR(inputData, albedoColor, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.occlusion, surfaceData.emission, surfaceData.alpha);
                 color.rgb = MixFog(color.rgb, inputData.fogCoord);
                 float2 mainUv = input.uv;
-                #if defined(SHADER_API_METAL) || defined(SHADER_API_VULKAN)
-                    mainUv.y = lerp(mainUv.y, 1.0f - mainUv.y, _MainTexUVFactor);
-                #endif
+                mainUv.y = lerp(mainUv.y, 1.0f - mainUv.y, _MainTexUVFactor);
                 return lerp(color, addWatermark(mainUv, color), _WatermarkIsVisible);
             }
 #endif

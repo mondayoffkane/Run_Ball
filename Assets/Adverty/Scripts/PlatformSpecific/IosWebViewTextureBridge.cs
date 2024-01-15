@@ -3,15 +3,13 @@ using Adverty.Native;
 #if UNITY_IOS && !UNITY_EDITOR
 using System.Runtime.InteropServices;
 #endif
-
 namespace Adverty.PlatformSpecific
 {
     public class IosWebViewTextureBridge : BaseWebViewTextureBridge, IIosWebViewTextureBridge
     {
 #if UNITY_IOS && !UNITY_EDITOR
-
         [DllImport(LIBRARY_NAME)]
-        private static extern IntPtr create(IntPtr cbo, int width, int height, int timeout, int scale);
+        private static extern IntPtr create(IntPtr cbo, int width, int height, int timeout, int scale, bool showDebugView);
 
         [DllImport(LIBRARY_NAME)]
         private static extern void setFramerate(IntPtr ptr, int framesPerSecond);
@@ -21,42 +19,35 @@ namespace Adverty.PlatformSpecific
 
         [DllImport(LIBRARY_NAME)]
         private static extern void viewabilityCheck(IntPtr ptr, IntPtr checkPoints, IntPtr viewabilityCallback);
-
-        public IntPtr Create(IntPtr cbo, int width, int height, int loadTimeout, int scale)
-        {
-            return create(cbo, width, height, loadTimeout, scale);
-        }
-
-        public void SetDrawScreenAfterUpdate(IntPtr ptr, bool afterScreenUpdate)
-        {
-            setDrawAfterScreenUpdates(ptr, afterScreenUpdate);
-        }
-
-        public void SetFramerate(IntPtr ptr, int framesPerSecond)
-        {
-            setFramerate(ptr, framesPerSecond);
-        }
-
-        public void ViewabilityCheck(IntPtr ptr, IntPtr checkPoints, IntPtr viewabilityCallback)
-        {
-            viewabilityCheck(ptr, checkPoints, viewabilityCallback);
-        }
-#else
-        public override IntPtr Create(IntPtr cbo, int width, int height, int loadTimeout, int scale)
-        {
-            return IntPtr.Zero;
-        }
-
-        public void SetDrawScreenAfterUpdate(IntPtr ptr, bool afterScreenUpdate)
-        {
-        }
-
-        public void SetFramerate(IntPtr ptr, int framesPerSecond)
-        {
-        }
-        public void ViewabilityCheck(IntPtr ptr, IntPtr checkPoints, IntPtr viewabilityCallback)
-        {
-        }
 #endif
+        public override IntPtr Create(IntPtr cbo, int width, int height, int loadTimeout, int scale, bool showDebugView)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            return create(cbo, width, height, loadTimeout, scale, showDebugView);
+#else
+            return IntPtr.Zero;
+#endif
+        }
+
+        public void SetDrawScreenAfterUpdate(IntPtr ptr, bool afterScreenUpdate)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            setDrawAfterScreenUpdates(ptr, afterScreenUpdate);
+#endif
+        }
+
+        public void SetFramerate(IntPtr ptr, int framesPerSecond)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            setFramerate(ptr, framesPerSecond);
+#endif
+        }
+
+        public void ViewabilityCheck(IntPtr ptr, IntPtr checkPoints, IntPtr viewabilityCallback)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            viewabilityCheck(ptr, checkPoints, viewabilityCallback);
+#endif
+        }
     }
 }

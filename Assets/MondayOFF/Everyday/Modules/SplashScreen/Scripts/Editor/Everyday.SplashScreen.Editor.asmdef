@@ -1,0 +1,20 @@
+{
+    "name": "Everyday.SplashScreen.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Everyday.SplashScreen",
+        "Everyday",
+        "Everyday.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

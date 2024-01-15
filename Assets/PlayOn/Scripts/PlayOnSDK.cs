@@ -92,7 +92,7 @@ public class PlayOnSDK
     private static LogLevel editorloglevel = LogLevel.Debug;
 #endif
 
-    public static string SDK_VERSION = "2.2.2";
+    public static string SDK_VERSION = "2.2.5";
 
     public enum LogLevel
     {
@@ -546,20 +546,27 @@ public class PlayOnSDK
         else onResume();
     };
 
+    public static int GetOptimalEditorDPI()
+    {
+        int result = 96;
+
+        int shortSide = Screen.width < Screen.height ? Screen.width : Screen.height;
+        if (shortSide >= 1440)
+            result = 440;
+        else if(shortSide >= 1080)
+            result = 323;
+        else if(shortSide >= 720)
+            result = 252;
+        else if(shortSide >= 480)
+            result = 170;
+        
+        return result;
+    }
+    
     public static void SetOptimalDPI()
     {
 #if UNITY_EDITOR
-        SetUnityEditorDPI(96);
-
-        float shortSide = Screen.width < Screen.height ? Screen.width : Screen.height;
-        if(shortSide >= 1440)
-            SetUnityEditorDPI(440);
-        else if(shortSide >= 1080)
-            SetUnityEditorDPI(323);
-        else if(shortSide >= 720)
-            SetUnityEditorDPI(252);
-        else if(shortSide >= 480)
-            SetUnityEditorDPI(170);
+        SetUnityEditorDPI(GetOptimalEditorDPI());
 #endif
     }
     
@@ -594,7 +601,9 @@ public class PlayOnSDK
 #elif UNITY_IOS && !UNITY_EDITOR
         return _playOnGetDeviceScale();
 #else
-        return GetUnityEditorDPI() / 160f;
+        return Application.platform == RuntimePlatform.Android
+            ? GetUnityEditorDPI() / 160f
+            : Mathf.Round(GetUnityEditorDPI() / 160f);
 #endif
     }
 

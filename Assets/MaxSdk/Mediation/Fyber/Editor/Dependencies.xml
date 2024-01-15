@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dependencies>
     <androidPackages>
-        <androidPackage spec="com.applovin.mediation:fyber-adapter:8.2.3.0"/>
+        <androidPackage spec="com.applovin.mediation:fyber-adapter:8.2.5.0"/>
     </androidPackages>
     <iosPods>
-        <iosPod name="AppLovinMediationFyberAdapter" version="8.2.0.1"/>
+        <iosPod name="AppLovinMediationFyberAdapter" version="8.2.5.1"/>
     </iosPods>
 </dependencies>

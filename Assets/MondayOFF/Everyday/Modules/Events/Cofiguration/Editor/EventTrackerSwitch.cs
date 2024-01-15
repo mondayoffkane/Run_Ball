@@ -53,7 +53,7 @@ namespace MondayOFF {
             if (isAdd)
 #endif
             {
-                Debug.Log($"[EVERYDAY] Project has valid Firebase: {isAdd}");
+                EverydayLogger.Info($"Project has valid Firebase: {isAdd}");
                 ModifyScriptingDefineSymbol(FIREBASE_ENABLED, isAdd);
             }
         }

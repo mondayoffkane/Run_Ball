@@ -10,7 +10,6 @@
         "Unity.Services.Core",
         "Unity.Services.Core.Environments",
         "SingularSDK",
-        "Everyday.Ads",
         "Everyday"
     ],
     "includePlatforms": [],

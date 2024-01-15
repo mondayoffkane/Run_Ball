@@ -1,23 +1,22 @@
-﻿namespace AmazonAds {
+﻿using System;
+using UnityEngine;
+
+namespace AmazonAds {
     public class APSBannerAdRequest : AdRequest {
 
-        public APSBannerAdRequest () : base() {  
-             Amazon.OnApplicationPause += OnApplicationPause;
+        public APSBannerAdRequest () : base() { 
         }
 
         public APSBannerAdRequest (string slotGroupName) : base() {
-            Amazon.OnApplicationPause += OnApplicationPause;
             client.SetSlotGroup (slotGroupName);
         }
 
         public APSBannerAdRequest (int width, int height, string uid) : base() {
-            Amazon.OnApplicationPause += OnApplicationPause;
             AdSize size = new AdSize (width, height, uid);
             client.SetSizes (size.GetInstance ());
         }
 
         public APSBannerAdRequest (AdSize size) {
-            Amazon.OnApplicationPause += OnApplicationPause;
             client.SetSizes (size.GetInstance ());
         }
 
@@ -42,47 +41,47 @@
             client.SetSlotGroup (slotGroupName);
         }
 
+        [Obsolete("This API has been deprecated", false)]
         public void SetAutoRefreshAdMob (bool flag, bool isSmartBanner = false) {
-            client.SetAutoRefreshAdMob (flag, isSmartBanner);
+            Debug.LogError("This API has been deprecated");
         }
 
+        [Obsolete("This API has been deprecated", false)]
         public void SetAutoRefreshMoPub (bool flag, int refreshTime) {
-            client.SetAutoRefreshMoPub (flag, refreshTime);
+            Debug.LogError("This API has been deprecated");
         }
 
+        [Obsolete("This API has been deprecated", false)]
         public void DisposeAd () {
-            client.DisposeAd ();
+            Debug.LogError("This API has been deprecated");
         }
 
+        [Obsolete("This API has been deprecated", false)]
         public void IsAutoRefreshAdMob () {
-            client.IsAutoRefreshAdMob ();
+            Debug.LogError("This API has been deprecated");
         }
 
+        [Obsolete("This API has been deprecated", false)]
         public void IsAutoRefreshMoPub () {
-            client.IsAutoRefreshMoPub ();
+            Debug.LogError("This API has been deprecated");
         }
         public string AutoRefreshID () {
             return client.AutoRefreshID ();
         }
 
+        [Obsolete("This API has been deprecated", false)]
         public void CreateFetchManager (bool isSmartBanner = false) {
-            client.CreateFetchManager (isSmartBanner);
+            Debug.LogError("This API has been deprecated");
         }
 
+        [Obsolete("This API has been deprecated", false)]
         public void DestroyFetchManager () {
-            client.DestroyFetchManager ();
+            Debug.LogError("The API has been deprecated");
         }
 
+        [Obsolete("This API has been deprecated", false)]
         public void OnApplicationPause (bool isPaused) {
-            if (isPaused) {
-                if( client.IsAutoRefreshAdMob() ){
-                    client.StopFetchManager();
-                }
-            } else {
-                if( client.IsAutoRefreshAdMob() ){
-                    client.StartFetchManager();
-                }
-            }
+            Debug.LogError("This API has been deprecated");
         }
     }
 }

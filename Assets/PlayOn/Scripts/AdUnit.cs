@@ -44,7 +44,7 @@ public class AdUnit
     [DllImport("__Internal")]
     public static extern bool _playOnIsAdAvailable(IntPtr client);
     [DllImport("__Internal")]
-    public static extern IntPtr _playOnSetListeners(IntPtr client, IntPtr callbackRef, AdListener.PlayOnNoArgsDelegateNative onShow, AdListener.PlayOnNoArgsDelegateNative onClose, AdListener.PlayOnNoArgsDelegateNative onClick, AdListener.PlayOnStateDelegateNative onAvailabilityChange, AdListener.PlayOnFloatDelegateNative onReward, AdListener.PlayOnDataDelegateNative onImpression);
+    public static extern IntPtr _playOnSetListeners(IntPtr client, IntPtr callbackRef, AdListener.PlayOnNoArgsDelegateNative onShow, AdListener.PlayOnNoArgsDelegateNative onClose, AdListener.PlayOnNoArgsDelegateNative onClick, AdListener.PlayOnStateDelegateNative onAvailabilityChange, AdListener.PlayOnFloatDelegateNative onReward, AdListener.PlayOnNoArgsDelegateNative onUserClose, AdListener.PlayOnDataDelegateNative onImpression);
     [DllImport("__Internal")]
     public static extern IntPtr _playOnCreateMutableArray();
     [DllImport("__Internal")]
@@ -96,100 +96,72 @@ public class AdUnit
 
     public class ImpressionData
     {
+        private string placementID = Guid.Empty.ToString();
+        private string sessionID = Guid.Empty.ToString();
+        private PlayOnSDK.AdUnitType adType = PlayOnSDK.AdUnitType.AudioLogoAd;
+        string country = "";
+        double revenue = 0;
+
 #if UNITY_ANDROID && !UNITY_EDITOR
-        AndroidJavaObject client;
-
         public ImpressionData(AndroidJavaObject ptr){
-            client = ptr;
+            placementID = ptr.Call<string>("getPlacementID");
+            sessionID = ptr.Call<string>("getSessionID");
+            AndroidJavaObject enumAdType = ptr.Call<AndroidJavaObject>("getAdType");
+            int typeIndex = enumAdType.Call<int> ("ordinal");
+            adType = (PlayOnSDK.AdUnitType)typeIndex;
+            country = ptr.Call<string>("getCountry");
+            revenue = ptr.Call<double>("getRevenue");
         }
-#elif UNITY_IOS && !UNITY_EDITOR
-        IntPtr client;
 
+#elif UNITY_IOS && !UNITY_EDITOR
         [DllImport("__Internal")]
         public static extern string _playOnImpressionGetPlacementID(IntPtr obj);
-            [DllImport("__Internal")]
+        [DllImport("__Internal")]
         public static extern string _playOnImpressionGetSessionID(IntPtr obj);
-            [DllImport("__Internal")]
+        [DllImport("__Internal")]
         public static extern int _playOnImpressionGetAdType(IntPtr obj);
-            [DllImport("__Internal")]
+        [DllImport("__Internal")]
         public static extern string _playOnImpressionGetCountry(IntPtr obj);
-            [DllImport("__Internal")]
+        [DllImport("__Internal")]
         public static extern double _playOnGetRevenue(IntPtr obj);
 
         public ImpressionData(IntPtr ptr){
-            client = ptr;
+            placementID = _playOnImpressionGetPlacementID(ptr);
+            sessionID = _playOnImpressionGetSessionID(ptr);
+            adType = (PlayOnSDK.AdUnitType)_playOnImpressionGetAdType(ptr);
+            country = _playOnImpressionGetCountry(ptr);
+            revenue = _playOnGetRevenue(ptr);
+            _playOnDestroyBridgeReference(ptr);
         }
 #endif
+
 #if UNITY_EDITOR
-        private PlayOnSDK.AdUnitType adUnitType;
         public ImpressionData(PlayOnSDK.AdUnitType type) {
-            adUnitType = type;
+            adType = type;
         }
 #endif
         public string GetPlacementID(){
-#if UNITY_ANDROID && !UNITY_EDITOR
-            return client.Call<string>("getPlacementID");
-#elif UNITY_IOS && !UNITY_EDITOR
-            return _playOnImpressionGetPlacementID(client);
-#elif UNITY_EDITOR
-            return Guid.Empty.ToString();
-#else
-            return null;
-#endif
+            return placementID;
         }
 
         public string GetSessionID()
         {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            return client.Call<string>("getSessionID");
-#elif UNITY_IOS && !UNITY_EDITOR
-            return _playOnImpressionGetSessionID(client);
-#elif UNITY_EDITOR
-            return Guid.Empty.ToString();
-#else
-            return null;
-#endif
+            return sessionID;
         }
 
         public PlayOnSDK.AdUnitType GetAdType()
         {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            AndroidJavaObject enumAdType = client.Call<AndroidJavaObject>("getAdType");
-            int typeIndex = enumAdType.Call<int> ("ordinal");
-            return (PlayOnSDK.AdUnitType)typeIndex;
-#elif UNITY_IOS && !UNITY_EDITOR
-            return (PlayOnSDK.AdUnitType)_playOnImpressionGetAdType(client);
-#elif UNITY_EDITOR
-            return adUnitType;
-#else
-            return PlayOnSDK.AdUnitType.AudioLogoAd;
-#endif
-
-
+            return adType;
         }
 
         public string GetCountry()
         {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            return client.Call<string>("getCountry");
-#elif UNITY_IOS && !UNITY_EDITOR
-            return _playOnImpressionGetCountry(client);
-#elif UNITY_EDITOR
-            return "None";
-#else
-            return null;
-#endif
+            return country;
         }
 
         public double GetRevenue()
         {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            return client.Call<double>("getRevenue");
-#elif UNITY_IOS && !UNITY_EDITOR
-            return _playOnGetRevenue(client);
-#else
-            return 0;
-#endif
+            return revenue;
         }
     }
 
@@ -231,7 +203,7 @@ public class AdUnit
     protected void SetAdListener()
     {
 #if UNITY_IOS && !UNITY_EDITOR
-        adListener.adNativeListenerRef = _playOnSetListeners(client, (IntPtr)GCHandle.Alloc(adListener), AdListener.OnShowNative, AdListener.OnCloseNative, AdListener.OnClickNative, AdListener.OnAvailabilityChangedNative, AdListener.OnRewardNative, AdListener.OnImpressionNative);
+        adListener.adNativeListenerRef = _playOnSetListeners(client, (IntPtr)GCHandle.Alloc(adListener), AdListener.OnShowNative, AdListener.OnCloseNative, AdListener.OnClickNative, AdListener.OnAvailabilityChangedNative, AdListener.OnRewardNative, AdListener.OnUserCloseNative, AdListener.OnImpressionNative);
 #endif
 
         adListener.OnClose += onClose;

@@ -8,7 +8,7 @@ namespace MondayOFF {
             var cpVidList = AssetDatabase.FindAssets("t:CPVideoList");
 
             if (cpVidList.Length != 1) {
-                Debug.LogError("[CP] There are zero or more than two Objects! " + cpVidList.Length);
+                EverydayLogger.Error("There are zero or more than two Objects! " + cpVidList.Length);
                 return;
             }
 

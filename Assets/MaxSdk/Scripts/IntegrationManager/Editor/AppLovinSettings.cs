@@ -58,6 +58,7 @@ public class AppLovinSettings : ScriptableObject
     [SerializeField] private string sdkKey;
 
     [SerializeField] private bool setAttributionReportEndpoint;
+    [SerializeField] private bool addApsSkAdNetworkIds;
 
     [SerializeField] private bool consentFlowEnabled;
     [SerializeField] private Platform consentFlowPlatform;
@@ -87,6 +88,21 @@ public class AppLovinSettings : ScriptableObject
         {
             if (instance == null)
             {
+                // Check for an existing AppLovinSettings somewhere in the project
+                var guids = AssetDatabase.FindAssets("AppLovinSettings t:ScriptableObject");
+                if (guids.Length > 1)
+                {
+                    MaxSdkLogger.UserWarning("Multiple AppLovinSettings found. This may cause unexpected results.");
+                }
+
+                if (guids.Length != 0)
+                {
+                    var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                    instance = AssetDatabase.LoadAssetAtPath<AppLovinSettings>(path);
+                    return instance;
+                }
+
+                // If there is no existing AppLovinSettings asset, create one in the default location
                 string settingsFilePath;
                 // The settings file should be under the Assets/ folder so that it can be version controlled and cannot be overriden when updating.
                 // If the plugin is outside the Assets folder, create the settings asset at the default location.
@@ -112,11 +128,9 @@ public class AppLovinSettings : ScriptableObject
                     Directory.CreateDirectory(settingsDir);
                 }
 
-                instance = AssetDatabase.LoadAssetAtPath<AppLovinSettings>(settingsFilePath);
-                if (instance != null) return instance;
-
                 instance = CreateInstance<AppLovinSettings>();
                 AssetDatabase.CreateAsset(instance, settingsFilePath);
+                MaxSdkLogger.D("Creating new AppLovinSettings asset at path: " + settingsFilePath);
             }
 
             return instance;
@@ -148,6 +162,15 @@ public class AppLovinSettings : ScriptableObject
     {
         get { return Instance.setAttributionReportEndpoint; }
         set { Instance.setAttributionReportEndpoint = value; }
+    }
+
+    /// <summary>
+    /// Whether or not to add Amazon Publisher Services SKAdNetworkID's.
+    /// </summary>
+    public bool AddApsSkAdNetworkIds
+    {
+        get { return Instance.addApsSkAdNetworkIds; }
+        set { Instance.addApsSkAdNetworkIds = value; }
     }
 
     /// <summary>

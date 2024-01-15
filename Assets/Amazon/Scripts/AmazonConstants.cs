@@ -2,7 +2,7 @@ using System;
 
 public static class AmazonConstants
 {
-    public const string VERSION = "1.5.1";
+    public const string VERSION = "1.6.0";
     public const string RELEASE_NOTES_URL = "https://ams.amazon.com/webpublisher/uam/docs/aps-mobile/resources"; //TODO : add Unity Release Notes link
 
     public const string titleAboutDialog = "About Amazon SDK";
@@ -12,7 +12,7 @@ public static class AmazonConstants
 
     public const string aboutDialogOk = "OK";
 
-    public const string manifestURL = "https://mdtb-sdk-packages.s3-us-west-2.amazonaws.com/Unity/aps_unity.json";
+    public const string manifestURL = "https://mdtb-sdk-packages.s3-us-west-2.amazonaws.com/Unity/aps_unity_alpha.json";
     public const string helpLink = "https://ams.amazon.com/webpublisher/uam/docs/aps-mobile/resources";
     public const string docUrl = "https://ams.amazon.com/webpublisher/uam/docs/aps-mobile";
 

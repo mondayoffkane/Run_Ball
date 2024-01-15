@@ -2,9 +2,13 @@
     "name": "Everyday",
     "rootNamespace": "",
     "references": [
-        "SingularSDK",
         "MaxSdk.Scripts",
-        "Everyday.Ads"
+        "PlayOn",
+        "SingularSDK",
+        "Amazon.Scripts",
+        "Google.Play.Review",
+        "Google.Play.Common",
+        "ChiceCMP"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

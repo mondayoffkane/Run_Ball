@@ -162,10 +162,6 @@ void _addSlotGroup(DTBSlotGroup* slot){
     [[AmazonManager sharedManager] addSlotGroup:slot];
 }
 
-const char* _fetchMoPubKeywords(DTBAdResponse* response){
-    return amazonStringCopy([[AmazonManager sharedManager] fetchMoPubKeywords:response]);
-}
-
 const char* _fetchAmznSlots(DTBAdResponse* response){
     return amazonStringCopy([[AmazonManager sharedManager] fetchAmznSlots:response]);
 }

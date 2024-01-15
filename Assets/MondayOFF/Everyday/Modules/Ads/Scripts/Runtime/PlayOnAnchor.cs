@@ -11,7 +11,7 @@ namespace MondayOFF {
             _rt = GetComponent<RectTransform>();
             _canvas = GetComponentInParent<Canvas>();
             if (_canvas == null) {
-                Debug.LogError("[EVERYDAY] PlayOnAnchor must be a descendant of Canvas!");
+                EverydayLogger.Error("PlayOnAnchor must be a descendant of Canvas!");
             }
         }
 

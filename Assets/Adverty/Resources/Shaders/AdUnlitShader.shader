@@ -81,10 +81,8 @@
             {
                 float2 mainUv = uv;
                 float2 fadeUV = mainUv;
-                #if SHADER_API_VULKAN || SHADER_API_METAL
-                    fadeUV.y = lerp(fadeUV.y, 1.0f - fadeUV.y, _FadeTexUVFactor);
-                    mainUv.y = lerp(mainUv.y, 1.0f - mainUv.y, _MainTexUVFactor);
-                #endif
+                fadeUV.y = lerp(fadeUV.y, 1.0f - fadeUV.y, _FadeTexUVFactor);
+                mainUv.y = lerp(mainUv.y, 1.0f - mainUv.y, _MainTexUVFactor);
 
                 half4 color = lerp(SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, mainUv), SAMPLE_TEXTURE2D(_FadeTexture, sampler_FadeTexture, fadeUV), _TransitionProgress);
                 color = lerp(color, addWatermark(mainUv, color), _WatermarkIsVisible);

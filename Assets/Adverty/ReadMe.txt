@@ -2,7 +2,7 @@
 This tutorial will show you seven easy steps to add our Unity SDK to your project. We will guide you through how to sign up, register an app, import the SDK and place your first ad unit in your app.
 Prerequisites:
 - Installed Unity versions 2019.1 or newer
-- Adverty Unity SDK version 4.1.5
+- Adverty Unity SDK version 4.2.2
 - Some familarity with Unity
 
 

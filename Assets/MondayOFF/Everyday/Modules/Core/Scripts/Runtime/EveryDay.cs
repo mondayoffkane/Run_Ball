@@ -1,89 +1,156 @@
 using UnityEngine;
 
-namespace MondayOFF {
-    public static partial class EveryDay {
-        public const string Version = "3.0.21";
+namespace MondayOFF
+{
+    public static partial class EveryDay
+    {
+        public const string Version = "3.1.1";
 
-        internal static EverydaySettings settings = default;
-        internal static System.Action onEverydayInitialized = default;
-        internal static bool isInitialized = false;
+        public static bool isInitialized => initializationStatus == InitializationStatus.Initialized;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-        private static void AfterAssembliesLoaded() {
-            LoadEverydaySettings();
-            PrepareLogger();
+        internal static System.Action OnEverydayInitialized = default;
+        private static InitializationStatus initializationStatus = InitializationStatus.NotInitialized;
+
+        public static void Initialize()
+        {
+            if (EverydaySettings.Instance.initializeOnLaunch)
+            {
+                EverydayLogger.Warn("initializeOnLaunch is true. Please do not call Initialize() manually.");
+                return;
+            }
+
+            InitializeImpl();
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void AfterSceneLoad() {
-            Debug.Log("[EVERYDAY] Initialize..");
-            EverydayAppTracking.RequestTrackingAuthorization(consented => {
-                Initialize();
-            });
+        private static void AfterSceneLoad()
+        {
+            initializationStatus = InitializationStatus.NotInitialized;
+            if (EverydaySettings.Instance.initializeOnLaunch)
+            {
+                MainThreadDispatcher.Instance.EnqueueCoroutine(InitializeAfterDelay());
+            }
         }
 
-        private static void LoadEverydaySettings() {
-            var assets = Resources.LoadAll<EverydaySettings>("EverydaySettings");
-            if (assets == null || assets.Length <= 0) {
-                Debug.Log("NOT found, search all");
-                assets = Resources.LoadAll<EverydaySettings>("");
-            }
-            if (assets.Length != 1) {
-                Debug.LogError($"[EVERYDAY] Found 0 or multiple {typeof(EverydaySettings).Name}s in Resources folder. There should only be one.");
-            } else {
-                settings = assets[0];
-            }
-            Debug.Assert(settings != null, "NO SETTINGS FOUND");
+        private static System.Collections.IEnumerator InitializeAfterDelay()
+        {
+            yield return new WaitForSeconds(EverydaySettings.Instance.initializationDelay);
+            InitializeImpl();
         }
 
-        private static void Initialize() {
-            if (isInitialized) {
+        private static void InitializeImpl()
+        {
+            if (initializationStatus != InitializationStatus.NotInitialized)
+            {
+                EverydayLogger.Warn("Everyday is already initialized or initializing!");
                 return;
             }
+
+            initializationStatus = InitializationStatus.Initializing;
+
+            // Initialize Max SDK
+            InitializeMaxSdk();
+        }
+
+        private static void InitializeMaxSdk()
+        {
             // MaxSDK
-            Debug.Log("[EVERYDAY] Initializing MaxSDK");
+            EverydayLogger.Info("Initializing MaxSDK");
             MaxSdkCallbacks.OnSdkInitializedEvent -= OnMaxSdkInitialized;
             MaxSdkCallbacks.OnSdkInitializedEvent += OnMaxSdkInitialized;
-            MaxSdk.SetSdkKey("-uBAP4IJbzlOMFq-KJUwdvW8bwGdhtGgmRr9V8T65CUSSIQocwhFqCNP7e2pVITFkJPERuLW5q-X7PJlJ_-7CM");
+
+            MaxSdk.SetSdkKey(Keys.EVERYDAY_MAX_KEY);
             MaxSdk.InitializeSdk();
         }
 
-        private static void OnMaxSdkInitialized(MaxSdk.SdkConfiguration sdkConfiguration) {
-            PrepareSettings(sdkConfiguration);
+        private static void OnMaxSdkInitialized(MaxSdk.SdkConfiguration sdkConfiguration)
+        {
+            // Initialize Facebook SDK
+            InitializeFacebook();
 
-            // Initialize Facebook
+            // Initialize Singular SDK
+            InitializeSingularSDK();
+
+            MainThreadDispatcher.Instance.Enqueue(() =>
+            {
+                // Send Max AdInfo to Singular
+                MaxSdkCallbacks.Interstitial.OnAdRevenuePaidEvent -= SingularAdDataSender.SendAdData;
+                MaxSdkCallbacks.Rewarded.OnAdRevenuePaidEvent -= SingularAdDataSender.SendAdData;
+                MaxSdkCallbacks.Banner.OnAdRevenuePaidEvent -= SingularAdDataSender.SendAdData;
+
+                MaxSdkCallbacks.Interstitial.OnAdRevenuePaidEvent += SingularAdDataSender.SendAdData;
+                MaxSdkCallbacks.Rewarded.OnAdRevenuePaidEvent += SingularAdDataSender.SendAdData;
+                MaxSdkCallbacks.Banner.OnAdRevenuePaidEvent += SingularAdDataSender.SendAdData;
+
+                // Initialize Ads Manager
+                MainThreadDispatcher.Instance.Enqueue(InitializeAdsManager);
+
+                initializationStatus = InitializationStatus.Initialized;
+
+                var initMessage =
+@$"
+================== Everyday {Version} ==================
+    Log Level: {EverydaySettings.Instance.logLevel}
+    Test Mode: {EverydaySettings.Instance.isTestMode}
+========================================================
+";
+                EverydayLogger.Info(initMessage);
+
+                OnEverydayInitialized?.Invoke();
+                OnEverydayInitialized = null;
+            });
+        }
+
+        private static void InitializeFacebook()
+        {
+            EverydayLogger.Info("Initializing Facebook SDK");
             FacebookInitializer.Initialize();
+        }
 
+        private static void InitializeSingularSDK()
+        {
             // Initialize Singular
-            if (SingularSDK.instance == null) {
-                var singularGO = new GameObject("SingularSDKObject", typeof(SingularSDK));
-                GameObject.DontDestroyOnLoad(singularGO);
+            EverydayLogger.Info("Initializing Singular SDK");
+            if (SingularSDK.instance != null)
+            {
+                Object.Destroy(SingularSDK.instance);
+                SingularSDK.instance = null;
             }
+            var singularGO = new GameObject("SingularSDKObject", typeof(SingularSDK));
+            SingularSDK.InitializeSingularSDK(Keys.EVERYDAY_SINGULAR_API_KEY, Keys.EVERYDAY_SINGULAR_SECRET_KEY);
 #if !UNITY_EDITOR
             SingularSDK.SkanRegisterAppForAdNetworkAttribution();
 #endif
+        }
 
-            // Send Max AdInfo to Singular
-            MaxSdkCallbacks.Interstitial.OnAdRevenuePaidEvent -= SingularAdDataSender.SendAdData;
-            MaxSdkCallbacks.Rewarded.OnAdRevenuePaidEvent -= SingularAdDataSender.SendAdData;
-            MaxSdkCallbacks.Banner.OnAdRevenuePaidEvent -= SingularAdDataSender.SendAdData;
-
-            MaxSdkCallbacks.Interstitial.OnAdRevenuePaidEvent += SingularAdDataSender.SendAdData;
-            MaxSdkCallbacks.Rewarded.OnAdRevenuePaidEvent += SingularAdDataSender.SendAdData;
-            MaxSdkCallbacks.Banner.OnAdRevenuePaidEvent += SingularAdDataSender.SendAdData;
-
+        private static void InitializeAdsManager()
+        {
             // Initialize Ads Manager
-            AdsManager.PrepareManager(settings.adSettings);
-            if (settings.adSettings.initializeOnLoad) {
+            AdsManager.PrepareManager();
+            if (EverydaySettings.AdSettings.initializeOnLoad)
+            {
                 AdsManager.Initialize();
             }
-
-            // Initialize Events Manager
-            EventTracker.Initialize();
-
-            isInitialized = true;
-            onEverydayInitialized?.Invoke();
-            onEverydayInitialized = null;
         }
+
+#if UNITY_EDITOR
+        static EveryDay()
+        {
+            Application.quitting -= OnEditorStop;
+            Application.quitting += OnEditorStop;
+        }
+
+        private static void OnEditorStop()
+        {
+            initializationStatus = InitializationStatus.NotInitialized;
+        }
+#endif
+    }
+
+    internal enum InitializationStatus
+    {
+        NotInitialized,
+        Initializing,
+        Initialized
     }
 }

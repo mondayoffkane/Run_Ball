@@ -4,6 +4,7 @@
 #endif
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Everyday.IAP")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Everyday.Events")]
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Everyday.SplashScreen")]
 [assembly: UnityEngine.Scripting.Preserve]

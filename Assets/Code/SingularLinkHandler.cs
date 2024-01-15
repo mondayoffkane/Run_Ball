@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 public interface SingularLinkHandler {
     void OnSingularLinkResolved(SingularLinkParams linkParams);
@@ -10,6 +11,7 @@ public class SingularLinkParams {
     private string _deeplink;
     private string _passthrough;
     private bool _isDeferred;
+    private Dictionary<string, string> _urlParameters;
 
     public SingularLinkParams() {
     }
@@ -42,6 +44,16 @@ public class SingularLinkParams {
         }
         set {
             _isDeferred = value;
+        }
+    }
+
+    [JsonProperty(PropertyName = "url_parameters")]
+    public Dictionary<string, string> UrlParameters {
+        get {
+            return _urlParameters;
+        }
+        set {
+            _urlParameters = value;
         }
     }
 }

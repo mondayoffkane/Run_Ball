@@ -79,12 +79,7 @@ public class EditorAdUnit : MonoBehaviour
     }
 
     private void SetPosition() {
-        float optimalDPI = PlayOnSDK.GetUnityEditorDPI();
-        if (!PlayOnSDK.DPISettedByUser())
-        {
-            optimalDPI = GetOptimalDPI();
-        }
-        
+
         if (_adUnit.type == PlayOnSDK.AdUnitType.AudioRewardedBannerAd || _adUnit.type == PlayOnSDK.AdUnitType.AudioRewardedLogoAd)
         {
             string prefabPath = EditorHelper.GetAssetBasedPath(AD_POPUP_PREFAB_FILENAME);
@@ -98,18 +93,22 @@ public class EditorAdUnit : MonoBehaviour
             _popUp = Instantiate(logoPrefab, Vector3.zero, Quaternion.identity);
             
             if(_adUnit.rewardType == PlayOnSDK.AdUnitRewardType.EndLevel) 
-                _popUp.ShowPopUp(EditorPopUpType.Banner, PlayOnSDK.Position.BottomCenter, 0, 0, optimalDPI);
+                _popUp.ShowPopUp(EditorPopUpType.Banner, PlayOnSDK.Position.BottomCenter, 0, 0);
             else 
-                _popUp.ShowPopUp(EditorPopUpType.Logo, _adUnit.popUpPosition, _adUnit.popUpOffsetX, _adUnit.popUpOffsetX, optimalDPI);
+                _popUp.ShowPopUp(EditorPopUpType.Logo, _adUnit.popUpPosition, _adUnit.popUpOffsetX, _adUnit.popUpOffsetY);
             
             DontDestroyOnLoad(_popUp);
         }
+
+        float deviceScale = PlayOnSDK.GetDeviceScale();
         
         rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.anchorMin = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = new Vector2((_size.x + 0.5f) * (optimalDPI / 160f) / canvas.scaleFactor, (_size.y + 0.5f) * (optimalDPI / 160f) / canvas.scaleFactor);
-        var xPos = (_xOffset * (optimalDPI / 160f)) + 0.5f;
-        var yPos = (_yOffset * (optimalDPI / 160f) + 0.5f);
+        rect.sizeDelta = new Vector2((_size.x + 0.5f) * deviceScale / canvas.scaleFactor, (_size.y + 0.5f) * deviceScale / canvas.scaleFactor);
+        
+        float xPos = _xOffset * deviceScale + 0.5f;
+        float yPos = _yOffset * deviceScale + 0.5f;
+        
         switch (_location)
         {
             case PlayOnSDK.Position.Centered:
@@ -153,28 +152,6 @@ public class EditorAdUnit : MonoBehaviour
                 break;
         }
         rect.position = new Vector3(xPos, yPos, 0);
-    }
-
-    private float GetOptimalDPI() {
-        float result = 0;
-        if (canvas.pixelRect.width >= 1440)
-        {
-            result = 440;
-        }
-        else if (canvas.pixelRect.width >= 1080)
-        {
-            result = 323;
-        }
-        else if (canvas.pixelRect.width >= 720)
-        {
-            result = 252;
-        }
-        else if (canvas.pixelRect.width >= 480)
-        {
-            result = 170;
-        }
-
-        return result;
     }
 }
 #endif

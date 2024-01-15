@@ -86,7 +86,7 @@ public class GameManager : SerializedMonoBehaviour
     public double Mps = 0;
 
     double tempRewardMoney = 0d;
-    double RV_RewardMoney = 0d;
+    [SerializeField] double RV_RewardMoney = 0d;
 
     [SerializeField] double tempAddBall_Price, tempMergeBalls_Price, tempAddPin_Price;
     bool isMerging = false;
@@ -154,8 +154,20 @@ public class GameManager : SerializedMonoBehaviour
 
     void CheckNoAds()
     {
-        bool isOn = isNoAds == 0 ? true : false;
-        Managers._uiGameScene.NoAds_On.gameObject.SetActive(isOn);
+        //bool isOn = isNoAds == 0 ? true : false;
+        //Managers._uiGameScene.NoAds_On.gameObject.SetActive(isOn);
+
+        if (isNoAds == 0)
+        {
+            Managers._uiGameScene.NoAds_On.gameObject.SetActive(true);
+        }
+        else
+        {
+            Managers._uiGameScene.NoAds_On.gameObject.SetActive(false);
+            AdsManager.DisableBanner();
+            AdsManager.DisableInterstitial();
+
+        }
 
     }
 
@@ -207,10 +219,10 @@ public class GameManager : SerializedMonoBehaviour
         {
             MondayOFF.EventTracker.TryStage(_level);
             Managers._uiGameScene.Bonus_Stage_Panel.SetActive(false);
-            if (_level == 1)
-            {
-                StartCoroutine(Cor_Review());
-            }
+            //if (_level == 1)
+            //{
+            //StartCoroutine(Cor_Review());
+            //}
             Managers._uiGameScene.StageText.text = $"Stage {Current_Stage_Level + 1}";
 
             if (Current_Stage != null)
@@ -264,11 +276,12 @@ public class GameManager : SerializedMonoBehaviour
             isBonusReady = true;
 
 
-            IEnumerator Cor_Review()
-            {
-                yield return new WaitForSeconds(1f);
-                CustomReviewManager.instance.StoreReview();
-            }
+            //IEnumerator Cor_Review()
+            //{
+            //    yield return new WaitForSeconds(1f);
+            //    Review.instance.StoreReview();
+            //    Google.Play.Review.ReviewManager.
+            //}
 
 
 
@@ -411,13 +424,13 @@ public class GameManager : SerializedMonoBehaviour
             Managers._uiGameScene.Store_Panel.SetActive(!Managers._uiGameScene.Store_Panel.activeSelf);
         }
 
-        else if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            ES3.DeleteFile();
-            Money = 200;
-            SaveData();
-            SetStage(Current_Stage_Level);
-        }
+        //else if (Input.GetKeyDown(KeyCode.Escape))
+        //{
+        //    ES3.DeleteFile();
+        //    Money = 200;
+        //    SaveData();
+        //    SetStage(Current_Stage_Level);
+        //}
 
         else if (Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -1001,7 +1014,7 @@ public class GameManager : SerializedMonoBehaviour
 
 
         RV_RewardMoney = tempRewardMoney * 50d;
-        Managers._uiGameScene.RV_AddMoney_Button.GetComponentInChildren<Text>().text = $"{ToCurrencyString(RV_RewardMoney)}";
+        Managers._uiGameScene.RV_AddMoney_Button.GetComponentInChildren<Text>().text = $"+{ToCurrencyString(RV_RewardMoney)}$";
 
         CheckButtons();
     }
@@ -1226,7 +1239,7 @@ public class GameManager : SerializedMonoBehaviour
         MoneyUpdate();
     }
 
-    public void RV_AddBall(int _count = 10)
+    public void RV_AddBall(int _count = 15)
     {
         EventTracker.LogCustomEvent("RV", new Dictionary<string, string> { { "Right_RV", "AddBall" } });
         for (int i = 0; i < _count; i++)

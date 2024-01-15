@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dependencies>
     <androidPackages>
-        <androidPackage spec="com.applovin.mediation:hyprmx-adapter:6.0.3.1"/>
+        <androidPackage spec="com.applovin.mediation:hyprmx-adapter:6.2.3.0"/>
     </androidPackages>
     <iosPods>
-        <iosPod name="AppLovinMediationHyprMXAdapter" version="6.0.3.1" />
+        <iosPod name="AppLovinMediationHyprMXAdapter" version="6.3.0.0" />
     </iosPods>
 </dependencies>

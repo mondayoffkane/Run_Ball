@@ -16,7 +16,7 @@ namespace MondayOFF {
                 "Assets/Firebase",
                 "Assets/Parse",
                 "Assets/MondayOFF/ThirdParties/Firebase",
-                "Assets/GeneratedLocalRepo"
+                "Assets/GeneratedLocalRepo",
             };
 
             bool hasDeleted = false;

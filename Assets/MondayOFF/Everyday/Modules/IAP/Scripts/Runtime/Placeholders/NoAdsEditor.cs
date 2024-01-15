@@ -8,16 +8,16 @@ namespace MondayOFF {
         public static readonly string NoAdsProductKey = default;
 
         static NoAds() {
-            // Debug.LogWarning("[EVERYDAY] IAP is not enabled! Please add In-App Purchasing Package to the project.");
+            // EverydayLogger.Warn("IAP is not enabled! Please add In-App Purchasing Package to the project.");
         }
 
         public static IAPStatus Purchase() {
-            Debug.LogWarning("[EVERYDAY] IAP is not enabled! Please add In-App Purchasing Package to the project.");
+            EverydayLogger.Warn("IAP is not enabled! Please add In-App Purchasing Package to the project.");
             return IAPManager.PurchaseProduct(NoAdsProductKey);
         }
 
         internal static void OnPurchase() {
-            Debug.LogWarning("[EVERYDAY] IAP is not enabled! Please add In-App Purchasing Package to the project.");
+            EverydayLogger.Warn("IAP is not enabled! Please add In-App Purchasing Package to the project.");
         }
     }
 }

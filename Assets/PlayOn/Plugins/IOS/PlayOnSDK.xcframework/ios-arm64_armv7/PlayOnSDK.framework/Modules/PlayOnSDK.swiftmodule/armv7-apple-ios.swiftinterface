@@ -17,7 +17,7 @@ import _Concurrency
   @objc public var intersectionIntPercCompletionHandler: ((Swift.Float) -> Swift.Void)?
   @objc public func startObserveFor(view: UIKit.UIView)
   @objc public func endObserve()
-  @objc public func forceCheck()
+  @objc public func forceCheck(overlaidCompletionHandler: (() -> Swift.Void)? = nil, notOverlaidCompletionHandler: (() -> Swift.Void)? = nil)
   @objc override dynamic public init()
   @objc deinit
 }

@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿#if UNITY_EDITOR && UNITY_IOS
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
@@ -12,7 +12,7 @@ public static class FrameworkResolver
 
     public const string DefaultUserTrackingDescriptionEnV0 = "Pressing \\\"Allow\\\" uses device info for more relevant ad content";
     public const string DefaultUserTrackingDescriptionEnV1 = "This only uses device info for less annoying, more relevant ads";
-    
+
     [PostProcessBuild]
     public static void OnPostprocessBuild(BuildTarget buildTarget, string path)
     {

@@ -9,7 +9,7 @@ namespace MondayOFF {
                     FB.Init(OnFBInitialization);
                 } catch (System.Exception e) {
                     Debug.LogException(e);
-                    Debug.LogWarning("[EVERYDAY] Failed to initialize Facebook SDK");
+                    EverydayLogger.Warn("Failed to initialize Facebook SDK");
                 }
             } else {
                 FB.ActivateApp();
@@ -20,7 +20,7 @@ namespace MondayOFF {
             if (FB.IsInitialized) {
                 FB.ActivateApp();
             } else {
-                Debug.LogWarning("[EVERYDAY] Failed to Initialize the Facebook SDK");
+                EverydayLogger.Warn("Failed to Initialize the Facebook SDK");
             }
         }
     }

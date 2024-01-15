@@ -7,6 +7,7 @@
 - (void)onClick;
 - (void)onReward:(float)amount;
 @optional
+- (void)onUserClose;
 - (void)onImpression:(POImpressionData *)impressionData;
 @end
 

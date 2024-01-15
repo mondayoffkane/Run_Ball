@@ -14,6 +14,7 @@ typedef void (*PlayOnDataDelegateNative) (POTypeCallbackClientRef* callback, CFT
     PlayOnNoArgsDelegateNative _onClickCallback;
     PlayOnStateDelegateNative _onAvailabilityChangedCallback;
     PlayOnFloatDelegateNative _onRewardCallback;
+    PlayOnNoArgsDelegateNative _onUserCloseCallback;
     PlayOnDataDelegateNative _onImpressionCallback;
     
     POTypeCallbackClientRef* _clientRef;
@@ -21,7 +22,14 @@ typedef void (*PlayOnDataDelegateNative) (POTypeCallbackClientRef* callback, CFT
 }
 
     
--(instancetype) initWithListeners:(POTypeCallbackClientRef* )client onShow:(PlayOnNoArgsDelegateNative)onShowRef onClose:(PlayOnNoArgsDelegateNative)onCloseRef onClick:(PlayOnNoArgsDelegateNative)onClickRef onAvailabilityChange:(PlayOnStateDelegateNative)onAvailabilityChangeRef onReward:(PlayOnFloatDelegateNative)onRewardRef onImpression:(PlayOnDataDelegateNative)onImpressionRef;
+-(instancetype) initWithListeners:(POTypeCallbackClientRef* )client
+    onShow:(PlayOnNoArgsDelegateNative)onShowRef
+    onClose:(PlayOnNoArgsDelegateNative)onCloseRef
+    onClick:(PlayOnNoArgsDelegateNative)onClickRef
+    onAvailabilityChange:(PlayOnStateDelegateNative)onAvailabilityChangeRef
+    onReward:(PlayOnFloatDelegateNative)onRewardRef
+    onUserClose:(PlayOnNoArgsDelegateNative)onUserCloseRef
+    onImpression:(PlayOnDataDelegateNative)onImpressionRef;
 
 - (void)onAvailabilityChanged:(BOOL)flag;
 
@@ -32,6 +40,8 @@ typedef void (*PlayOnDataDelegateNative) (POTypeCallbackClientRef* callback, CFT
 - (void)onReward:(float)amount;
 
 - (void)onShow;
+
+- (void)onUserClose;
 
 - (void)onImpression:(POImpressionData *)impressionData;
 

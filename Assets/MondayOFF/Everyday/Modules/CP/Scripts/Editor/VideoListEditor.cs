@@ -25,6 +25,9 @@ namespace MondayOFF {
         }
 
         private void DrawListElement(Rect rect, int index, bool isActive, bool isFocused) {
+            if (index >= _property.arraySize) {
+                return;
+            }
             var item = _property.GetArrayElementAtIndex(index);
             EditorGUI.PropertyField(rect, item);
         }
@@ -59,7 +62,7 @@ namespace MondayOFF {
             _list.DoLayoutList();
 
             serializedObject.ApplyModifiedProperties();
-            if(GUI.changed) {
+            if (GUI.changed) {
                 EditorUtility.SetDirty(target);
             }
         }

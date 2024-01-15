@@ -12,38 +12,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0da90100806d46409dc5f2bb6272482, type: 3}
   m_Name: EverydaySettings
   m_EditorClassIdentifier: 
-  verboseLogging: 1
+  initializeOnLaunch: 1
+  initializationDelay: 1.5
+  logLevel: 3
+  isTestMode: 0
   adSettings:
     initializeOnLoad: 1
     showBannerOnLoad: 1
     adInitializationOrder: 84
-    delay: 2
+    adInitializationDelay: 2
     interstitialInterval: 60
     resetTimerOnRewarded: 1
     bannerPosition: 7
-    iOS_IS_AdUnitID: a912781846dd87da
-    iOS_RV_AdUnitID: c2b7bb4fea1d21d5
-    iOS_BN_AdUnitID: 2e01660fb1f6e2d3
-    iOS_APS_AppID: 40bc8abe-b831-4a97-b420-f14d7dc24a9c
-    iOS_APS_IS_SlotID: c964680d-cdcc-4c58-822c-9dac4b7d3dd3
-    iOS_APS_RV_SlotID: 01ca5bcb-4bb0-405d-9158-7501af8f3261
-    iOS_APS_BN_SlotID: 2876914d-ecaf-4fa7-8aa7-a31a396ec9c6
     AOS_IS_AdUnitID: c58aeed5ae3c209d
     AOS_RV_AdUnitID: df7e799fd84abdc0
     AOS_BN_AdUnitID: fd4865a87d297ebe
+    AOS_IS_Backup_AdUnitID: 
+    AOS_RV_Backup_AdUnitID: 
+    AOS_BN_Backup_AdUnitID: 
     AOS_APS_AppID: e4eef956-5b1d-40a1-aa64-deff161b5cef
     AOS_APS_IS_SlotID: 69a8a757-8772-471e-b18a-90921bd1af2c
     AOS_APS_RV_SlotID: af8f8100-1459-41ec-87c0-55159ae3bb1c
     AOS_APS_BN_SlotID: df1f6dbc-f261-49c2-a0b5-5effdb4aae93
-    playOnAPIKey_Android: 3bfc9acd-1a18-4d75-91c8-b77b666c2df6
-    playOnAPIKey_iOS: 4795582d-a012-4a9b-a74b-67cb3000beea
-    storeID: 6446715757
-    playPlayonEveryNthInterstitial: 1
+    AOS_PlayOnApiKey: 3bfc9acd-1a18-4d75-91c8-b77b666c2df6
+    AOS_AdvertyApiKey: NWVlNTA2ZTMtZWUxOS00NTNhLWFkNGQtYWFmNzdkNTI2ZTA4JGh0dHBzOi8vYWRzZXJ2ZXIuYWR2ZXJ0eS5jb20=
+    iOS_IS_AdUnitID: a912781846dd87da
+    iOS_RV_AdUnitID: c2b7bb4fea1d21d5
+    iOS_BN_AdUnitID: 2e01660fb1f6e2d3
+    iOS_IS_Backup_AdUnitID: 
+    iOS_RV_Backup_AdUnitID: 
+    iOS_BN_Backup_AdUnitID: 
+    iOS_APS_AppID: 40bc8abe-b831-4a97-b420-f14d7dc24a9c
+    iOS_APS_IS_SlotID: c964680d-cdcc-4c58-822c-9dac4b7d3dd3
+    iOS_APS_RV_SlotID: 01ca5bcb-4bb0-405d-9158-7501af8f3261
+    iOS_APS_BN_SlotID: 2876914d-ecaf-4fa7-8aa7-a31a396ec9c6
+    iOS_PlayOnApiKey: 4795582d-a012-4a9b-a74b-67cb3000beea
+    iOS_storeID: 6446715757
+    iOS_AdvertyApiKey: YTU5YmE4NWQtODA1YS00M2U2LTg5NGYtNTE0NWVmMTZhNmJlJGh0dHBzOi8vYWRzZXJ2ZXIuYWR2ZXJ0eS5jb20=
+    showPlayOnAfterInterstitial: 1
+    playOnInterstitialCount: 2
     playOnPosition:
-      useScreenPositioning: 1
-      playOnLogoAnchor: 3
+      useScreenPositioning: 0
+      playOnLogoAnchor: 0
       playOnLogoOffset: {x: 0, y: 150}
       playOnLogoSize: 64
     initializeAdvertyOnAwake: 1
-    advertyApiKey_Android: NWVlNTA2ZTMtZWUxOS00NTNhLWFkNGQtYWFmNzdkNTI2ZTA4JGh0dHBzOi8vYWRzZXJ2ZXIuYWR2ZXJ0eS5jb20=
-    advertyApiKey_iOS: YTU5YmE4NWQtODA1YS00M2U2LTg5NGYtNTE0NWVmMTZhNmJlJGh0dHBzOi8vYWRzZXJ2ZXIuYWR2ZXJ0eS5jb20=
+  gameId: 
+  companyLogo: {fileID: 0}
+  gameSceneName: Game 2

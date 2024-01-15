@@ -10,13 +10,11 @@ public class EditorPopUp : MonoBehaviour
     private int _yOffset;
     private PlayOnSDK.Position _location;
     private Vector2 _size;
-    private float _dpi;
-    public void ShowPopUp ( EditorPopUpType type, PlayOnSDK.Position location, int xOffset, int yOffset, float optimalDPI) {
+    public void ShowPopUp ( EditorPopUpType type, PlayOnSDK.Position location, int xOffset, int yOffset) {
         _type = type;
         _location = location;
         _xOffset = xOffset;
         _yOffset = yOffset;
-        _dpi = optimalDPI;
         if (type == EditorPopUpType.Banner)
             _size = new Vector2(320, 50);
         else
@@ -26,11 +24,16 @@ public class EditorPopUp : MonoBehaviour
     
     private void SetPosition ()
     {
+        float deviceScale = PlayOnSDK.GetDeviceScale();
+        
         rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.anchorMin = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = new Vector2((_size.x + 0.5f) * (_dpi / 160f) / canvas.scaleFactor, (_size.y + 0.5f) * (_dpi / 160f) / canvas.scaleFactor);
-        var xPos = (_xOffset * (_dpi / 160f)) + 0.5f;
-        var yPos = (_yOffset * (_dpi / 160f) + 0.5f);
+        rect.sizeDelta = new Vector2((_size.x + 0.5f) * deviceScale / canvas.scaleFactor, (_size.y + 0.5f) * deviceScale / canvas.scaleFactor);
+        
+       
+        var xPos = _xOffset * deviceScale + 0.5f;
+        var yPos = _yOffset * deviceScale + 0.5f;
+        
         switch (_location)
         {
             case PlayOnSDK.Position.Centered:

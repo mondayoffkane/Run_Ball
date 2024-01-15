@@ -111,8 +111,24 @@ void _playOnSetLogo(POAdUnit* ad, int position, int xOffset, int yOffset, int si
     [ad setLogoWithPosition:position xOffset:xOffset yOffset:yOffset withSize:size];
 }
 
-PlayOnAdListener* _playOnSetListeners(POAdUnit* ad, POTypeCallbackClientRef * adListener, PlayOnNoArgsDelegateNative onShow, PlayOnNoArgsDelegateNative onClose, PlayOnNoArgsDelegateNative onClick, PlayOnStateDelegateNative onAvailabilityChange, PlayOnFloatDelegateNative onReward, PlayOnDataDelegateNative onImpression){
-    PlayOnAdListener* newDelegate = [[PlayOnAdListener alloc] initWithListeners:adListener onShow:onShow onClose:onClose onClick:onClick onAvailabilityChange:onAvailabilityChange onReward:onReward onImpression:onImpression];
+PlayOnAdListener* _playOnSetListeners(POAdUnit* ad,
+    POTypeCallbackClientRef * adListener,
+    PlayOnNoArgsDelegateNative onShow,
+    PlayOnNoArgsDelegateNative onClose,
+    PlayOnNoArgsDelegateNative onClick,
+    PlayOnStateDelegateNative onAvailabilityChange,
+    PlayOnFloatDelegateNative onReward,
+    PlayOnNoArgsDelegateNative onUserClose,
+    PlayOnDataDelegateNative onImpression){
+    
+    PlayOnAdListener* newDelegate = [[PlayOnAdListener alloc] initWithListeners:adListener
+        onShow:onShow
+        onClose:onClose
+        onClick:onClick
+        onAvailabilityChange:onAvailabilityChange
+        onReward:onReward
+        onUserClose:onUserClose
+        onImpression:onImpression];
     CFBridgingRetain(newDelegate);
     [ad setDelegate:newDelegate];
     return newDelegate;
@@ -221,7 +237,7 @@ const char* _playOnImpressionGetSessionID(POImpressionData *data){
 }
  
 int _playOnImpressionGetAdType(POImpressionData *data){
-    return plsyOnStringCopy(data.adUnit);
+    return data.adUnit;
 }
  
 const char* _playOnImpressionGetCountry(POImpressionData *data){

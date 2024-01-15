@@ -7,12 +7,12 @@ namespace Adverty.PlatformSpecific
     public class OsxUtils : IOsxNativeUtils
     {
 #if UNITY_EDITOR_OSX || (!UNITY_EDITOR && UNITY_STANDALONE_OSX)
-        [DllImport("utils", CharSet = CharSet.Unicode)]
-        private static extern string _Utils_GetSystemLocale();
+        [DllImport("AdvertyOSXPlugin")]
+        private static extern string GetLocale();
 
         public string GetSystemLocale()
         {
-            return _Utils_GetSystemLocale();
+            return GetLocale();
         }
 #else
         public string GetSystemLocale()

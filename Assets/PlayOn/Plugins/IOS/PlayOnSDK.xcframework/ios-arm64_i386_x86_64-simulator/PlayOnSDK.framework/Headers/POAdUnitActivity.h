@@ -38,4 +38,5 @@
 - (void)onResume;
 - (void)pauseAd;
 - (void)resumeAd;
+- (BOOL)isExpired;
 @end

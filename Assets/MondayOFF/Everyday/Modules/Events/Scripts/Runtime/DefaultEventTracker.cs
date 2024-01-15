@@ -2,21 +2,27 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace MondayOFF {
-    public static class EventTracker {
+namespace MondayOFF
+{
+    public static class EventTracker
+    {
         private static bool _isInitialized = false;
 
-        public static void TryStage(int stageNum, string stageName = "Stage") {
-            if (!_isInitialized) {
-                Debug.Log("[EVERYDAY] Event Tracker is NOT initialized!");
+        public static void TryStage(int stageNum, string stageName = "Stage")
+        {
+            if (!_isInitialized)
+            {
+                EverydayLogger.Info("Event Tracker is NOT initialized!");
                 return;
             }
-            Debug.Log($"[EVERYDAY] Default Event Tracker: Trying {stageName} {stageNum}");
+            EverydayLogger.Info($"Default Event Tracker: Trying {stageName} {stageNum}");
         }
 
-        public static void ClearStage(int stageNum, string stageName = "Stage") {
+        public static void ClearStage(int stageNum, string stageName = "Stage")
+        {
             // Send event regardless of initialization status
-            switch (stageNum) {
+            switch (stageNum)
+            {
                 case 10:
                 case 20:
                 case 30:
@@ -24,39 +30,60 @@ namespace MondayOFF {
                     break;
             }
 
-            if (!_isInitialized) {
-                Debug.Log("[EVERYDAY] Event Tracker is NOT initialized!");
+            if (!_isInitialized)
+            {
+                EverydayLogger.Info("Event Tracker is NOT initialized!");
                 return;
             }
 
-            Debug.Log($"[EVERYDAY] Default Event Tracker: Cleared {stageName} {stageNum}");
+            EverydayLogger.Info($"Default Event Tracker: Cleared {stageName} {stageNum}");
         }
 
         // Stringify prameter values
-        public static void LogCustomEvent(string eventName, Dictionary<string, string> parameters = null) {
-            if (!_isInitialized) {
-                Debug.Log("[EVERYDAY] Event Tracker is NOT initialized!");
+        public static void LogCustomEvent(string eventName, Dictionary<string, string> parameters = null)
+        {
+            if (!_isInitialized)
+            {
+                EverydayLogger.Info("Event Tracker is NOT initialized!");
                 return;
             }
 
-            if (parameters == null) {
-                Debug.Log($"[EVERYDAY] Default Event Tracker: {eventName} logged without any parameters");
-            } else {
+            if (parameters == null)
+            {
+                EverydayLogger.Info($"Default Event Tracker: {eventName} logged without any parameters");
+            }
+            else
+            {
                 string paramString = "\n";
-                foreach (var item in parameters) {
+                foreach (var item in parameters)
+                {
                     paramString += $"{item.Key} : {item.Value}\n";
                 }
 
-                Debug.Log($"[EVERYDAY] Default Event Tracker: {eventName} logged with parameters: {paramString}");
+                EverydayLogger.Info($"Default Event Tracker: {eventName} logged with parameters: {paramString}");
             }
         }
 
-        internal static void Initialize() {
-            if (_isInitialized) {
-                Debug.Log("[EVERYDAY] Event Tracker is already initialized!");
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void AfterSceneLoad()
+        {
+            Initialize();
+        }
+
+        internal static void Initialize()
+        {
+            if (!EveryDay.isInitialized)
+            {
+                EveryDay.OnEverydayInitialized += Initialize;
                 return;
             }
-            Debug.Log("[EVERYDAY] Initialize Event Tracker");
+
+            if (_isInitialized)
+            {
+                EverydayLogger.Info("Event Tracker is already initialized!");
+                return;
+            }
+            EverydayLogger.Info("Initialize Event Tracker");
             _isInitialized = true;
 #if UNITY_EDITOR
             Application.quitting -= OnEditorStop;
@@ -65,8 +92,9 @@ namespace MondayOFF {
         }
 
 #if UNITY_EDITOR
-        private static void OnEditorStop() {
-            Debug.Log("[EVERYDAY] Stop Playmode Event Tracker");
+        private static void OnEditorStop()
+        {
+            EverydayLogger.Info("Stop Playmode Event Tracker");
             _isInitialized = false;
         }
 #endif

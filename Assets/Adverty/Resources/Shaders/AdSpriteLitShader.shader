@@ -1,4 +1,4 @@
-﻿Shader "Adverty/AdSpriteLitShader"
+Shader "Adverty/AdSpriteLitShader"
 {
     Properties
     {
@@ -67,10 +67,8 @@
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
                 float2 fadeUV = input.uv.xy;
-                #if defined(SHADER_API_METAL) || defined(SHADER_API_VULKAN)
-                    fadeUV.y = lerp(fadeUV.y, 1.0f - fadeUV.y, _FadeTexUVFactor);
-                    input.uv.y = lerp(input.uv.y, 1.0f - input.uv.y, _MainTexUVFactor);
-                #endif
+                fadeUV.y = lerp(fadeUV.y, 1.0f - fadeUV.y, _FadeTexUVFactor);
+                input.uv.y = lerp(input.uv.y, 1.0f - input.uv.y, _MainTexUVFactor);
                 
                 half3 normal = half3(1.0f, 1.0f, 1.0f);
                 half4 specular = half4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -85,7 +83,7 @@
                 
                 //Uncomment to use with URP 12.1.7 (Unity 2021.3.0+)
                 //bool backFace = !(dot(inputData.normalWS, inputData.viewDirectionWS) > 0);
-                bool backFace = !(dot(input.normal, input.viewDir) > 0);
+                bool backFace = !(dot(inputData.normalWS, inputData.viewDirectionWS) > 0);
 
                 mainUV.x = lerp(mainUV.x, 1.0f - mainUV.x, backFace);
                 fadeUV.x = lerp(fadeUV.x, 1.0f - fadeUV.x, backFace);
@@ -95,7 +93,7 @@
                 
                 //Uncomment to use with URP 12.1.7 (Unity 2021.3.0+)
                 //half4 color = UniversalFragmentBlinnPhong(inputData, diffuseColor, specular, smoothness, emission, alpha, normal);
-                half4 color = UniversalFragmentBlinnPhong(inputData, diffuseColor, specular, smoothness, emission, alpha);
+                half4 color = UniversalFragmentBlinnPhong(inputData, diffuseColor, specular, smoothness, emission, alpha, normal);
                 
                 color.rgb = MixFog(color.rgb, inputData.fogCoord);
                 return lerp(color, addWatermark(mainUV, color), _WatermarkIsVisible);

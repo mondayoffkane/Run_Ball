@@ -272,7 +272,7 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) OverlayServi
 @property (nonatomic, copy) void (^ _Nullable intersectionIntPercCompletionHandler)(float);
 - (void)startObserveForView:(UIView * _Nonnull)view;
 - (void)endObserve;
-- (void)forceCheck;
+- (void)forceCheckWithOverlaidCompletionHandler:(void (^ _Nullable)(void))overlaidCompletionHandler notOverlaidCompletionHandler:(void (^ _Nullable)(void))notOverlaidCompletionHandler;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
@@ -584,7 +584,7 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) OverlayServi
 @property (nonatomic, copy) void (^ _Nullable intersectionIntPercCompletionHandler)(float);
 - (void)startObserveForView:(UIView * _Nonnull)view;
 - (void)endObserve;
-- (void)forceCheck;
+- (void)forceCheckWithOverlaidCompletionHandler:(void (^ _Nullable)(void))overlaidCompletionHandler notOverlaidCompletionHandler:(void (^ _Nullable)(void))notOverlaidCompletionHandler;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
@@ -896,7 +896,7 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) OverlayServi
 @property (nonatomic, copy) void (^ _Nullable intersectionIntPercCompletionHandler)(float);
 - (void)startObserveForView:(UIView * _Nonnull)view;
 - (void)endObserve;
-- (void)forceCheck;
+- (void)forceCheckWithOverlaidCompletionHandler:(void (^ _Nullable)(void))overlaidCompletionHandler notOverlaidCompletionHandler:(void (^ _Nullable)(void))notOverlaidCompletionHandler;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 

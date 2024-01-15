@@ -7,3 +7,6 @@
 # Adverty
 -keep class com.unity3d.player.**{ *; }
 -keep class com.adverty.**{ *; }
+# Firebase
+-keep public class com.google.firebase.analytics.FirebaseAnalytics { public *; }
+-keep public class com.google.android.gms.measurement.AppMeasurement { public *; }

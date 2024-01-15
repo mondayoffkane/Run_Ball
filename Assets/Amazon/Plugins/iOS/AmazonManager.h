@@ -46,7 +46,6 @@
 -(DTBSlotGroup*)createSlotGroup:(NSString*)slotGroupName;
 -(void)addSlot:(DTBSlotGroup*)slot size:(DTBAdSize*)size;
 -(void)addSlotGroup:(DTBSlotGroup*)group;
--(NSString*)fetchMoPubKeywords:(DTBAdResponse*)response;
 -(NSString*)fetchAmznSlots:(DTBAdResponse*)response;
 -(int)fetchAdWidth:(DTBAdResponse*)response;
 -(int)fetchAdHeight:(DTBAdResponse*)response;

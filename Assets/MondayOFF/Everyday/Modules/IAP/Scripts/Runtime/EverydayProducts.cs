@@ -37,7 +37,7 @@ namespace MondayOFF {
             if (isRegistered) {
                 _onPurchase.Invoke();
             } else {
-                Debug.Log($"[EVERYDAY] Purchase was completed but {productID} does not have reward set! Make sure this is the intended behaviour.");
+                EverydayLogger.Info($"Purchase was completed but {productID} does not have reward set! Make sure this is the intended behaviour.");
                 _purchaseCount++;
             }
         }

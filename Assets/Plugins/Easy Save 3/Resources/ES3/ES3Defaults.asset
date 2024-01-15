@@ -32,20 +32,21 @@ MonoBehaviour:
     assemblyNames:
     - ACTk.Editor
     - ACTk.Runtime
+    - Adverty.PlatformSpecific.Editor
     - AdvertyPlatformSpecific
     - Amazon.Editor
     - Amazon.Scripts
     - Assembly-CSharp
     - Assembly-CSharp-firstpass
-    - Cinemachine
     - CodeStage.Maintainer.Editor
     - Everyday
-    - Everyday.Ads
-    - Everyday.Ads.Editor
     - Everyday.Editor
+    - Everyday.Events
+    - Everyday.Events.Editor
     - Everyday.IAP
     - Everyday.IAP.Editor
-    - Google.Android.AppBundle.Editor
+    - Everyday.SplashScreen
+    - Everyday.SplashScreen.Editor
     - Google.Play.Common
     - Google.Play.Core
     - Google.Play.Review

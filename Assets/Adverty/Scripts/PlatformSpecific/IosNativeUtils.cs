@@ -22,6 +22,12 @@ namespace Adverty.PlatformSpecific
 
         [DllImport(LIBRARY_NAME)]
         private static extern NativeIABData AdvertyRequestIABData();
+
+        [DllImport(LIBRARY_NAME)]
+        private static extern void AdvertyCreateUILoopHandler(int operationsPerCall);
+
+        [DllImport(LIBRARY_NAME)]
+        private static extern void AdvertyDestroyUILoopHandler();
 #endif
 
         public string GetSystemLocale()
@@ -60,6 +66,19 @@ namespace Adverty.PlatformSpecific
             return AdvertyRequestIABData();
 #else
             return new NativeIABData();
+#endif
+        }
+
+        public void CreateUILoopHandler(int operationsPerCall)
+        {
+#if !UNITY_EDITOR && UNITY_IOS
+            AdvertyCreateUILoopHandler(operationsPerCall);
+#endif
+        }
+        public void DestroyUILoopHandler()
+        {
+#if !UNITY_EDITOR && UNITY_IOS
+            AdvertyDestroyUILoopHandler();
 #endif
         }
     }

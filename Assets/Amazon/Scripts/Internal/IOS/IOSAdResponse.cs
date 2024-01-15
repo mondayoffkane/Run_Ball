@@ -22,10 +22,6 @@ namespace AmazonAds.IOS {
             return Externs._fetchAdWidth(resp);
         }
 
-        public override string GetMoPubKeywords () {
-            return Externs._fetchMoPubKeywords(resp);
-        }
-
         public override IntPtr GetIosResponseObject()
         {
             return resp;
@@ -87,6 +83,11 @@ namespace AmazonAds.IOS {
 
         internal override void SetAdLoader(AdRequest adRequest) {
             adLoader = adRequest;
+        }
+
+        public override string GetMoPubKeywords()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -2,11 +2,13 @@ using UnityEngine;
 
 namespace MondayOFF {
     internal sealed class Rewarded : FullscreenAdType {
-        private string _adUnitID => _settings.rewardedAdUnitId;
+        internal static event System.Action OnBeforeShow = default;
+        internal static event System.Action OnAfterShow = default;
+        private string _adUnitID => EverydaySettings.AdSettings.rewardedAdUnitId;
         private System.Action _onRewarded = default;
 
         public override void Dispose() {
-            Debug.Log("[EVERYDAY] Disposing Rewarded Ad");
+            EverydayLogger.Info("Disposing Rewarded Ad");
 
             MaxSdkCallbacks.Rewarded.OnAdLoadedEvent -= OnAdLoadedEvent;
             MaxSdkCallbacks.Rewarded.OnAdLoadFailedEvent -= OnAdLoadFailedEvent;
@@ -26,19 +28,19 @@ namespace MondayOFF {
 
         internal override bool Show() {
             if (IsReady()) {
-                CallOnBeforeShow();
-                Debug.Log("[EVERYDAY] Show Rewarded");
+                OnBeforeShow?.Invoke();
+                EverydayLogger.Info("Show Rewarded");
                 MaxSdk.ShowRewardedAd(_adUnitID);
                 return true;
             }
-            Debug.Log("[EVERYDAY] Rewarded ad is not loaded yet");
+            EverydayLogger.Info("Rewarded ad is not loaded yet");
 
             LoadRewardedAd();
             return false;
         }
 
-        internal Rewarded(in AdSettings settings) : base(settings) {
-            Debug.Log("[EVERYDAY] Createing Rewarded Ad");
+        internal Rewarded() {
+            EverydayLogger.Info("Createing Rewarded Ad");
 
             // Attach callback
             MaxSdkCallbacks.Rewarded.OnAdLoadedEvent += OnAdLoadedEvent;
@@ -48,7 +50,7 @@ namespace MondayOFF {
             MaxSdkCallbacks.Rewarded.OnAdHiddenEvent += OnAdHiddenEvent;
             MaxSdkCallbacks.Rewarded.OnAdReceivedRewardEvent += OnAdReceivedRewardEvent;
 
-            if (_settings.HasAPSKey(AdType.Rewarded)) {
+            if (EverydaySettings.AdSettings.HasAPSKey(AdType.Rewarded)) {
                 LoadAPSRewarded();
             } else {
                 LoadRewardedAd();
@@ -56,14 +58,14 @@ namespace MondayOFF {
         }
 
         private void LoadAPSRewarded() {
-            Debug.Log("[EVERYDAY] Loading APS Rewarded Ad");
-            var rewardedVideoAd = new AmazonAds.APSVideoAdRequest(320, 480, _settings.apsRewardedSlotId);
+            EverydayLogger.Info("Loading APS Rewarded Ad");
+            var rewardedVideoAd = new AmazonAds.APSVideoAdRequest(320, 480, EverydaySettings.AdSettings.apsRewardedSlotId);
             rewardedVideoAd.onSuccess += (adResponse) => {
-                MaxSdk.SetRewardedAdLocalExtraParameter(_settings.rewardedAdUnitId, "amazon_ad_response", adResponse.GetResponse());
+                MaxSdk.SetRewardedAdLocalExtraParameter(EverydaySettings.AdSettings.rewardedAdUnitId, "amazon_ad_response", adResponse.GetResponse());
                 LoadRewardedAd();
             };
             rewardedVideoAd.onFailedWithError += (adError) => {
-                MaxSdk.SetRewardedAdLocalExtraParameter(_settings.rewardedAdUnitId, "amazon_ad_error", adError.GetAdError());
+                MaxSdk.SetRewardedAdLocalExtraParameter(EverydaySettings.AdSettings.rewardedAdUnitId, "amazon_ad_error", adError.GetAdError());
                 LoadRewardedAd();
             };
 
@@ -91,11 +93,12 @@ namespace MondayOFF {
             // Rewarded ad failed to load. We recommend retrying with exponentially higher delays.
             _retryAttempt = Mathf.Min(_retryAttempt + 1, MaxRetryCount);
             int retryDelay = _retryAttempt * RetryInterval;
+
             TryLoadingAfterDelay(System.TimeSpan.FromSeconds(retryDelay));
         }
 
         private void OnAdDisplayFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo errorInfo, MaxSdkBase.AdInfo adInfo) {
-            CallOnAfterShow();
+            OnAfterShow?.Invoke();
             // Rewarded ad failed to display. We recommend loading the next ad
             LoadRewardedAd();
         }
@@ -105,7 +108,7 @@ namespace MondayOFF {
         }
 
         private void OnAdHiddenEvent(string adUnitId, MaxSdkBase.AdInfo adInfo) {
-            CallOnAfterShow();
+            OnAfterShow?.Invoke();
             // Rewarded ad is hidden. Pre-load the next ad
             LoadRewardedAd();
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
-using UnityEngine.ProBuilder.MeshOperations;
+//using UnityEngine.ProBuilder.MeshOperations;
 
 public class Pin : MonoBehaviour
 {
@@ -48,7 +48,7 @@ public class Pin : MonoBehaviour
 
     private void Awake()
     {
-        
+
         _clip = Resources.Load<AudioClip>("Sound/Ball_1");
         if (Handle == null)
             Handle = transform.GetChild(1).gameObject;
@@ -97,7 +97,7 @@ public class Pin : MonoBehaviour
 
 
         Mesh _mesh = Meshes[((int)pinType) * 3 + Random.Range(0, 3)];
-    
+
         ChildObj.GetComponent<MeshFilter>().sharedMesh = _mesh;
         _meshCollider.sharedMesh = _mesh;
         _meshCollider.convex = true;
@@ -110,7 +110,7 @@ public class Pin : MonoBehaviour
         if (collision.transform.CompareTag("Ball"))
         {
             Ball _ball = collision.transform.GetComponent<Ball>();
-           
+
             Managers.Game.FloatingTextFunc(_ball.Price, transform);
 
             Managers.Game.Vibe();
@@ -125,7 +125,7 @@ public class Pin : MonoBehaviour
             {
 
                 case PinType.Cannon:
-                   
+
                     collision.transform.position = transform.position + transform.up;
                     collision.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     collision.transform.GetComponent<Rigidbody>().AddForce(transform.up * ShootPower);
@@ -141,7 +141,7 @@ public class Pin : MonoBehaviour
 
 
                 default:
-                   
+
 
                     break;
             }

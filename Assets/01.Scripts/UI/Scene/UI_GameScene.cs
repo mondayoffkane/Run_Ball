@@ -209,8 +209,10 @@ public class UI_GameScene : UI_Scene
         });
         MondayOFF.NoAds.OnNoAds += () =>
         {
-            PlayerPrefs.SetInt("isNoAds", 1);
+
             Managers.Game.isNoAds = 1;
+            PlayerPrefs.SetInt("isNoAds", Managers.Game.isNoAds);
+
             NoAds_Panel.SetActive(false);
             NoAds_On.gameObject.SetActive(false);
 

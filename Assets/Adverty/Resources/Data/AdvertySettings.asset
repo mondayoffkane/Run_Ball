@@ -14,11 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enableLogs: 1
   platform: 0
-  apiKey: 
-  hostUrl: 
-  isLazyLoadAllowed: 1
+  androidKeyData:
+    APIKey: 
+    HostUrl: 
+    ApplicationKey: 
+  iosKeyData:
+    APIKey: 
+    HostUrl: 
+    ApplicationKey: 
+  generalKeyData:
+    APIKey: 
+    HostUrl: 
+    ApplicationKey: 
   clickHandling: 0
   sandboxMode: 0
   renderPipelineType: 
   renderPipelineVersion: 
   advertyLogLevel: 6
+  reloadDomainEnabled: 0
